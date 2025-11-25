@@ -1,0 +1,40 @@
+.filter_fodiv{
+  display: flex;           
+  flex-direction: column;   
+  font-family: serif;
+  padding: 15px;
+  width: 250px;            
+  box-sizing: border-box;
+  background-color: #f9f9f9; 
+  margin-top: 0;           
+  margin-left: 0;           
+  min-height: 100vh;       
+  position: sticky;        
+  top: 0;
+}
+
+h3{
+    background-color: rgba(219, 219, 219, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.123);
+    width: 170px;
+    font-size: larger;
+}
+
+select{
+    width: 170px;
+    margin-bottom: 7px;
+
+}
+
+.min-max_ar{
+    width: 90px;
+    height: 20px;
+    margin: 5px;
+    border:1px solid rgba(0, 0, 0, 0.25)
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
