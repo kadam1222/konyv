@@ -7,6 +7,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import http from "../http-common";
 import { useEffect ,useState } from "react";
 import { NavItem } from "react-bootstrap";
+import Main from "./main";
 
 export default function Header({ onSearch }) {
   const [fokat, setFokat] = useState([]);
@@ -52,6 +53,11 @@ export default function Header({ onSearch }) {
   };
 
   const fetchFilterData = async (kereso) => {
+    if (!kereso || kereso.trim() === "") {
+    onSearch(null);   // Visszaállítjuk teljes listára
+    return;
+  }
+    
     try{ 
       const response = await http.get('/konyvek/fokereso', {
         params: {
@@ -60,6 +66,7 @@ export default function Header({ onSearch }) {
         }
       });
       onSearch(response.data);
+      
 
     } catch(error){
       console.error('Error fetching search data:', error);
@@ -71,6 +78,8 @@ export default function Header({ onSearch }) {
   }, []);
   
   return(
+    <>
+
     <Navbar expand="lg" className="bg-body-tertiary">
       <NavItem style={{marginLeft:"14px"}}><h2>Bolt</h2></NavItem>
       <Container>
@@ -137,5 +146,7 @@ export default function Header({ onSearch }) {
 
       </Container>
     </Navbar>
+      
+    </>
   );
 }

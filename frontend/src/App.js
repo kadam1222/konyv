@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import Filters from './components/filter';
 import Fooldal from './components/fooldal';
 import { useState } from 'react';
+import Main from './components/main';
 
 function App() {
   const [talalatok, setTalalatok] = useState(null);
@@ -15,9 +16,9 @@ function App() {
   return (
     <>
       <Header onSearch={handleSearch} />
-
+      {talalatok === null && <Main />}
       <div style={{display:"flex"}}>
-        <Filters />
+        {talalatok !== null && talalatok.length > 0 && <Filters />}
         <Fooldal talalatok={talalatok} />
       </div>
     </>

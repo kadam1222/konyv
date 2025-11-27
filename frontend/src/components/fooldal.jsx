@@ -33,7 +33,9 @@ function Fooldal({ talalatok }) {
           <Card.Body>
             <Card.Title>{t.cim}</Card.Title>
             <Card.Subtitle>{t.szerzok}</Card.Subtitle>
-            <Card.Text>{t.leiras.substring(0,100) + "..."}</Card.Text>
+            <Card.Text>
+              {t.leiras ? t.leiras.substring(0, 100) + "..." : "Nincs leírás"}
+            </Card.Text>
           </Card.Body>
           <ListGroup className="list-group-flush">
             <ListGroup.Item>{t.kiado_nev}</ListGroup.Item>
