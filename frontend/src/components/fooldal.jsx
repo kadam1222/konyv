@@ -30,7 +30,7 @@ function Fooldal({ talalatok }) {
       {megjelenoLista.map((t, index) => (
         <Card style={{ width: '18rem' }} key={index} className='kartya'>
           <Card.Img variant="top" src={`/kepek/${t.ISBN}.jpg`} className='termek_kep'/>
-          <Card.Body>
+          <Card.Body style={{padding:"1rem"}}>
             <Card.Title>{t.cim}</Card.Title>
             <Card.Subtitle>{t.szerzok}</Card.Subtitle>
             <Card.Text>
@@ -42,9 +42,9 @@ function Fooldal({ talalatok }) {
             <ListGroup.Item>{t.kiadas_eve}</ListGroup.Item>
             <ListGroup.Item>{t.ar} KWD</ListGroup.Item>
           </ListGroup>
-          <Card.Body>
+          <Card.Footer>
             <Button variant="primary">Kosárba rakom</Button>
-          </Card.Body>
+          </Card.Footer>
         </Card>
       ))}
     </div>

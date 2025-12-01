@@ -1,19 +1,23 @@
-.fodiv{
+.fodiv {
     justify-content: center;
     display: flex;
     flex-wrap: wrap;
     padding: 15px;
     gap: 15px;
-    
 }
 
-.termek_kep{
-    width: 100%;
-    height: 400px;
-
-}
-.kartya{
-    margin-bottom: 15px;
+.kartya {
     flex: 1 1 18rem;
-    max-width: 20%;
+    max-width: 18rem;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: 850px;
 }
+
+.termek_kep {
+    width: 100%;
+    height: auto;
+    max-height: 430px;
+}
+

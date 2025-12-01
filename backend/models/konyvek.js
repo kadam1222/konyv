@@ -1,5 +1,6 @@
 const db = require('../config/db');
 
+
 class Konyvek {
   static async getAll() {
     try {

@@ -7,7 +7,6 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import http from "../http-common";
 import { useEffect ,useState } from "react";
 import { NavItem } from "react-bootstrap";
-import Main from "./main";
 
 export default function Header({ onSearch }) {
   const [fokat, setFokat] = useState([]);
@@ -54,7 +53,7 @@ export default function Header({ onSearch }) {
 
   const fetchFilterData = async (kereso) => {
     if (!kereso || kereso.trim() === "") {
-    onSearch(null);   // Visszaállítjuk teljes listára
+    onSearch(null); 
     return;
   }
     
@@ -81,7 +80,11 @@ export default function Header({ onSearch }) {
     <>
 
     <Navbar expand="lg" className="bg-body-tertiary">
-      <NavItem style={{marginLeft:"14px"}}><h2>Bolt</h2></NavItem>
+      <NavItem style={{ marginLeft:"14px" }}>
+        <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
+          <h2>Bolt</h2>
+        </a>
+      </NavItem>
       <Container>
 
         <div style={{
@@ -130,7 +133,7 @@ export default function Header({ onSearch }) {
                   }}
                 />
                 <button 
-                  style={{ width:"40px", height:"30px", border:"1px solid rgba(0,0,0,0.25)" }}
+                  style={{ width:"40px", height:"30px", border:"1px solid rgba(0,0,0,0.25)" , display : "flex", alignItems : "center", padding : 0, justifyContent : "center"}}
                   onClick={() => fetchFilterData(keresett)}
                 >
                   <FaMagnifyingGlass />
