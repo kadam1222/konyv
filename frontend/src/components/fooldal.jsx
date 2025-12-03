@@ -5,113 +5,86 @@ import httpCommon from '../http-common';
 import { useState , useEffect, useRef, useCallback } from 'react';
 import "./fooldal.css"
 
-function Fooldal({ talalatok }) { 
-
+function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSearch, setTalalatok, page, setPage, hasMore, setHasMore }) { 
   const [adatok, setAdatok] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const observerRef = useRef();
 
-  // ❗ Ha érkezik új keresési eredmény → scroll kikapcs, lista törlődik
-  useEffect(() => {
-    if (talalatok !== null) {
-      setAdatok([]);  
-      setHasMore(false);
-    }
-  }, [talalatok]);
-
-  // 🔥 Infinite scroll betöltés
   const fetchData = async (pagenum) => {
-    if (talalatok !== null) return; // ha keresel → nincs scroll
-
     try {
       setLoading(true);
       const response = await httpCommon.get(`/konyvek?page=${pagenum}&limit=10`);
       const uj = response.data;
 
-      if (uj.length === 0) {
-        setHasMore(false);
-      } else {
-        setAdatok(prev => [...prev, ...uj]);
-      }
+      if (uj.length === 0) setHasMore(false);
+      else setAdatok(prev => [...prev, ...uj]);
     } catch (error) {
       console.error('Error fetching data: ', error);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  // Lapozás trigger
-  useEffect(() => {
-    if (talalatok === null) {
-      fetchData(page);
-    }
-  }, [page, talalatok]);
+  const fetchSearchData = async (query, pagenum) => {
+    if(!query) return;
+    try {
+      setLoading(true);
+      const response = await httpCommon.get(`/konyvek/fokereso?page=${pagenum}&limit=10&cim=${query}&szerzo=${query}`);
+      const uj = response.data;
 
-  // IntersectionObserver → lap aljára érve új oldal
-  const lastItemRef = useCallback(
-    (node) => {
-      if (loading || !hasMore || talalatok !== null) return;
+      if(uj.length === 0) setHasMoreSearch(false);
+      setTalalatok(prev => [...prev, ...uj]);
+    } catch(err) {
+      console.error(err);
+    } finally { setLoading(false); }
+  };
 
-      if (observerRef.current) observerRef.current.disconnect();
+  useEffect(() => { if(!searchQuery) fetchData(page); }, [page, searchQuery]);
+  useEffect(() => { if(searchQuery) fetchSearchData(searchQuery, searchPage); }, [searchPage, searchQuery]);
 
-      observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          setPage(prev => prev + 1);
+  const lastItemRef = useCallback((node) => {
+    if (loading) return;
+    if(observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if(entries[0].isIntersecting){
+        if(searchQuery){
+          if(hasMoreSearch) setSearchPage(prev => prev + 1);
+        } else {
+          if(hasMore) setPage(prev => prev + 1);
         }
-      });
+      }
+    });
 
-      if (node) observerRef.current.observe(node);
-    },
-    [loading, hasMore, talalatok]
-  );
+    if(node) observerRef.current.observe(node);
+  }, [loading, hasMore, hasMoreSearch, searchQuery]);
 
-  // ❗ Ha van keresési találat → azt mutasd
-  const lista = talalatok !== null ? talalatok : adatok;
+  const lista = searchQuery ? talalatok : adatok;
 
   return (
     <div className='fodiv'>
       {lista.map((t, index) => {
         const isLast = index === lista.length - 1;
-
         return (
-          <Card
-            style={{ width: '18rem' }}
-            key={t.ISBN}
-            ref={isLast && talalatok === null ? lastItemRef : null}
-            className='kartya'
-          >
-            <Card.Img 
-              variant="top" 
-              src={`/kepek/${t.ISBN}.jpg`} 
-              className='termek_kep'
-            />
-
+          <Card style={{ width: '18rem' }} key={t.ISBN} ref={isLast ? lastItemRef : null} className='kartya'>
+            <Card.Img variant="top" src={`/kepek/${t.ISBN}.jpg`} className='termek_kep' />
             <Card.Body style={{padding:"1rem"}}>
               <Card.Title>{t.cim}</Card.Title>
               <Card.Subtitle>{t.szerzok}</Card.Subtitle>
-              <Card.Text>
-                {t.leiras ? t.leiras.substring(0, 100) + "..." : "Nincs leírás"}
-                {t.borito_tipus}
-              </Card.Text>
+              <Card.Text>{t.leiras ? t.leiras.substring(0, 100)+"..." : "Nincs leírás"} {t.borito_tipus}</Card.Text>
             </Card.Body>
-
             <ListGroup className="list-group-flush">
               <ListGroup.Item>{t.kiado_nev}</ListGroup.Item>
               <ListGroup.Item>{t.kiadas_eve}</ListGroup.Item>
               <ListGroup.Item>{t.ar} KWD</ListGroup.Item>
             </ListGroup>
-
             <Card.Footer>
               <Button variant="primary">Kosárba rakom</Button>
             </Card.Footer>
           </Card>
         );
       })}
-
-      {loading && talalatok === null && <p>Loading...</p>}
-      {!hasMore && talalatok === null && <p>Nincs több találat</p>}
+      {loading && <p>Loading...</p>}
+      {(!hasMore && !searchQuery) && <p>Nincs több találat</p>}
+      {(!hasMoreSearch && searchQuery) && <p>Nincs több találat</p>}
     </div>
   );
 }

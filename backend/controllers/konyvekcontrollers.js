@@ -42,10 +42,10 @@ exports.filter = async (req, res) => {
 
 exports.fokereso = async (req,res) => {
   try{
-    const cim = req.query.cim
-    const szerzo = req.query.szerzo
-
-    const konyvek_filter = await konyvek.fokereso(cim,szerzo);
+    const cim = req.query.cim || ""
+    const szerzo = req.query.szerzo || ""
+    const page = parseInt(req.query.page) || 1;
+    const konyvek_filter = await konyvek.fokereso(cim,szerzo, page);
     res.json(konyvek_filter);
   }
   catch(err)
