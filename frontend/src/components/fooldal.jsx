@@ -5,10 +5,11 @@ import httpCommon from '../http-common';
 import { useState , useEffect, useRef, useCallback } from 'react';
 import "./fooldal.css"
 
-function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSearch, setTalalatok, page, setPage, hasMore, setHasMore }) { 
+function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSearch, setTalalatok, page, setPage, hasMore, setHasMore , setHasMoreSearch}) { 
   const [adatok, setAdatok] = useState([]);
   const [loading, setLoading] = useState(false);
   const observerRef = useRef();
+
 
   const fetchData = async (pagenum) => {
     try {
@@ -17,7 +18,11 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       const uj = response.data;
 
       if (uj.length === 0) setHasMore(false);
-      else setAdatok(prev => [...prev, ...uj]);
+        setAdatok(prev => {
+        const combined = [...prev, ...uj];
+        const unique = Array.from(new Map(combined.map(item => [item.ISBN, item])).values());
+    return unique;
+});
     } catch (error) {
       console.error('Error fetching data: ', error);
     } finally { setLoading(false); }
@@ -31,7 +36,11 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       const uj = response.data;
 
       if(uj.length === 0) setHasMoreSearch(false);
-      setTalalatok(prev => [...prev, ...uj]);
+      setTalalatok(prev => {
+      const combined = [...prev, ...uj];
+      const unique = Array.from(new Map(combined.map(item => [item.ISBN, item])).values());
+      return unique;
+  });
     } catch(err) {
       console.error(err);
     } finally { setLoading(false); }

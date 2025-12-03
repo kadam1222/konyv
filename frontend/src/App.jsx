@@ -16,24 +16,34 @@ function App() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const handleSearch = async (query, pageNum = 1) => {
-    if(pageNum === 1) setTalalatok([]); 
-
+  const handleSearch = async (dataorQuery, pageNum = 1, query = "") => {
+    if (Array.isArray(dataorQuery)) {
+    setTalalatok(dataorQuery);
     setSearchQuery(query);
+    setSearchPage(pageNum);
+    setHasMoreSearch(true); 
+  }
+  else{
+  const searchStr = dataorQuery;
+      if(pageNum === 1) setTalalatok([]); 
 
-    try {
-      const response = await fetch(`/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`);
-      const data = await response.json();
+      setSearchQuery(query);
 
-      if(data.length < 10) setHasMoreSearch(false);
-      else setHasMoreSearch(true);
+      try {
+        const response = await fetch(`/konyvek/fokereso?page=${pageNum}&limit=10&cim=${searchStr}&szerzo=${searchStr}`);
+        const data = await response.json();
 
-      setTalalatok(prev => pageNum === 1 ? data : [...prev, ...data]);
-      setSearchPage(pageNum);
-    } catch (err) {
-      console.error(err);
+        if(data.length < 10) setHasMoreSearch(false);
+        else setHasMoreSearch(true);
+
+        setTalalatok(prev => pageNum === 1 ? data : [...prev, ...data]);
+        setSearchPage(pageNum);
+      } catch (err) {
+        console.error(err);
+      }
     }
-  };
+  }
+    
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

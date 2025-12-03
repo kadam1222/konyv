@@ -28,9 +28,9 @@ export default function Header({ onSearch }) {
 
     try {
       const response = await http.get("/konyvek/search", {
-        params: { katNev }
-      });
-      onSearch(response.data);
+        params: { kat: katNev }
+    });
+      onSearch(response.data, 1, katNev);
     } catch (error) {
       console.error("Hiba a kategória szűrésnél:", error);
     }
@@ -43,7 +43,7 @@ export default function Header({ onSearch }) {
     }
     
     onSearch([]);
-    onSearch(kereso); 
+    onSearch(kereso, 1); 
   };
 
   const CategoryDropdown = ({ title }) => (

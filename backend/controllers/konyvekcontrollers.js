@@ -32,7 +32,7 @@ exports.filter = async (req, res) => {
     const nyelv = req.query.nyelv
     const illusztrator = req.query.illusz
     const borito = req.query.borito
-    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito);
+    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia" );
     res.json(konyvek_filter); 
   } catch (err) {
     console.error(err);
