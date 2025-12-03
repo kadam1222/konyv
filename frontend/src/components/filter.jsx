@@ -1,14 +1,41 @@
 import './filter.css'
 import { useState,useEffect } from 'react';
 import httpCommon from '../http-common';
+import { useSearchParams } from "react-router-dom";
 
 
-export default function Filters(){
-    const [kategoriak, setKategoriak] = useState([]);
+export default function Filters( { onSearch, talalatok }){
     const [kiadok, setKiadok] = useState([]);
     const [nyelv, setNyelv] = useState([]);
     const [borito, setBorito] = useState([]);
     const [error,setError] = useState();
+    const [formData, setFormData] = useState({
+        borito: "",
+        armin: "",
+        armax: "",
+        kiado: "",
+        nyelv: "",
+    });
+    const [searchParams, setSearchParams] = useSearchParams();
+  const handleFilter = (kiado, nyelv, borito) => {
+    let lista = talalatok ?? []; 
+
+    if (!lista.length) return; 
+
+    if (borito) {
+      lista = lista.filter(k => k.borito_nev === borito);
+    }
+
+    if (kiado) {
+      lista = lista.filter(k => k.kiado_nev.toLowerCase().includes(kiado.toLowerCase()));
+    }
+
+    if (nyelv) {
+      lista = lista.filter(k => k.nyelv_nev.toLowerCase().includes(nyelv.toLowerCase()));
+    }
+
+    onSearch(lista); 
+  };
     
     const fetchData = async (nev, setter) =>{
         try{ 
@@ -22,11 +49,16 @@ export default function Filters(){
     }
     
     useEffect(() => {
-        fetchData("kategoria", setKategoriak);
+        const borito = searchParams.get("borito") || "";
+        const nyelv = searchParams.get("nyelv") || "";  
+        const kiado = searchParams.get("kiado") || ""; 
+        setFormData({kiado,nyelv,borito})
         fetchData("kiadok", setKiadok);
         fetchData("nyelv", setNyelv);
         fetchData("borito", setBorito);
     }, []);
+
+    
     
     return(
         <>
@@ -44,19 +76,10 @@ export default function Filters(){
                     <option value="Kiadás éve (csökkenő)">Kiadás éve (csökkenő)</option>
                 </select>
             </div>
-            <div className="category">
-                <h3>Kategóriák: </h3>
-                {kategoriak.map((t, index) => (
-                    <>
-                    {t.katazon && <span key={index}>{t.kat_nev}<br /></span>}
-                    </>
-                    
-                ))}
-            </div>
             <div className="borito">
                 <h3>Borító: </h3>
                 {borito.map((t, index) => (
-                    <span key={index}>{t.borito_nev}<br /></span>
+                    <span onClick={() => handleFilter("","",t.borito_nev)} key={index} style={{cursor: "pointer"}}>{t.borito_nev}<br /></span>
                 ))}
             </div>
             <div className="ar">

@@ -7,10 +7,31 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import http from "../http-common";
 import { useEffect ,useState } from "react";
 import { NavItem } from "react-bootstrap";
+import { useSearchParams } from "react-router-dom";
 
 export default function Header({ onSearch }) {
   const [fokat, setFokat] = useState([]);
   const [keresett, setKeresett] = useState("");
+  const [formData, setFormData] = useState({
+        alkat: "",
+        tipus: "",
+    });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+const handleFilter = async (kat) => {
+  setSearchParams({ kat });
+
+  try {
+    const response = await http.get("/konyvek/search", {
+      params: { kat }
+    });
+
+    onSearch(response.data);
+  } catch (error) {
+    console.error("Hiba a kategória szűrésnél:", error);
+  }
+};
+
 
   const CategoryDropdown = ({ title }) => (
     <NavDropdown title={title} id={`nav-${title}`}>
@@ -24,7 +45,7 @@ export default function Header({ onSearch }) {
           >
             {getSubcategories(f.id).length > 0 ? (
               getSubcategories(f.id).map(sub => (
-                <NavDropdown.Item key={sub.id}>
+                <NavDropdown.Item key={sub.id} onClick={() => handleFilter(sub.kat_nev)}>
                   {sub.kat_nev}
                 </NavDropdown.Item>
               ))
@@ -58,7 +79,7 @@ export default function Header({ onSearch }) {
   }
     
     try{ 
-      const response = await http.get('/konyvek/fokereso', {
+      const response = await http.get('/konyvek/fokereso?page=1&limit=10', {
         params: {
           cim: kereso,
           szerzo: kereso
@@ -72,9 +93,22 @@ export default function Header({ onSearch }) {
     }
   };
 
-  useEffect(()=>{      
+  const fetchKategoria = async () =>{
+    try{ 
+      const response = await http.get('/konyvek/search');
+      setFokat(response.data);
+    }
+    catch(error){
+      console.error('Error fetching data: ', error);
+    }
+  }
+
+  useEffect(()=>{     
+    const alkat = searchParams.get("alkat") || "";
+    const tipus = searchParams.get("tipus") || ""; 
+    setFormData({ alkat, tipus});
     fetchData();
-  }, []);
+  }, [searchParams]);
   
   return(
     <>
@@ -93,8 +127,6 @@ export default function Header({ onSearch }) {
           justifyContent:"space-between",
           width: "100%"
         }}>
-
-          
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
