@@ -37,8 +37,8 @@ class Konyvek {
           feltetelek_parameter.push(`%${szerzo}%`)
       }
       const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" OR ") : ""
-      const params = [...feltetelek_parameter, limit,offset];
-      const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} limit ? offset ?`, params);
+      const params = [...feltetelek_parameter];
+      const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} limit ${limit} offset ${offset}`, params);
       return rows
     }
     catch(error){

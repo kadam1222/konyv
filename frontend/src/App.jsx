@@ -44,18 +44,20 @@ function App() {
 
         <div style={{ display: "flex" }}>
           {talalatok.length > 0 && <Filters onSearch={handleSearch} talalatok={talalatok} />}
-          <Fooldal 
-            talalatok={talalatok} 
-            searchQuery={searchQuery} 
-            searchPage={searchPage} 
-            setSearchPage={setSearchPage} 
-            hasMoreSearch={hasMoreSearch} 
-            setTalalatok={setTalalatok} 
+          <Fooldal
+            talalatok={talalatok}
+            searchQuery={searchQuery}
+            searchPage={searchPage}
+            setSearchPage={setSearchPage}
+            hasMoreSearch={hasMoreSearch}
+            setHasMoreSearch={setHasMoreSearch}
+            setTalalatok={setTalalatok}
             page={page}
             setPage={setPage}
             hasMore={hasMore}
             setHasMore={setHasMore}
           />
+
         </div>
 
         <Footer />

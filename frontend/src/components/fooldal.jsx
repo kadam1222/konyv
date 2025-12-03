@@ -64,7 +64,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       {lista.map((t, index) => {
         const isLast = index === lista.length - 1;
         return (
-          <Card style={{ width: '18rem' }} key={t.ISBN} ref={isLast ? lastItemRef : null} className='kartya'>
+          <Card style={{ width: '18rem' }} key={`${t.ISBN}-${index}`} ref={isLast ? lastItemRef : null} className='kartya'>
             <Card.Img variant="top" src={`/kepek/${t.ISBN}.jpg`} className='termek_kep' />
             <Card.Body style={{padding:"1rem"}}>
               <Card.Title>{t.cim}</Card.Title>
