@@ -2,7 +2,8 @@ const konyvek = require('../models/konyvek');
 
 exports.getAllKonyvek = async (req, res) => {
   try {
-    const konyvek_all = await konyvek.getAll();
+    const page = req.query.page
+    const konyvek_all = await konyvek.getAll(page);
     res.json(konyvek_all); 
   } catch (err) {
     console.error(err);
@@ -30,7 +31,8 @@ exports.filter = async (req, res) => {
     const kategoria = req.query.kat
     const nyelv = req.query.nyelv
     const illusztrator = req.query.illusz
-    const konyvek_filter = await konyvek.filter(cim,kiado,kategoria,nyelv,szerzo,illusztrator);
+    const borito = req.query.borito
+    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito);
     res.json(konyvek_filter); 
   } catch (err) {
     console.error(err);
