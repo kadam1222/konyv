@@ -48,6 +48,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
 
   useEffect(() => { if(!searchQuery) fetchData(page); }, [page, searchQuery]);
   useEffect(() => { if(searchQuery) fetchSearchData(searchQuery, searchPage); }, [searchPage, searchQuery]);
+  
 
   const lastItemRef = useCallback((node) => {
     if (loading) return;
@@ -69,6 +70,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
   const lista = searchQuery ? talalatok : adatok;
 
   return (
+    <div style={{textAlign: "center"}}>
     <div className='fodiv'>
       {lista.map((t, index) => {
         const isLast = index === lista.length - 1;
@@ -83,7 +85,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
             <ListGroup className="list-group-flush">
               <ListGroup.Item>{t.kiado_nev}</ListGroup.Item>
               <ListGroup.Item>{t.kiadas_eve}</ListGroup.Item>
-              <ListGroup.Item>{t.ar} KWD</ListGroup.Item>
+              <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
             </ListGroup>
             <Card.Footer>
               <Button variant="primary">Kosárba rakom</Button>
@@ -91,9 +93,11 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
           </Card>
         );
       })}
-      {loading && <p>Loading...</p>}
-      {(!hasMore && !searchQuery) && <p>Nincs több találat</p>}
-      {(!hasMoreSearch && searchQuery) && <p>Nincs több találat</p>}
+      
+    </div>
+      {loading && <p className='uzenet'>Loading...</p>}
+      {(!hasMore && !searchQuery) && <p className='uzenet'>Nincs több találat!</p>}
+      {(!hasMoreSearch && searchQuery) && <p className='uzenet' id='nincstalalat'>Nincs több találat!</p>}
     </div>
   );
 }

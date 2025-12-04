@@ -43,7 +43,7 @@ export default function Header({ onSearch }) {
     }
     
     onSearch([]);
-    onSearch(kereso, 1); 
+    onSearch(kereso, 1, kereso); 
   };
 
   const CategoryDropdown = ({ title }) => (
@@ -93,7 +93,7 @@ export default function Header({ onSearch }) {
                   onChange={(e) => setKeresett(e.target.value)}
                   value={keresett}
                   type="search"
-                  onKeyDown={(e) => { if (e.key === "Enter") fetchFilterData(keresett) }}
+                  onKeyDown={(e) => { if (e.key === "Enter") onSearch(keresett, 1, keresett); }}
                 />
                 <button 
                   style={{ width:"40px", height:"30px", border:"1px solid rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", padding:0 }}

@@ -79,7 +79,7 @@ export default function Filters( { onSearch, talalatok }){
             <div className="borito">
                 <h3>Borító: </h3>
                 {borito.map((t, index) => (
-                    <span onClick={() => handleFilter("","",t.borito_nev)} key={index} style={{cursor: "pointer"}}>{t.borito_nev}<br /></span>
+                    <span onClick={() => handleFilter("","",t.borito_nev)} key={index} style={{cursor: "pointer", textTransform:"capitalize"}} className='kat'>{t.borito_nev}<br /></span>
                 ))}
             </div>
             <div className="ar">
@@ -91,14 +91,14 @@ export default function Filters( { onSearch, talalatok }){
             <div className="kiadok">
                 <h3>Kiadó: </h3>
                 {kiadok.map((t, index) => (
-                    <span key={index}>{t.kiado_nev}<br /></span>
+                    <span key={index} className='kat'>{t.kiado_nev}<br /></span>
                 ))}
             </div>
             <div className="language">
                 <h3>Nyelv: </h3>
                 {nyelv.map((t, index) => (
                     <>
-                   <span key={index}>{t.nyelv_nev}<br /></span>
+                   <span key={index} className='kat'>{t.nyelv_nev}<br /></span>
                     </>
                     
                 ))}

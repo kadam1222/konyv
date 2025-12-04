@@ -11,8 +11,7 @@ function Main() {
             <img className="carouselimg" src="/kepek/stockimage1.jpg" />
           </div>
           <Carousel.Caption>
-            <h2 style={{color : "black"}}>First slide label</h2>
-            <p style={{color : "black"}}>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+            <h2 style={{color : "black"}}>Legjobb könyvek!</h2>
           </Carousel.Caption>
         </Carousel.Item>
 
@@ -22,7 +21,6 @@ function Main() {
           </div>
           <Carousel.Caption>
             <h2 style={{color : "black"}}>Minden korosztály számára!</h2>
-            <p style={{color : "black"}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
           </Carousel.Caption>
         </Carousel.Item>
 
