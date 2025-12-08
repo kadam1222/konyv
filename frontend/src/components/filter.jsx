@@ -9,6 +9,7 @@ export default function Filters( { onSearch, talalatok }){
     const [nyelv, setNyelv] = useState([]);
     const [borito, setBorito] = useState([]);
     const [error,setError] = useState();
+    const [filteredTalalatok, setFilteredTalalatok] = useState([]);
     const [formData, setFormData] = useState({
         borito: "",
         armin: "",
@@ -17,25 +18,31 @@ export default function Filters( { onSearch, talalatok }){
         nyelv: "",
     });
     const [searchParams, setSearchParams] = useSearchParams();
-  const handleFilter = (kiado, nyelv, borito) => {
-    let lista = talalatok ?? []; 
+  const handleFilter = (kiado, nyelv, borito, kat) => {
+    let lista = talalatok ?? []; // mindig a teljes talalatok-on indulunk
 
     if (!lista.length) return; 
 
+    if (kat) {
+      lista = lista.filter(k => k.kat_nev?.includes(kat));
+    }
+
     if (borito) {
-      lista = lista.filter(k => k.borito_nev === borito);
+      lista = lista.filter(k => k.borito_tipus?.includes(borito));
     }
 
     if (kiado) {
-      lista = lista.filter(k => k.kiado_nev.toLowerCase().includes(kiado.toLowerCase()));
+      lista = lista.filter(k => k.kiado_nev?.includes(kiado));
     }
 
     if (nyelv) {
-      lista = lista.filter(k => k.nyelv_nev.toLowerCase().includes(nyelv.toLowerCase()));
+      lista = lista.filter(k => k.nyelv_nev?.includes(nyelv));
     }
 
-    onSearch(lista); 
-  };
+    setFilteredTalalatok(lista);
+    onSearch(lista);
+};
+
     
     const fetchData = async (nev, setter) =>{
         try{ 
@@ -48,15 +55,22 @@ export default function Filters( { onSearch, talalatok }){
         }
     }
     
-    useEffect(() => {
-        const borito = searchParams.get("borito") || "";
-        const nyelv = searchParams.get("nyelv") || "";  
-        const kiado = searchParams.get("kiado") || ""; 
-        setFormData({kiado,nyelv,borito})
-        fetchData("kiadok", setKiadok);
-        fetchData("nyelv", setNyelv);
-        fetchData("borito", setBorito);
-    }, []);
+useEffect(() => {
+    fetchData("kiadok", setKiadok);
+    fetchData("nyelv", setNyelv);
+    fetchData("borito", setBorito);
+}, []);
+
+useEffect(() => {
+    const borito = searchParams.get("borito") || "";
+    const nyelv = searchParams.get("nyelv") || "";
+    const kiado = searchParams.get("kiado") || "";
+    const kat = searchParams.get("kat") || "";
+
+    handleFilter(kiado, nyelv, borito, kat);
+}, [searchParams, talalatok]);
+
+
 
     
     
@@ -79,7 +93,20 @@ export default function Filters( { onSearch, talalatok }){
             <div className="borito">
                 <h3>Borító: </h3>
                 {borito.map((t, index) => (
-                    <span onClick={() => handleFilter("","",t.borito_nev)} key={index} style={{cursor: "pointer", textTransform:"capitalize"}} className='kat'>{t.borito_nev}<br /></span>
+<span 
+  key={index}
+  className="kat"
+  style={{ cursor: "pointer", textTransform: "capitalize" }}
+  onClick={() => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("borito", t.borito_tipus);
+    setSearchParams(newParams); // ez triggereli a useEffect-et
+}}
+>
+  {t.borito_tipus}
+</span>
+
+
                 ))}
             </div>
             <div className="ar">

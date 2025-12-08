@@ -15,6 +15,8 @@ function App() {
   const [hasMoreSearch, setHasMoreSearch] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [rawResults, setRawResults] = useState([]);
+
 
   const handleSearch = async (dataorQuery, pageNum = 1, query = "") => {
     if (Array.isArray(dataorQuery)) {
@@ -32,6 +34,8 @@ function App() {
       try {
         const response = await fetch(`/konyvek/fokereso?page=${pageNum}&limit=10&cim=${searchStr}&szerzo=${searchStr}`);
         const data = await response.json();
+        setRawResults(data);
+        setTalalatok(data);
 
         if(data.length < 10) setHasMoreSearch(false);
         else setHasMoreSearch(true);
@@ -53,7 +57,7 @@ function App() {
         {talalatok.length === 0 && <Main />}
 
         <div style={{ display: "flex" }}>
-          {talalatok.length > 0 && <Filters onSearch={handleSearch} talalatok={talalatok} />}
+          {talalatok.length > 0 && <Filters onSearch={handleSearch} talalatok={rawResults} />}
           <Fooldal
             talalatok={talalatok}
             searchQuery={searchQuery}
