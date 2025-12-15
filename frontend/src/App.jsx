@@ -5,8 +5,10 @@ import Filters from './components/filter';
 import Fooldal from './components/fooldal';
 import { useState } from 'react';
 import Main from './components/main';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { Route, BrowserRouter as Router } from 'react-router-dom';
 import Footer from './components/footer';
+import Termek from './components/termek';
+
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -18,42 +20,40 @@ function App() {
   const [rawResults, setRawResults] = useState([]);
 
 
-  const handleSearch = async (dataorQuery, pageNum = 1, query = "") => {
-    if (Array.isArray(dataorQuery)) {
-    setTalalatok(dataorQuery);
+ const handleSearch = async (dataOrQuery, pageNum = 1, query = "") => {
+
+  if (Array.isArray(dataOrQuery)) {
+    setTalalatok(dataOrQuery);
+    setSearchQuery(query);
+    setSearchPage(1);
+    setHasMoreSearch(false);
+    return;
+  }
+  try {
+    const res = await fetch(
+      `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${dataOrQuery}&szerzo=${dataOrQuery}`
+    );
+    const data = await res.json();
+
+    setTalalatok(prev =>
+      pageNum === 1 ? data : [...prev, ...data]
+    );
+
     setSearchQuery(query);
     setSearchPage(pageNum);
-    setHasMoreSearch(true); 
+    setHasMoreSearch(data.length === 10);
+  } catch (err) {
+    console.error(err);
   }
-  else{
-  const searchStr = dataorQuery;
-      if(pageNum === 1) setTalalatok([]); 
+};
 
-      setSearchQuery(query);
-
-      try {
-        const response = await fetch(`/konyvek/fokereso?page=${pageNum}&limit=10&cim=${searchStr}&szerzo=${searchStr}`);
-        const data = await response.json();
-        setRawResults(data);
-        setTalalatok(data);
-
-        if(data.length < 10) setHasMoreSearch(false);
-        else setHasMoreSearch(true);
-
-        setTalalatok(prev => pageNum === 1 ? data : [...prev, ...data]);
-        setSearchPage(pageNum);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  }
     
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Router>
-        <Header onSearch={handleSearch} />
 
+        <Header onSearch={handleSearch} />
         {talalatok.length === 0 && <Main />}
 
         <div style={{ display: "flex" }}>

@@ -4,11 +4,16 @@ import Button from 'react-bootstrap/Button';
 import httpCommon from '../http-common';
 import { useState , useEffect, useRef, useCallback } from 'react';
 import "./fooldal.css"
+import Termek from './termek.jsx';
+import { useSearchParams } from "react-router-dom";
 
 function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSearch, setTalalatok, page, setPage, hasMore, setHasMore , setHasMoreSearch}) { 
   const [adatok, setAdatok] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [kivalasztottisbn, setKivalasztottisbn] = useState(null)
+  const [searchParams, setSearchParams] = useSearchParams();
   const observerRef = useRef();
+    
 
 
   const fetchData = async (pagenum) => {
@@ -67,6 +72,18 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
     if(node) observerRef.current.observe(node);
   }, [loading, hasMore, hasMoreSearch, searchQuery]);
 
+  const handleKattint = async (ISBN) => {
+      setSearchParams({ ISBN : ISBN });
+  
+      try {
+        const response = await http.get("/konyvek/", {
+          params: { ISBN: ISBN }
+      });
+      } catch (error) {
+        console.error("Hiba a kategória szűrésnél:", error);
+      }
+    };
+
   const lista = searchQuery ? talalatok : adatok;
 
   return (
@@ -75,10 +92,10 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       {lista.map((t, index) => {
         const isLast = index === lista.length - 1;
         return (
-          <Card border='secondary' style={{ width: '18rem' }} key={`${t.ISBN}-${index}`} ref={isLast ? lastItemRef : null} className='kartya'>
+          <Card onClick={() => setKivalasztottisbn(t.ISBN) } border='secondary' style={{ width: '18rem' }} key={`${t.ISBN}-${index}`} ref={isLast ? lastItemRef : null} className='kartya'>
             <Card.Img variant="top" src={`/kepek/${t.ISBN}.jpg`} className='termek_kep' />
             <Card.Body style={{padding:"1rem"}}>
-              <Card.Title>{t.cim}</Card.Title>
+              <Card.Title >{t.cim}</Card.Title>
               <Card.Subtitle>{t.szerzok}</Card.Subtitle>
               <Card.Text>{t.leiras ? t.leiras.substring(0, 100)+"..." : "Nincs leírás"} {t.borito_tipus}</Card.Text>
             </Card.Body>
@@ -95,6 +112,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       })}
       
     </div>
+      {kivalasztottisbn && {handleKattint} && <Termek ISBN={kivalasztottisbn}/>}
       {loading && <p className='uzenet'>Loading...</p>}
       {(!hasMore && !searchQuery) && <p className='uzenet'>Nincs több találat!</p>}
       {(!hasMoreSearch && searchQuery) && <p className='uzenet' id='nincstalalat'>Nincs több találat!</p>}
