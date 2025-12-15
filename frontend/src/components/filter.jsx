@@ -19,7 +19,7 @@ export default function Filters( { onSearch, talalatok }){
     });
     const [searchParams, setSearchParams] = useSearchParams();
   const handleFilter = (kiado, nyelv, borito, kat) => {
-    let lista = talalatok ?? []; // mindig a teljes talalatok-on indulunk
+    let lista = talalatok ?? [];
 
     if (!lista.length) return; 
 
@@ -93,20 +93,18 @@ useEffect(() => {
             <div className="borito">
                 <h3>Borító: </h3>
                 {borito.map((t, index) => (
-<span 
-  key={index}
-  className="kat"
-  style={{ cursor: "pointer", textTransform: "capitalize" }}
-  onClick={() => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set("borito", t.borito_tipus);
-    setSearchParams(newParams); // ez triggereli a useEffect-et
-}}
->
-  {t.borito_tipus}
-</span>
-
-
+                <span 
+                    key={index}
+                    className="kat"
+                    style={{ cursor: "pointer", textTransform: "capitalize" }}
+                    onClick={() => {
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.set("borito", t.borito_nev);
+                        setSearchParams(newParams); 
+                    }}
+                >
+                    {t.borito_nev}
+                </span>
                 ))}
             </div>
             <div className="ar">
@@ -118,14 +116,37 @@ useEffect(() => {
             <div className="kiadok">
                 <h3>Kiadó: </h3>
                 {kiadok.map((t, index) => (
-                    <span key={index} className='kat'>{t.kiado_nev}<br /></span>
+                <span 
+                    key={index}
+                    className="kat"
+                    style={{ cursor: "pointer", textTransform: "capitalize" }}
+                    onClick={() => {
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.set("kiado", t.kiado_nev);
+                        setSearchParams(newParams); 
+                    }}
+                >
+                    {t.kiado_nev}
+                </span>
                 ))}
+                
             </div>
             <div className="language">
                 <h3>Nyelv: </h3>
                 {nyelv.map((t, index) => (
                     <>
-                   <span key={index} className='kat'>{t.nyelv_nev}<br /></span>
+                <span 
+                    key={index}
+                    className="kat"
+                    style={{ cursor: "pointer", textTransform: "capitalize" }}
+                    onClick={() => {
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.set("nyelv", t.nyelv_nev);
+                        setSearchParams(newParams); 
+                    }}
+                >
+                    {t.nyelv_nev}
+                </span>
                     </>
                     
                 ))}
