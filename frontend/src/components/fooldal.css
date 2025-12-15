@@ -12,12 +12,23 @@
     display: flex;
     flex-direction: column;
     height: auto;
-    max-height: 850px;
+    max-height: 860px;
 }
 
 .termek_kep {
     width: 100%;
     height: auto;
     max-height: 430px;
+    border-radius: 5px;
 }
 
+.uzenet{
+    font-size: larger;
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#nincstalalat{
+    color: black;
+}
