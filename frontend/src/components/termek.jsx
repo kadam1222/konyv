@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import httpCommon from "../http-common";
+import "./termek.css"
 
 export default function Termek() {
   const { isbn } = useParams();
@@ -57,22 +58,46 @@ export default function Termek() {
     return <p style={{ textAlign: "center" }}>Nincs ilyen termék.</p>;
   }
 
-  return (
-    <div className="termek-container">
-      <a href="/">Vissza</a>
-      <h2>{adatok.cim}</h2>
-      <img src={`/kepek/${adatok.ISBN}.jpg`}></img>
-      <p><strong>Szerző(k):</strong> {adatok.szerzok}</p>
-      <p>{adatok.leiras}</p>
+return (
+  <div className="termek-page">
+    <div className="termek-card">
 
-      <div className="termek-meta">
-        <p><strong>ISBN:</strong> {adatok.ISBN}</p>
-        <p><strong>Borító:</strong> {adatok.borito_tipus}</p>
-        <p><strong>Kiadó:</strong> {adatok.kiado_nev}</p>
-        <p><strong>Nyelv:</strong> {adatok.nyelv_nev}</p>
-        <p><strong>Kiadás éve:</strong> {adatok.kiadas_eve}</p>
-        <p><strong>Ár:</strong> {adatok.ar} Ft</p>
+      {/* BAL OLDAL – BORÍTÓ */}
+      <div className="termek-image">
+        <img
+          src={`/kepek/${adatok.ISBN}.jpg`}
+          alt={adatok.cim}
+        />
+      </div>
+
+      {/* JOBB OLDAL – TARTALOM */}
+      <div className="termek-content">
+
+        <a href="/" className="termek-vissza">← Vissza</a>
+
+        <h1>{adatok.cim}</h1>
+        <h3>{adatok.szerzok}</h3>
+
+        <p className="termek-leiras">
+          {adatok.leiras}
+        </p>
+
+        <div className="termek-meta">
+          <span><strong>ISBN:</strong> {adatok.ISBN}</span>
+          <span><strong>Borító:</strong> {adatok.borito_tipus}</span>
+          <span><strong>Kiadó:</strong> {adatok.kiado_nev}</span>
+          <span><strong>Nyelv:</strong> {adatok.nyelv_nev}</span>
+          <span><strong>Kiadás éve:</strong> {adatok.kiadas_eve}</span>
+        </div>
+
+        <div className="termek-footer">
+          <div className="termek-ar">{adatok.ar} Ft</div>
+          <button className="termek-kosar">Kosárba</button>
+        </div>
+
       </div>
     </div>
-  );
+  </div>
+);
+
 }
