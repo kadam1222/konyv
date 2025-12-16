@@ -1,3 +1,4 @@
+
 export default function Footer() {
   return (
     <footer style={{
@@ -28,7 +29,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Jobb oldal */}
         <div style={styles.rightBlock}>
           <h4 style={styles.getApp}>Get the app</h4>
 

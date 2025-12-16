@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "proxy" : "http://localhost:5173",
+  "proxy": "http://localhost:5173",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -18,7 +18,8 @@
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.9.6"
+    "react-router-dom": "^7.9.6",
+    "reactjs-popup": "^2.0.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

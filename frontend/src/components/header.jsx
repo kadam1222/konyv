@@ -8,7 +8,9 @@ import { useEffect ,useState } from "react";
 import { NavItem } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
 import http from "../http-common";
-
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
+import LoginForm from "./loginform";
 export default function Header({ onSearch }) {
   const [fokat, setFokat] = useState([]);
   const [keresett, setKeresett] = useState("");
@@ -102,7 +104,42 @@ export default function Header({ onSearch }) {
                   <FaMagnifyingGlass />
                 </button>
               </div>
-              <a>Belépés/Regisztráció</a>
+              <Popup
+  trigger={
+    <button
+      type="button"
+      style={{
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        padding: 0
+      }}
+    >
+      Belépés / Regisztráció
+    </button>
+  }
+  modal
+  nested
+>
+  {(close) => (
+    <div
+      style={{
+        background: "#fff",
+        padding: "20px",
+        borderRadius: "8px",
+        width: "400px",
+        maxWidth: "90%",
+      }}
+    >
+      <LoginForm />
+
+      <div style={{ textAlign: "right", marginTop: "10px" }}>
+        <button onClick={close}>Bezárás</button>
+      </div>
+    </div>
+  )}
+</Popup>
+
               <a><TfiShoppingCartFull /></a>
             </NavItem>
           </Navbar.Collapse>

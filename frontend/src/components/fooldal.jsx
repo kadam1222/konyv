@@ -6,13 +6,14 @@ import { useState , useEffect, useRef, useCallback } from 'react';
 import "./fooldal.css"
 import Termek from './termek.jsx';
 import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSearch, setTalalatok, page, setPage, hasMore, setHasMore , setHasMoreSearch}) { 
+function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSearch, setTalalatok, page, setPage, hasMore, setHasMore , setHasMoreSearch, kivalasztottisbn, setKivalasztottisbn}) { 
   const [adatok, setAdatok] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [kivalasztottisbn, setKivalasztottisbn] = useState(null)
   const [searchParams, setSearchParams] = useSearchParams();
   const observerRef = useRef();
+  const navigate = useNavigate();
     
 
 
@@ -92,7 +93,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       {lista.map((t, index) => {
         const isLast = index === lista.length - 1;
         return (
-          <Card onClick={() => setKivalasztottisbn(t.ISBN) } border='secondary' style={{ width: '18rem' }} key={`${t.ISBN}-${index}`} ref={isLast ? lastItemRef : null} className='kartya'>
+          <Card onClick={() => navigate(`/termek/${t.ISBN}`) } border='secondary' style={{ width: '18rem' }} key={`${t.ISBN}-${index}`} ref={isLast ? lastItemRef : null} className='kartya'>
             <Card.Img variant="top" src={`/kepek/${t.ISBN}.jpg`} className='termek_kep' />
             <Card.Body style={{padding:"1rem"}}>
               <Card.Title >{t.cim}</Card.Title>
