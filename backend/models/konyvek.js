@@ -174,9 +174,25 @@ class Konyvek {
     }
   }
 
- 
+  static async regisztracio (nev, email, jelszo){
+    try {
+      await db.query('INSERT INTO vevo(vevo_nev , email, jelszo) VALUES (?, ?, ?)', [nev,email,jelszo])
+    } 
+    catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+   static async findByEmail (email){
+    try{
+        const [rows] = await db.query("SELECT * FROM vevo WHERE email = ?", [email])
+        return rows[0]
+    }
+    catch(err){
+        throw err
+    }
 
-  
+}
 }
 
 module.exports = Konyvek;

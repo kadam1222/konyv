@@ -1,5 +1,8 @@
 const konyvek = require('../models/konyvek');
-
+const { validationResult } = require("express-validator");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 exports.getAllKonyvek = async (req, res) => {
   try {
     const page = req.query.page
@@ -116,6 +119,65 @@ exports.borito = async (req,res) => {
   {
     console.error(err);
     res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+}
+
+exports.regisztracio = async ( req, res, next) =>{
+  try{
+    const {nev, email, jelszo} = req.body;
+    if (!nev || !email || !jelszo) {
+      return res.status(400).json({
+        message: 'Minden mező kitöltése kötelező!'
+      });
+    }
+    const hashedjelszo = await bcrypt.hash(jelszo, 10)
+
+    await konyvek.regisztracio(
+      nev,
+      email,
+      hashedjelszo
+    )
+    res.status(201).json({message: "Sikeres regisztráció! 🎉"})
+  }
+  catch(err){
+    next(err)
+  }
+}
+
+exports.bejelentkezes = async (req, res, next) =>{
+  try{
+    const {email, jelszo} = req.body
+        if (!email || !jelszo) {
+        return res.status(400).json({ error: "Minden mező kitöltése kötelező" });
+        }
+    const felhasznalo  = await konyvek.findByEmail(email);
+    if (!felhasznalo){
+      return res.status(401).json({ error: "Hibás a felhasználónév vagy jelszó" });
+    }
+    const talalat = await bcrypt.compare(jelszo, felhasznalo.jelszo);
+        if (!talalat) {
+            return res.status(401).json({ error: "Hibás a felhasználónév vagy jelszó" });
+        }
+      const accessToken = jwt.sign(
+      { id: konyvek.id, nev: konyvek.vevo_nev, email: konyvek .email},
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN } 
+    );        
+    const refreshToken = jwt.sign(
+      { id: konyvek.id, email: konyvek.email },
+      process.env.REFRESH_JWT_SECRET,
+      { expiresIn: process.env.REFRESH_EXPIRES_IN } 
+    );
+     res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", 
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000 
+    });
+    res.status(200).json({ message: "Sikeres bejelentkezés 🎉", accessToken})
+  }
+  catch(error){
+    next(error)
   }
 }
 
