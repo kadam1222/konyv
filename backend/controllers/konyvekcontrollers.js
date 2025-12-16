@@ -159,19 +159,19 @@ exports.bejelentkezes = async (req, res, next) =>{
             return res.status(401).json({ error: "Hibás a felhasználónév vagy jelszó" });
         }
       const accessToken = jwt.sign(
-      { id: konyvek.id, nev: konyvek.vevo_nev, email: konyvek .email},
+      { id: felhasznalo.id, nev: felhasznalo.vevo_nev, email: felhasznalo .email},
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN } 
     );        
     const refreshToken = jwt.sign(
-      { id: konyvek.id, email: konyvek.email },
+      { id: felhasznalo.id, email: felhasznalo.email },
       process.env.REFRESH_JWT_SECRET,
       { expiresIn: process.env.REFRESH_EXPIRES_IN } 
     );
      res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
-      sameSite: "Strict",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000 
     });
     res.status(200).json({ message: "Sikeres bejelentkezés 🎉", accessToken})
@@ -180,6 +180,32 @@ exports.bejelentkezes = async (req, res, next) =>{
     next(error)
   }
 }
+exports.refreshToken = (req, res) => {
+  const token = req.cookies.refreshToken;
+
+  if (!token) {
+    return res.status(401).json({ message: "Nincs refresh token" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.REFRESH_JWT_SECRET);
+
+    const newAccessToken = jwt.sign(
+      {
+        id: decoded.id,
+        email: decoded.email
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    res.json({ accessToken: newAccessToken });
+
+  } catch (err) {
+    return res.status(403).json({ message: "Érvénytelen refresh token" });
+  }
+};
+
 
 
 

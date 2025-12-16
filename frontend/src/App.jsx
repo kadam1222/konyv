@@ -3,7 +3,7 @@ import Header from './components/header';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Filters from './components/filter';
 import Fooldal from './components/fooldal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Main from './components/main';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Footer from './components/footer';
@@ -17,7 +17,25 @@ function App() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [rawResults, setRawResults] = useState([]);
+  const [accessToken, setAccessToken] = useState("");
 
+  useEffect(() => {
+    const refreshToken = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/auth/refresh", {
+          method: "POST",
+          credentials: "include",
+        });
+        if (!res.ok) return;
+          const data = await res.json();
+          setAccessToken(data.accessToken);
+      } 
+      catch(err){
+
+      }
+    };
+    refreshToken();
+  }, []);
   const handleSearch = async (query, pageNum = 1) => {
     if (!query) {
       setTalalatok([]);
@@ -45,16 +63,14 @@ function App() {
 
   return (
     <Router>
+
       <div className="app">
 
-        <Header onSearch={handleSearch} />
+        <Header onSearch={handleSearch}  accessToken={accessToken} setAccessToken={setAccessToken} />
 
         <Routes>
 
-          {/* FŐOLDAL */}
-          <Route
-            path="/"
-            element={
+          <Route path="/" element={
               <>
                 {talalatok.length === 0 && <Main />}
 
@@ -83,8 +99,8 @@ function App() {
             }
           />
 
-          {/* TERMÉK */}
           <Route path="/termek/:isbn" element={<Termek />} />
+
 
         </Routes>
 

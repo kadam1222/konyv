@@ -2,16 +2,14 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
 const konyvekRouter = require('./routes/konyvek')
+const authRoutes = require("./routes/tokens")
 
 var app = express();
 
 const cors = require('cors')
-var corsOptions = { origin: "*"}
+var corsOptions = { origin: "http://localhost:5173", credentials : true}
 
 app.use(cors(corsOptions))
 app.use(logger('dev'));
@@ -20,9 +18,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use("/auth", authRoutes);
 app.use('/konyvek', konyvekRouter)
 
 module.exports = app;
