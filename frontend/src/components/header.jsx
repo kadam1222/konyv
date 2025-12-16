@@ -105,12 +105,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                 trigger={
                   <div
                     style={{
-                      display: "inline-block",
-                      cursor: "pointer",
-                      padding: "5px 10px",
-                      border: "1px solid #ccc",
-                      borderRadius: "4px",
-                      background: "#f0f0f0"
+                      background: "none", border: "none", cursor: "pointer", padding: 0 , transition: "transform 0.2s",
                     }}
                     onClick={() => {
                       if (accessToken) {
