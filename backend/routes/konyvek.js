@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const konyvekcontrollers = require('../controllers/konyvekcontrollers');
 
-
-
 router.get('/search', konyvekcontrollers.filter);
 router.get('/fokereso', konyvekcontrollers.fokereso);
 router.get('/kategoria', konyvekcontrollers.kategoria);
