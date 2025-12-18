@@ -2,9 +2,11 @@ const db = require('../config/db');
 
 
 class Konyvek {
-  static async getAll() {
+  static async getAll(page) {
     try {
-      const [rows] = await db.query('SELECT * FROM osszes_konyv');
+      const limit = 10;
+      const offset = (page-1) * limit
+      const [rows] = await db.query(`SELECT * FROM osszes_konyv ORDER BY RAND() limit ${limit} offset ?`, [offset]);
       return rows;
     } catch (err) {
       throw err;
@@ -20,11 +22,12 @@ class Konyvek {
     }
   }
 
-  static async fokereso(cim,szerzo){
+  static async fokereso(cim,szerzo, page){
     try{
+      const limit = 10;
+      const offset = (page-1) * limit
       const feltetelek_sql = []
       const feltetelek_parameter = []
-
       if(cim){
           feltetelek_sql.push("cim LIKE ?")
           feltetelek_parameter.push(`%${cim}%`)
@@ -33,9 +36,9 @@ class Konyvek {
           feltetelek_sql.push("szerzok LIKE ?")
           feltetelek_parameter.push(`%${szerzo}%`)
       }
-      
       const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" OR ") : ""
-      const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres}`, feltetelek_parameter);
+      const params = [...feltetelek_parameter];
+      const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} limit ${limit} offset ${offset}`, params);
       return rows
     }
     catch(error){
@@ -44,30 +47,31 @@ class Konyvek {
     }
   }
 
-  static async rendezes(ar_nov,ar_csok,kiadas_no,kiadas_csok){
-    const feltetelek_sql = []
-    
+  static async rendezes(relevancia){
+    let rendezes = "";
+
     try{
-      if (ar_nov){
-        feltetelek_sql
+      if (relevancia == "Kiadás éve (növekvő)"){
+        rendezes = "order by kiadas_eve ASC"
       }
-      if (ar_csok){
-        
+      if (relevancia == "Kiadás éve (csökkenő)"){
+        rendezes = "order by kiadas_eve DESC"
       }
-      if (kiadas_no){
-        
+      if (relevancia == "Ár (növekvő)"){
+        rendezes = "order by ar ASC"
       }
-      if (kiadas_csok){
-        
+      if (relevancia == "Ár (csökennő)"){
+        rendezes = "order by ar DESC"
       }
 
+      return rendezes
     }
     catch(error){
       console.error(error)
       throw error;
     }
   }
-  static async filter(kiado,kat,nyelv,illusztrator) {
+  static async filter(kiado,kat,nyelv,illusztrator,borito, relevanciabe) {
       try{
         const feltetelek_sql = []
         const feltetelek_parameter = []
@@ -87,10 +91,22 @@ class Konyvek {
           feltetelek_sql.push("illusztratorok LIKE ?")
           feltetelek_parameter.push(`%${illusztrator}%`)
         }
-  
+        if(borito){
+          feltetelek_sql.push("borito_tipus LIKE ?")
+          feltetelek_parameter.push(`%${borito}%`)
+        }
+        
         const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" AND ") : ""
-        const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres}`, feltetelek_parameter);
+
+        if(relevanciabe != "Relevancia"){
+          const rendezes = await this.rendezes(relevanciabe);
+          const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} ${rendezes}`, feltetelek_parameter,);
+          return rows
+        }
+        
+        const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} ORDER BY RAND()`, feltetelek_parameter);
         return rows
+       
       }
       catch (err) {
         console.error(err)
@@ -158,9 +174,25 @@ class Konyvek {
     }
   }
 
- 
+  static async regisztracio (nev, email, jelszo){
+    try {
+      await db.query('INSERT INTO vevo(vevo_nev , email, jelszo) VALUES (?, ?, ?)', [nev,email,jelszo])
+    } 
+    catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+   static async findByEmail (email){
+    try{
+        const [rows] = await db.query("SELECT * FROM vevo WHERE email = ?", [email])
+        return rows[0]
+    }
+    catch(err){
+        throw err
+    }
 
-  
+}
 }
 
 module.exports = Konyvek;

@@ -1,14 +1,48 @@
 import './filter.css'
 import { useState,useEffect } from 'react';
 import httpCommon from '../http-common';
+import { useSearchParams } from "react-router-dom";
 
 
-export default function Filters(){
-    const [kategoriak, setKategoriak] = useState([]);
+export default function Filters( { onSearch, talalatok }){
     const [kiadok, setKiadok] = useState([]);
     const [nyelv, setNyelv] = useState([]);
     const [borito, setBorito] = useState([]);
     const [error,setError] = useState();
+    const [filteredTalalatok, setFilteredTalalatok] = useState([]);
+    const [formData, setFormData] = useState({
+        borito: "",
+        armin: "",
+        armax: "",
+        kiado: "",
+        nyelv: "",
+    });
+    const [searchParams, setSearchParams] = useSearchParams();
+  const handleFilter = (kiado, nyelv, borito, kat) => {
+    let lista = talalatok ?? [];
+
+    if (!lista.length) return; 
+
+    if (kat) {
+      lista = lista.filter(k => k.kat_nev?.includes(kat));
+    }
+
+    if (borito) {
+      lista = lista.filter(k => k.borito_tipus?.includes(borito));
+    }
+
+    if (kiado) {
+      lista = lista.filter(k => k.kiado_nev?.includes(kiado));
+    }
+
+    if (nyelv) {
+      lista = lista.filter(k => k.nyelv_nev?.includes(nyelv));
+    }
+
+    setFilteredTalalatok(lista);
+    onSearch(lista);
+};
+
     
     const fetchData = async (nev, setter) =>{
         try{ 
@@ -21,12 +55,24 @@ export default function Filters(){
         }
     }
     
-    useEffect(() => {
-        fetchData("kategoria", setKategoriak);
-        fetchData("kiadok", setKiadok);
-        fetchData("nyelv", setNyelv);
-        fetchData("borito", setBorito);
-    }, []);
+useEffect(() => {
+    fetchData("kiadok", setKiadok);
+    fetchData("nyelv", setNyelv);
+    fetchData("borito", setBorito);
+}, []);
+
+useEffect(() => {
+    const borito = searchParams.get("borito") || "";
+    const nyelv = searchParams.get("nyelv") || "";
+    const kiado = searchParams.get("kiado") || "";
+    const kat = searchParams.get("kat") || "";
+
+    handleFilter(kiado, nyelv, borito, kat);
+}, [searchParams, talalatok]);
+
+
+
+    
     
     return(
         <>
@@ -44,19 +90,21 @@ export default function Filters(){
                     <option value="Kiadás éve (csökkenő)">Kiadás éve (csökkenő)</option>
                 </select>
             </div>
-            <div className="category">
-                <h3>Kategóriák: </h3>
-                {kategoriak.map((t, index) => (
-                    <>
-                    {t.katazon && <span key={index}>{t.kat_nev}<br /></span>}
-                    </>
-                    
-                ))}
-            </div>
             <div className="borito">
                 <h3>Borító: </h3>
                 {borito.map((t, index) => (
-                    <span key={index}>{t.borito_nev}<br /></span>
+                <span 
+                    key={index}
+                    className="kat"
+                    style={{ cursor: "pointer", textTransform: "capitalize" }}
+                    onClick={() => {
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.set("borito", t.borito_nev);
+                        setSearchParams(newParams); 
+                    }}
+                >
+                    {t.borito_nev}
+                </span>
                 ))}
             </div>
             <div className="ar">
@@ -68,14 +116,37 @@ export default function Filters(){
             <div className="kiadok">
                 <h3>Kiadó: </h3>
                 {kiadok.map((t, index) => (
-                    <span key={index}>{t.kiado_nev}<br /></span>
+                <span 
+                    key={index}
+                    className="kat"
+                    style={{ cursor: "pointer", textTransform: "capitalize" }}
+                    onClick={() => {
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.set("kiado", t.kiado_nev);
+                        setSearchParams(newParams); 
+                    }}
+                >
+                    {t.kiado_nev}
+                </span>
                 ))}
+                
             </div>
             <div className="language">
                 <h3>Nyelv: </h3>
                 {nyelv.map((t, index) => (
                     <>
-                   <span key={index}>{t.nyelv_nev}<br /></span>
+                <span 
+                    key={index}
+                    className="kat"
+                    style={{ cursor: "pointer", textTransform: "capitalize" }}
+                    onClick={() => {
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.set("nyelv", t.nyelv_nev);
+                        setSearchParams(newParams); 
+                    }}
+                >
+                    {t.nyelv_nev}
+                </span>
                     </>
                     
                 ))}
