@@ -84,6 +84,7 @@ function App() {
 
                   <Fooldal
                     talalatok={talalatok}
+                    setTalalatok={setTalalatok}
                     searchQuery={searchQuery}
                     searchPage={searchPage}
                     setSearchPage={setSearchPage}

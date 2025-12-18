@@ -17,6 +17,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
     
 
 
+
   const fetchData = async (pagenum) => {
     try {
       setLoading(true);
@@ -35,7 +36,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
   };
 
   const fetchSearchData = async (query, pagenum) => {
-    if(!query) return;
+    if(!query || !hasMoreSearch) return;
     try {
       setLoading(true);
       const response = await httpCommon.get(`/konyvek/fokereso?page=${pagenum}&limit=10&cim=${query}&szerzo=${query}`);
@@ -53,7 +54,19 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
   };
 
   useEffect(() => { if(!searchQuery) fetchData(page); }, [page, searchQuery]);
-  useEffect(() => { if(searchQuery) fetchSearchData(searchQuery, searchPage); }, [searchPage, searchQuery]);
+  useEffect(() => {
+  if (searchQuery) {
+    setTalalatok([]);
+    setSearchPage(1);
+    setHasMoreSearch(true);
+  }
+}, [searchQuery]);
+
+  useEffect(() => { 
+    if(searchQuery) {
+      fetchSearchData(searchQuery, searchPage); 
+    }
+  }, [searchPage]);
   
 
   const lastItemRef = useCallback((node) => {
@@ -61,7 +74,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
     if(observerRef.current) observerRef.current.disconnect();
 
     observerRef.current = new IntersectionObserver((entries) => {
-      if(entries[0].isIntersecting){
+      if(entries[0].isIntersecting && !loading ){
         if(searchQuery){
           if(hasMoreSearch) setSearchPage(prev => prev + 1);
         } else {

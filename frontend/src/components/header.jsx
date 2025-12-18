@@ -1,16 +1,17 @@
 import { TfiShoppingCartFull } from "react-icons/tfi";
 import { FaMagnifyingGlass } from "react-icons/fa6";
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
 import { useEffect, useState } from "react";
 import { NavItem } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
 import http from "../http-common";
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 import LoginForm from "./loginform";
+import Fooldal from "./fooldal";
 
 export default function Header({ onSearch, accessToken, setAccessToken }) {
   const [fokat, setFokat] = useState([]);
@@ -19,126 +20,198 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   const [showLogin, setShowLogin] = useState(false);
 
   const fetchData = async () => {
-    try { 
-      const response = await http.get('/konyvek/kategoria');
+    try {
+      const response = await http.get("/konyvek/kategoria");
       setFokat(response.data);
     } catch (error) {
-      console.error('Error fetching data: ', error);
+      console.error("Error fetching data: ", error);
     }
   };
 
-  useEffect(() => { fetchData(); }, [searchParams]);
+  // categories do NOT depend on URL params
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // 🔒 ONLY runs on Enter or button click
+  const handleSearch = () => {
+    if (!keresett.trim()) return;
+
+    // clear URL params ONLY now
+    setSearchParams({}, { replace: true });
+
+    onSearch(keresett, 1, null);
+  };
 
   const handleFilter = async (katNev) => {
     setSearchParams({ kat: katNev });
+
     try {
-      const response = await http.get("/konyvek/search", { params: { kat: katNev } });
+      const response = await http.get("/konyvek/search", {
+        params: { kat: katNev },
+      });
       onSearch(response.data, 1, katNev);
     } catch (error) {
       console.error("Hiba a kategória szűrésnél:", error);
     }
   };
 
-  const fetchFilterData = async (kereso) => {
-    if (!kereso || kereso.trim() === "") {
-      onSearch([]);
-      return;
-    }
-    onSearch([]);
-    onSearch(kereso, 1, kereso); 
-  };
-
   const CategoryDropdown = ({ title }) => (
     <NavDropdown title={title} id={`nav-${title}`}>
-      {fokat.filter(f => !f.katazon).map((f) => (
-        <NavDropdown key={f.id} title={f.kat_nev} id={`nav-sub-${f.id}`}>
-          {fokat.filter(k => k.katazon === f.id).length > 0 ? (
-            fokat.filter(k => k.katazon === f.id).map(sub => (
-              <NavDropdown.Item key={sub.id} onClick={() => handleFilter(sub.kat_nev)}>
-                {sub.kat_nev}
+      {fokat
+        .filter((f) => !f.katazon)
+        .map((f) => (
+          <NavDropdown key={f.id} title={f.kat_nev} id={`nav-sub-${f.id}`}>
+            {fokat.filter((k) => k.katazon === f.id).length > 0 ? (
+              fokat
+                .filter((k) => k.katazon === f.id)
+                .map((sub) => (
+                  <NavDropdown.Item
+                    key={sub.id}
+                    onClick={() => handleFilter(sub.kat_nev)}
+                  >
+                    {sub.kat_nev}
+                  </NavDropdown.Item>
+                ))
+            ) : (
+              <NavDropdown.Item disabled>
+                Nincs alkategória
               </NavDropdown.Item>
-            ))
-          ) : (
-            <NavDropdown.Item disabled>Nincs alkategória</NavDropdown.Item>
-          )}
-        </NavDropdown>
-      ))}
+            )}
+          </NavDropdown>
+        ))}
     </NavDropdown>
   );
 
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
-      <NavItem style={{ marginLeft: "14px" }}>
-        <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
-          <h2>Bolt</h2>
-        </a>
-      </NavItem>
-      <Container>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-            <Nav className="me-auto" style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
-              <CategoryDropdown title="Könyv" />
-              <CategoryDropdown title="E-Könyv" />
-              <CategoryDropdown title="Antikvárium" />
-            </Nav>
+    <header>
+      <Navbar expand="lg" className="bg-body-tertiary">
+        <NavItem style={{ marginLeft: "14px" }}>
+          <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <h2>Bolt</h2>
+          </a>
+        </NavItem>
 
-            <NavItem style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <input 
-                  placeholder="Keresés..." 
-                  style={{ width: "300px", height: "30px", border: "1px solid rgba(0,0,0,0.25)" }}
-                  onChange={(e) => setKeresett(e.target.value)}
-                  value={keresett}
-                  type="search"
-                  onKeyDown={(e) => { if (e.key === "Enter") onSearch(keresett, 1, keresett); }}
-                />
-                <button 
-                  style={{ width: "40px", height: "30px", border: "1px solid rgba(0,0,0,0.25)", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
-                  onClick={() => fetchFilterData(keresett)}
-                >
-                  <FaMagnifyingGlass />
-                </button>
-              </div>
+        <Container>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-              <Popup
-                trigger={
-                  <div
-                    style={{
-                      background: "none", border: "none", cursor: "pointer", padding: 0 , transition: "transform 0.2s",
-                    }}
-                    onClick={() => {
-                      if (accessToken) {
-                        setAccessToken(""); 
-                      } else {
-                        setShowLogin(true); 
-                      }
-                    }}
-                  >
-                    {accessToken ? "Kijelentkezés" : "Belépés / Regisztráció"}
-                  </div>
-                }
-                modal
-                nested
-                open={showLogin}
-                onClose={() => setShowLogin(false)}
+            <Navbar.Collapse
+              id="basic-navbar-nav"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <Nav
+                className="me-auto"
+                style={{ display: "flex", flexDirection: "row", gap: "20px" }}
               >
-                {(close) => (
-                  <div style={{ background: "#fff", padding: "20px", borderRadius: "8px", width: "400px", maxWidth: "90%" }}>
-                    <LoginForm setAccessToken={setAccessToken} onClose={close} />
-                    <div style={{ textAlign: "right", marginTop: "10px" }}>
-                      <button onClick={close}>Bezárás</button>
+                <CategoryDropdown title="Könyv" />
+                <CategoryDropdown title="E-Könyv" />
+                <CategoryDropdown title="Antikvárium" />
+              </Nav>
+
+              <NavItem
+                style={{ display: "flex", alignItems: "center", gap: "15px" }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <input
+                    placeholder="Keresés..."
+                    style={{
+                      width: "300px",
+                      height: "30px",
+                      border: "1px solid rgba(0,0,0,0.25)",
+                    }}
+                    value={keresett}
+                    onChange={(e) => setKeresett(e.target.value)}
+                    type="search"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSearch();
+                    }}
+                  />
+
+                  <button
+                    style={{
+                      width: "40px",
+                      height: "30px",
+                      border: "1px solid rgba(0,0,0,0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: 0,
+                    }}
+                    onClick={handleSearch}
+                  >
+                    <FaMagnifyingGlass />
+                  </button>
+                </div>
+
+                <Popup
+                  trigger={
+                    <div
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                      onClick={() => {
+                        if (accessToken) {
+                          setAccessToken("");
+                        } else {
+                          setShowLogin(true);
+                        }
+                      }}
+                    >
+                      {accessToken
+                        ? "Kijelentkezés"
+                        : "Belépés / Regisztráció"}
                     </div>
-                  </div>
-                )}
-              </Popup>
+                  }
+                  modal
+                  nested
+                  open={showLogin}
+                  onClose={() => setShowLogin(false)}
+                >
+                  {(close) => (
+                    <div
+                      style={{
+                        background: "#fff",
+                        padding: "20px",
+                        borderRadius: "8px",
+                        width: "400px",
+                        maxWidth: "90%",
+                      }}
+                    >
+                      <LoginForm
+                        setAccessToken={setAccessToken}
+                        onClose={close}
+                      />
+                      <div style={{ textAlign: "right", marginTop: "10px" }}>
+                        <button onClick={close}>Bezárás</button>
+                      </div>
+                    </div>
+                  )}
+                </Popup>
 
-
-              <a href="/cart"><TfiShoppingCartFull /></a>
-            </NavItem>
-          </Navbar.Collapse>
-        </div>
-      </Container>
-    </Navbar>
+                <a href="/cart">
+                  <TfiShoppingCartFull />
+                </a>
+              </NavItem>
+            </Navbar.Collapse>
+          </div>
+        </Container>
+      </Navbar>
+    </header>
   );
 }

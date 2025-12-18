@@ -62,7 +62,6 @@ return (
   <div className="termek-page">
     <div className="termek-card">
 
-      {/* BAL OLDAL – BORÍTÓ */}
       <div className="termek-image">
         <img
           src={`/kepek/${adatok.ISBN}.jpg`}
@@ -70,7 +69,6 @@ return (
         />
       </div>
 
-      {/* JOBB OLDAL – TARTALOM */}
       <div className="termek-content">
 
         <a href="/" className="termek-vissza">← Vissza</a>
