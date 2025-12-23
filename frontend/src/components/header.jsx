@@ -91,14 +91,13 @@ export default function Header({ onSearch }) {
               <div style={{ display:"flex", alignItems:"center" }}>
                 <input 
                   placeholder="Keresés..." 
-                  style={{ width:"300px", height:"30px", border:"1px solid rgba(0,0,0,0.25)" }}
+                  style={{ width:"300px", height:"30px", border:"1px solid rgba(0,0,0,0.25)",borderRadius: "4px",padding: "4px 8px",color: "#3a3a3a",fontSize: "14px",outlineColor: "#9f8d73",transition: "outline-color 0.2s ease" }}
                   onChange={(e) => setKeresett(e.target.value)}
                   value={keresett}
                   type="search"
                   onKeyDown={(e) =>  { if (e.key === "Enter") onSearch(keresett, 1, keresett); }}
                 />
-                <button 
-                  style={{ width:"40px", height:"30px", border:"1px solid rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", padding:0 }}
+                <button style={{ width:"40px", height:"32px",border: "1px solid #c3af89",borderRadius: "0 4px 4px 0",backgroundColor: "white",display: "flex",alignItems: "center",justifyContent: "center",cursor: "pointer",color: "#9f8d73", transition: "color 0.2s ease",}}
                   onClick={() => fetchFilterData(keresett)}
                 >
                   <FaMagnifyingGlass />
@@ -112,7 +111,11 @@ export default function Header({ onSearch }) {
         background: "none",
         border: "none",
         cursor: "pointer",
-        padding: 0
+        padding: 0,
+        color: "#3a3a3a",
+        fontSize: "14px",
+        fontWeight: "500",
+        transition: "color 0.2s ease",
       }}
     >
       Belépés / Regisztráció

@@ -1,0 +1,82 @@
+.footer {
+  padding: 50px 80px;
+  background: #9f8d73;
+  border-top: 1px solid #c3af89;
+  font-family: Inter, sans-serif;
+}
+
+/* Felső rész */
+.topSection {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 60px; /* volt 40 */
+}
+
+.leftBlock {
+  max-width: 450px;
+}
+
+.brand {
+  margin-bottom: 12px;
+}
+    
+
+.description {
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+/* Linkek */
+.linksRow {
+  margin-top: 25px;
+  display: flex;
+  gap: 35px; /* volt 25 */
+  font-size: 16px;
+  flex-wrap: wrap;
+}
+.linksRow a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.linksRow a:hover {
+  color: #dbc38c;
+}
+
+/* Elválasztó */
+.line {
+  border: none;
+  height: 1px;
+  background: #c3af89;
+  margin: 20px 0;
+}
+
+/* Alsó rész */
+.bottomSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.copy {
+  color: #f2e5bb;
+}
+
+/* Ikonok */
+.iconRow {
+  display: flex;
+  gap: 25px;
+  margin-top: 10px;
+}
+
+.icon {
+  font-size: 20px;
+  color: #ffffff;
+  transition: color 0.2s ease;
+}
+
+.icon:hover {
+  color: #dbc38c;
+}
