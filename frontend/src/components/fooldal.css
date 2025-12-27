@@ -6,6 +6,10 @@
     gap: 15px;
 }
 
+body{
+    background-color: #f2e5bb;
+}
+
 .kartya {
     flex: 1 1 18rem;
     max-width: 18rem;
@@ -13,6 +17,20 @@
     flex-direction: column;
     height: auto;
     max-height: 860px;
+    background-color:#F5F5DC;
+
+}
+
+.kartya:hover,
+.kartya:hover .card-body,
+.kartya:hover .list-group-item {
+    transform: translateY(-2px);
+    background-color: #e5e5cf;
+    box-shadow: 0 8px 20px rgba(159, 141, 115, 0.4);
+}
+
+.kartya:hover .list-group-item {
+  border: 1px solid #d6cfb4; 
 }
 
 .termek_kep {
@@ -31,4 +49,26 @@
 
 #nincstalalat{
     color: black;
+}
+
+.Kosargomb{
+    padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #dbc38c;
+  color: #3a2f1f;
+  transition: all 0.2s ease;
+}
+
+.Kosargomb:hover{
+    background-color: #c3af89;
+    box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
+    transform: translateY(-2px);
+}
+
+.list-group-item{
+    background-color: #F5F5DC
 }

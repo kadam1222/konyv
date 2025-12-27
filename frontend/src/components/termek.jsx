@@ -76,10 +76,10 @@ return (
         <a href="/" className="termek-vissza">← Vissza</a>
 
         <h1>{adatok.cim}</h1>
-        <h3>{adatok.szerzok}</h3>
+        <h4 className="szerzonevek">{adatok.szerzok}</h4>
 
         <p className="termek-leiras">
-          {adatok.leiras}
+          { adatok.leiras ? adatok.leiras : "Nincs leírás"}
         </p>
 
         <div className="termek-meta">

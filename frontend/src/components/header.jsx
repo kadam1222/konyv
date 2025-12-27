@@ -72,7 +72,8 @@ export default function Header({ onSearch }) {
   useEffect(()=>{ fetchData(); }, [searchParams]);
 
   return(
-    <Navbar expand="lg" className="bg-body-tertiary">
+    <header style={{backgroundColor:"#ceb795ff"}}> 
+    <Navbar expand="lg" >
       <NavItem style={{ marginLeft:"14px" }}>
         <a href="/"  style={{ textDecoration: "none", color: "inherit" }}>
           <h2>Bolt</h2>
@@ -91,13 +92,13 @@ export default function Header({ onSearch }) {
               <div style={{ display:"flex", alignItems:"center" }}>
                 <input 
                   placeholder="Keresés..." 
-                  style={{ width:"300px", height:"30px", border:"1px solid rgba(0,0,0,0.25)",borderRadius: "4px",padding: "4px 8px",color: "#3a3a3a",fontSize: "14px",outlineColor: "#9f8d73",transition: "outline-color 0.2s ease" }}
+                  style={{ width:"300px", height:"30px", border:"1px solid rgba(0,0,0,0.25)",borderRadius: "4px",padding: "4px 8px",color: "#3a3a3a",fontSize: "14px",outlineColor: "#9f8d73",transition: "outline-color 0.2s ease", backgroundColor: "#ffffffec" }}
                   onChange={(e) => setKeresett(e.target.value)}
                   value={keresett}
                   type="search"
                   onKeyDown={(e) =>  { if (e.key === "Enter") onSearch(keresett, 1, keresett); }}
                 />
-                <button style={{ width:"40px", height:"32px",border: "1px solid #c3af89",borderRadius: "0 4px 4px 0",backgroundColor: "white",display: "flex",alignItems: "center",justifyContent: "center",cursor: "pointer",color: "#9f8d73", transition: "color 0.2s ease",}}
+                <button style={{ width:"40px", height:"32px",border: "1px solid #c3af89",borderRadius: "0 4px 4px 0",backgroundColor: "#ffffffec" ,display: "flex",alignItems: "center",justifyContent: "center",cursor: "pointer",color: "#9f8d73", transition: "color 0.2s ease",}}
                   onClick={() => fetchFilterData(keresett)}
                 >
                   <FaMagnifyingGlass />
@@ -149,5 +150,6 @@ export default function Header({ onSearch }) {
         </div>
       </Container>
     </Navbar>
+    </header>
   );
 }
