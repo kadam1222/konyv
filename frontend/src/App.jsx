@@ -18,6 +18,7 @@ function App() {
   const [hasMore, setHasMore] = useState(true);
   const [rawResults, setRawResults] = useState([]);
   const [accessToken, setAccessToken] = useState("");
+  
 
   useEffect(() => {
     const refreshToken = async () => {
@@ -36,30 +37,29 @@ function App() {
     };
     refreshToken();
   }, []);
-  const handleSearch = async (query, pageNum = 1) => {
-    if (!query) {
-      setTalalatok([]);
-      return;
+  const handleSearch = async (query, pageNum = 1, category = null) => {
+  try {
+    let url;
+    if (category) {
+      url = `/konyvek/search?kat=${category}&page=${pageNum}&limit=10`;
+    } else {
+      url = `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`;
     }
 
-    try {
-      const res = await fetch(
-        `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`
-      );
-      const data = await res.json();
+    const res = await fetch(url);
+    const data = await res.json();
 
-      setTalalatok(prev =>
-        pageNum === 1 ? data : [...prev, ...data]
-      );
+    setTalalatok(prev => pageNum === 1 ? data : [...prev, ...data]);
+    setSearchQuery(query);
+    setSearchPage(pageNum);
+    setHasMoreSearch(data.length === 10);
+    setRawResults(data);
 
-      setSearchQuery(query);
-      setSearchPage(pageNum);
-      setHasMoreSearch(data.length === 10);
-      setRawResults(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   return (
     <Router>

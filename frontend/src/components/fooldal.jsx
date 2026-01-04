@@ -98,7 +98,8 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       }
     };
 
-  const lista = searchQuery ? talalatok : adatok;
+  const lista = talalatok.length > 0 ? talalatok : adatok;
+
 
   return (
     <div style={{textAlign: "center"}}>
