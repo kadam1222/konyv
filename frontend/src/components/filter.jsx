@@ -68,12 +68,10 @@ useEffect(() => {
     const kat = searchParams.get("kat") || "";
 
     handleFilter(kiado, nyelv, borito, kat);
-}, [searchParams, talalatok]);
+}, [searchParams]);
 
 
 
-    
-    
     return(
         <>
         <div className="filter_fodiv">

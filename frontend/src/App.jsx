@@ -78,7 +78,7 @@ function App() {
                   {talalatok.length > 0 && (
                     <Filters
                       onSearch={setTalalatok}
-                      talalatok={rawResults}
+                      talalatok={talalatok}
                     />
                   )}
 
