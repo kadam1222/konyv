@@ -8,6 +8,7 @@ import Main from './components/main';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Footer from './components/footer';
 import Termek from './components/termek';
+import Kosar from './components/kosar';
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -101,6 +102,7 @@ function App() {
           />
 
           <Route path="/termek/:isbn" element={<Termek />} />
+          <Route path="/cart" element={<Kosar/>} />
 
 
         </Routes>
