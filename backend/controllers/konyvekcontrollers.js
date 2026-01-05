@@ -36,7 +36,9 @@ exports.filter = async (req, res) => {
     const illusztrator = req.query.illusz
     const borito = req.query.borito
     const tipus = req.query.tipus
-    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia",tipus );
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia",tipus , page, limit);
     res.json(konyvek_filter); 
   } catch (err) {
     console.error(err);
