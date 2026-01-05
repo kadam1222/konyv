@@ -90,7 +90,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       setSearchParams({ ISBN : ISBN });
   
       try {
-        const response = await http.get("/konyvek/", {
+       await http.get("/konyvek/", {
           params: { ISBN: ISBN }
       });
       } catch (error) {
@@ -98,7 +98,8 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       }
     };
 
-  const lista = searchQuery ? talalatok : adatok;
+  const lista = talalatok.length > 0 ? talalatok : adatok;
+
 
   return (
     <div style={{textAlign: "center"}}>
