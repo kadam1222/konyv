@@ -11,13 +11,14 @@ import http from "../http-common";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import LoginForm from "./loginform";
-import Fooldal from "./fooldal";
+import RegisterForm from "./registerform";
 
 export default function Header({ onSearch, accessToken, setAccessToken }) {
   const [fokat, setFokat] = useState([]);
   const [keresett, setKeresett] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
-  const [showLogin, setShowLogin] = useState(false);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -28,16 +29,11 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
     }
   };
 
-  // categories do NOT depend on URL params
   useEffect(() => {
     fetchData();
   }, []);
-
-  // 🔒 ONLY runs on Enter or button click
   const handleSearch = () => {
     if (!keresett.trim()) return;
-
-    // clear URL params ONLY now
     setSearchParams({}, { replace: true });
 
     onSearch(keresett, 1, null);
@@ -45,15 +41,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
 
   const handleFilter = async (katNev) => {
     setSearchParams({ kat: katNev });
-
-    try {
-      const response = await http.get("/konyvek/search", {
-        params: { kat: katNev },
-      });
-      onSearch(response.data, 1, katNev);
-    } catch (error) {
-      console.error("Hiba a kategória szűrésnél:", error);
-    }
+    onSearch("", 1, katNev);
   };
 
   const CategoryDropdown = ({ title }) => (
@@ -169,7 +157,8 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                         if (accessToken) {
                           setAccessToken("");
                         } else {
-                          setShowLogin(true);
+                          setShowAuthPopup(true);
+                          setShowLoginForm(true);
                         }
                       }}
                     >
@@ -180,8 +169,8 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                   }
                   modal
                   nested
-                  open={showLogin}
-                  onClose={() => setShowLogin(false)}
+                  open={showAuthPopup}
+                  onClose={() => setShowAuthPopup(false)}
                 >
                   {(close) => (
                     <div
@@ -192,11 +181,25 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                         width: "400px",
                         maxWidth: "90%",
                       }}
-                    >
-                      <LoginForm
-                        setAccessToken={setAccessToken}
-                        onClose={close}
-                      />
+                    >{showLoginForm ? (
+                        <LoginForm
+                          setAccessToken={setAccessToken}
+                          onClose={() => {
+                            close();
+                            setShowAuthPopup(false);
+                          }}
+                          switchToRegister={() => setShowLoginForm(false)}
+                        />
+                      ) : (
+                        <RegisterForm
+                          onClose={() => {
+                            close();
+                            setShowAuthPopup(false);
+                          }}
+                          switchToLogin={() => setShowLoginForm(true)}
+                        />
+                      )}
+
                       <div style={{ textAlign: "right", marginTop: "10px" }}>
                         <button onClick={close}>Bezárás</button>
                       </div>
