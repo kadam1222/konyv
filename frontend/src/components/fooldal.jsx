@@ -112,13 +112,12 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
             <Card.Body style={{padding:"1rem"}}>
               <Card.Title >{t.cim}</Card.Title>
               <Card.Subtitle>{t.szerzok}</Card.Subtitle>
-              <Card.Text>{t.leiras ? t.leiras.substring(0, 100)+"..." : "Nincs leírás"} {t.borito_tipus}</Card.Text>
+              <Card.Text>{t.leiras ? t.leiras.substring(0, 100)+"..." : "Nincs leírás"}</Card.Text>
             </Card.Body>
             <ListGroup className="list-group-flush">
               <ListGroup.Item>{t.kiado_nev}</ListGroup.Item>
               <ListGroup.Item>{t.kiadas_eve}</ListGroup.Item>
               <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
-              <ListGroup.Item>{t.borito_tipus} Ft</ListGroup.Item>
             </ListGroup>
             <Card.Footer>
               <Button variant="primary">Kosárba rakom</Button>

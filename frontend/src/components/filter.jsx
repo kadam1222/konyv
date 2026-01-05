@@ -8,6 +8,7 @@ export default function Filters( { onSearch, talalatok }){
     const [kiadok, setKiadok] = useState([]);
     const [nyelv, setNyelv] = useState([]);
     const [borito, setBorito] = useState([]);
+    const [tipus, setTipus] = useState([]);
     const [error,setError] = useState();
     const [filteredTalalatok, setFilteredTalalatok] = useState([]);
     const [formData, setFormData] = useState({
@@ -16,9 +17,10 @@ export default function Filters( { onSearch, talalatok }){
         armax: "",
         kiado: "",
         nyelv: "",
+        tipus:"",
     });
     const [searchParams, setSearchParams] = useSearchParams();
-  const handleFilter = (kiado, nyelv, borito, kat) => {
+  const handleFilter = (kiado, nyelv, borito, kat, tipus) => {
     let lista = talalatok ?? [];
 
     if (!lista.length) return; 
@@ -37,6 +39,10 @@ export default function Filters( { onSearch, talalatok }){
 
     if (nyelv) {
       lista = lista.filter(k => k.nyelv_nev?.includes(nyelv));
+    }
+
+    if(tipus) {
+        lista = lista.filter(k => k.tipus_nev?.includes(tipus));
     }
 
     setFilteredTalalatok(lista);
@@ -59,6 +65,7 @@ useEffect(() => {
     fetchData("kiadok", setKiadok);
     fetchData("nyelv", setNyelv);
     fetchData("borito", setBorito);
+    fetchData("tipus", setTipus)
 }, []);
 
 useEffect(() => {
@@ -66,8 +73,9 @@ useEffect(() => {
     const nyelv = searchParams.get("nyelv") || "";
     const kiado = searchParams.get("kiado") || "";
     const kat = searchParams.get("kat") || "";
+    const tipus = searchParams.get("tipus") || "";
 
-    handleFilter(kiado, nyelv, borito, kat);
+    handleFilter(kiado, nyelv, borito, kat, tipus);
 }, [searchParams]);
 
 
@@ -102,6 +110,23 @@ useEffect(() => {
                     }}
                 >
                     {t.borito_nev}
+                </span>
+                ))}
+            </div>
+            <div className="borito">
+                <h3>Típusok: </h3>
+                {tipus.map((t, index) => (
+                <span 
+                    key={index}
+                    className="kat"
+                    style={{ cursor: "pointer", textTransform: "capitalize" }}
+                    onClick={() => {
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.set("tipus", t.tipus_nev);
+                        setSearchParams(newParams); 
+                    }}
+                >
+                    {t.tipus_nev}
                 </span>
                 ))}
             </div>

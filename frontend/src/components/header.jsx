@@ -71,6 +71,14 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
     </NavDropdown>
   );
 
+  const Profildropdown = () => (
+    <NavDropdown title="Profilom" id="asd">
+          <NavDropdown.Item >Rendeléseim</NavDropdown.Item>
+          <NavDropdown.Item >Segítség</NavDropdown.Item>
+          <NavDropdown.Item >Kijelentkezés</NavDropdown.Item>    
+    </NavDropdown>
+  );
+
   return (
     <header>
       <Navbar expand="lg" className="bg-body-tertiary">
@@ -104,9 +112,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                 className="me-auto"
                 style={{ display: "flex", flexDirection: "row", gap: "20px" }}
               >
-                <CategoryDropdown title="Könyv" />
-                <CategoryDropdown title="E-Könyv" />
-                <CategoryDropdown title="Antikvárium" />
+                <CategoryDropdown title="Kategóriák" />
               </Nav>
 
               <NavItem
@@ -163,7 +169,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                       }}
                     >
                       {accessToken
-                        ? "Kijelentkezés"
+                        ? <Profildropdown title="Profil" />
                         : "Belépés / Regisztráció"}
                     </div>
                   }

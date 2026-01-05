@@ -71,7 +71,7 @@ class Konyvek {
       throw error;
     }
   }
-  static async filter(kiado,kat,nyelv,illusztrator,borito, relevanciabe) {
+  static async filter(kiado,kat,nyelv,illusztrator,borito, relevanciabe, tipus) {
       try{
         const feltetelek_sql = []
         const feltetelek_parameter = []
@@ -94,6 +94,10 @@ class Konyvek {
         if(borito){
           feltetelek_sql.push("borito_tipus LIKE ?")
           feltetelek_parameter.push(`%${borito}%`)
+        }
+        if(tipus){
+          feltetelek_sql.push("tipus_nev LIKE ?")
+          feltetelek_parameter.push(`%${tipus}%`)
         }
         
         const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" AND ") : ""
@@ -166,6 +170,16 @@ class Konyvek {
  static async borito(){
     try{
       const [rows] = await db.query('SELECT * FROM borito');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+  static async tipus(){
+    try{
+      const [rows] = await db.query('SELECT * FROM tipus');
       return rows;
     }
     catch(error){
