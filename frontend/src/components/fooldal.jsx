@@ -120,7 +120,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
               <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
             </ListGroup>
             <Card.Footer>
-              <Button onClick={() => ""} variant="primary">Kosárba rakom</Button>
+              <Button onClick={() => {localStorage.setItem("termek", JSON.stringify(t)) }} variant="primary">Kosárba rakom</Button>
             </Card.Footer>
           </Card>
         );
