@@ -118,7 +118,6 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
               <ListGroup.Item>{t.kiado_nev}</ListGroup.Item>
               <ListGroup.Item>{t.kiadas_eve}</ListGroup.Item>
               <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
-              <ListGroup.Item>{t.borito_tipus} Ft</ListGroup.Item>
             </ListGroup>
             <Card.Footer>
               <Button variant="primary">Kosárba rakom</Button>
