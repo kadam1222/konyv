@@ -3,7 +3,7 @@ import Header from './components/header';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Filters from './components/filter';
 import Fooldal from './components/fooldal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Main from './components/main';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Footer from './components/footer';
@@ -11,6 +11,7 @@ import Termek from './components/termek';
 import Ászf from './components/ÁSZF'
 import Rolunk from './components/rolunk';
 import Elerhetosegek from './components/elerhetosegek';
+import Kosar from './components/kosar';
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -20,44 +21,60 @@ function App() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [rawResults, setRawResults] = useState([]);
+  const [accessToken, setAccessToken] = useState("");
+  
 
-  const handleSearch = async (query, pageNum = 1) => {
-    if (!query) {
-      setTalalatok([]);
-      return;
+  useEffect(() => {
+    const refreshToken = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/auth/refresh", {
+          method: "POST",
+          credentials: "include",
+        });
+        if (!res.ok) return;
+          const data = await res.json();
+          setAccessToken(data.accessToken);
+      } 
+      catch(err){
+
+      }
+    };
+    refreshToken();
+  }, []);
+  const handleSearch = async (query, pageNum = 1, category = null) => {
+  try {
+    let url;
+    if (category) {
+      url = `/konyvek/search?kat=${category}&page=${pageNum}&limit=10`;
+    } else {
+      url = `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`;
     }
 
-    try {
-      const res = await fetch(
-        `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`
-      );
-      const data = await res.json();
+    const res = await fetch(url);
+    const data = await res.json();
 
-      setTalalatok(prev =>
-        pageNum === 1 ? data : [...prev, ...data]
-      );
+    setTalalatok(prev => pageNum === 1 ? data : [...prev, ...data]);
+    setSearchQuery(query);
+    setSearchPage(pageNum);
+    setHasMoreSearch(data.length === 10);
+    setRawResults(data);
 
-      setSearchQuery(query);
-      setSearchPage(pageNum);
-      setHasMoreSearch(data.length === 10);
-      setRawResults(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   return (
     <Router>
+
       <div className="app">
 
-        <Header onSearch={handleSearch} />
+        <Header onSearch={handleSearch}  accessToken={accessToken} setAccessToken={setAccessToken} />
 
         <Routes>
 
-          {/* FŐOLDAL */}
-          <Route
-            path="/"
-            element={
+          <Route path="/" element={
               <>
                 {talalatok.length === 0 && <Main />}
 
@@ -65,12 +82,13 @@ function App() {
                   {talalatok.length > 0 && (
                     <Filters
                       onSearch={setTalalatok}
-                      talalatok={rawResults}
+                      talalatok={talalatok}
                     />
                   )}
 
                   <Fooldal
                     talalatok={talalatok}
+                    setTalalatok={setTalalatok}
                     searchQuery={searchQuery}
                     searchPage={searchPage}
                     setSearchPage={setSearchPage}
@@ -86,11 +104,13 @@ function App() {
             }
           />
 
-          {/* TERMÉK */}
           <Route path="/termek/:isbn" element={<Termek />} />
           <Route path="/ASZF" element={<Ászf />} />
           <Route path="/rolunk" element={<Rolunk />} />
           <Route path="/elerhetosegek" element={<Elerhetosegek />} />
+          <Route path="/cart" element={<Kosar/>} />
+
+
         </Routes>
 
         <Footer />

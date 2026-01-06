@@ -1,4 +1,4 @@
-/* Reset + alap */
+
 * {
   box-sizing: border-box;
 }
@@ -10,14 +10,12 @@ body {
   color: #222;
 }
 
-/* App wrapper */
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Központi tartalom */
 main {
   flex: 1;
 }

@@ -17,6 +17,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
     
 
 
+
   const fetchData = async (pagenum) => {
     try {
       setLoading(true);
@@ -35,7 +36,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
   };
 
   const fetchSearchData = async (query, pagenum) => {
-    if(!query) return;
+    if(!query || !hasMoreSearch) return;
     try {
       setLoading(true);
       const response = await httpCommon.get(`/konyvek/fokereso?page=${pagenum}&limit=10&cim=${query}&szerzo=${query}`);
@@ -53,7 +54,19 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
   };
 
   useEffect(() => { if(!searchQuery) fetchData(page); }, [page, searchQuery]);
-  useEffect(() => { if(searchQuery) fetchSearchData(searchQuery, searchPage); }, [searchPage, searchQuery]);
+  useEffect(() => {
+  if (searchQuery) {
+    setTalalatok([]);
+    setSearchPage(1);
+    setHasMoreSearch(true);
+  }
+}, [searchQuery]);
+
+  useEffect(() => { 
+    if(searchQuery) {
+      fetchSearchData(searchQuery, searchPage); 
+    }
+  }, [searchPage]);
   
 
   const lastItemRef = useCallback((node) => {
@@ -61,7 +74,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
     if(observerRef.current) observerRef.current.disconnect();
 
     observerRef.current = new IntersectionObserver((entries) => {
-      if(entries[0].isIntersecting){
+      if(entries[0].isIntersecting && !loading ){
         if(searchQuery){
           if(hasMoreSearch) setSearchPage(prev => prev + 1);
         } else {
@@ -77,7 +90,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       setSearchParams({ ISBN : ISBN });
   
       try {
-        const response = await http.get("/konyvek/", {
+       await http.get("/konyvek/", {
           params: { ISBN: ISBN }
       });
       } catch (error) {
@@ -85,7 +98,8 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       }
     };
 
-  const lista = searchQuery ? talalatok : adatok;
+  const lista = talalatok.length > 0 ? talalatok : adatok;
+
 
   return (
     <div style={{textAlign: "center"}}>
@@ -93,12 +107,12 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       {lista.map((t, index) => {
         const isLast = index === lista.length - 1;
         return (
-          <Card onClick={() => navigate(`/termek/${t.ISBN}`) } border='secondary' style={{ width: '18rem' }} key={`${t.ISBN}-${index}`} ref={isLast ? lastItemRef : null} className='kartya'>
-            <Card.Img variant="top" src={`/kepek/${t.ISBN}.jpg`} className='termek_kep' />
-            <Card.Body style={{padding:"1rem"}}>
+          <Card border='secondary' style={{ width: '18rem' }} key={`${t.ISBN}-${index}`} ref={isLast ? lastItemRef : null} className='kartya'>
+            <Card.Img onClick={() => navigate(`/termek/${t.ISBN}`) } variant="top" src={`/kepek/${t.ISBN}.jpg`} className='termek_kep' />
+            <Card.Body onClick={() => navigate(`/termek/${t.ISBN}`) } style={{padding:"1rem"}}>
               <Card.Title >{t.cim}</Card.Title>
               <Card.Subtitle>{t.szerzok}</Card.Subtitle>
-              <Card.Text>{t.leiras ? t.leiras.substring(0, 100)+"..." : "Nincs leírás"} {t.borito_tipus}</Card.Text>
+              <Card.Text>{t.leiras ? t.leiras.substring(0, 100)+"..." : "Nincs leírás"}</Card.Text>
             </Card.Body>
             <ListGroup className="list-group-flush">
               <ListGroup.Item>{t.kiado_nev}</ListGroup.Item>
@@ -106,7 +120,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
               <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
             </ListGroup>
             <Card.Footer>
-              <Button variant="primary" className='Kosargomb'>Kosárba rakom</Button>
+              <Button onClick={() => {localStorage.setItem("termek", JSON.stringify(t)) }} variant="primary">Kosárba rakom</Button>
             </Card.Footer>
           </Card>
         );

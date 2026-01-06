@@ -1,0 +1,55 @@
+.teljesar{
+    border: 1px solid rgba(0, 0, 0, 0.2) ;
+    width: 300px;
+    margin-left: 100px;
+}
+
+.kosarfodiv{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 20px
+}
+
+.cim{
+    margin-top: 100px;
+    margin-left: 20%;
+}
+
+.termekek{
+    display: flex;
+    border: 1px solid rgba(0, 0, 0, 0.2) ;
+}
+
+.termekek > img{
+    width: 100px;
+    height: 150px;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    margin-left: 5%;
+}
+
+.termekek > input{
+    width: 15%;
+    height: 15%;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.Termekinfo{
+    display: flex;
+    flex-direction: column;
+    margin-left: 30px;
+    margin-top: 5%;
+    margin-bottom: 1%;
+    padding: 0%;
+}
+
+#rendelescim{
+    margin: 20px 0px  0px  20px
+}
+
+.rendeles{
+    margin-top: 5px;
+}
