@@ -1,16 +1,17 @@
-/* A teljes Carousel-t középre igazítja */
+
 .carousel-wrapper {
     display: flex;
     justify-content: center;
     width: 100%;
+    margin-top: 10px;
 }
 
-/* <<< EZ A LEGFONTOSABB: stabil szélesség a Carousel-nek */
+
 .carousel-fixed {
     width: 700px !important;
 }
 
-/* Fix "keret", hogy a magasság ne változzon */
+
 .carousel-frame {
     width: 700px;
     height: 300px;
@@ -18,7 +19,7 @@
     border-radius: 6px;
 }
 
-/* A kép kitölti a keretet és nem torzul */
+
 .carouselimg {
     width: 100%;
     height: 100%;

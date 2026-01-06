@@ -8,6 +8,9 @@ import Main from './components/main';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Footer from './components/footer';
 import Termek from './components/termek';
+import Ászf from './components/ÁSZF'
+import Rolunk from './components/rolunk';
+import Elerhetosegek from './components/elerhetosegek';
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -101,8 +104,9 @@ function App() {
           />
 
           <Route path="/termek/:isbn" element={<Termek />} />
-
-
+          <Route path="/ASZF" element={<Ászf />} />
+          <Route path="/rolunk" element={<Rolunk />} />
+          <Route path="/elerhetosegek" element={<Elerhetosegek />} />
         </Routes>
 
         <Footer />

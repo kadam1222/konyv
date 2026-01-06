@@ -6,7 +6,7 @@
 body {
   margin: 0;
   font-family: 'Inter', 'Segoe UI', sans-serif;
-  background-color: #f5f6f8;
+  background-color: #ddd1aa;
   color: #222;
 }
 
@@ -25,9 +25,16 @@ button:hover {
   transform: translateY(-1px);
 }
 
+.footer-fodiv{
+  width: 450px;
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  display: flex;
+}
+
 header{
-position: fixed; 
-    top: 0;          
-    width: 100%;    
-    z-index: 999;    
+  position: sticky;
+  top: 0;
+  padding: 10px 16px;
+  background: #555;
+  z-index: 99;
 }

@@ -120,7 +120,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
               <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
             </ListGroup>
             <Card.Footer>
-              <Button variant="primary">Kosárba rakom</Button>
+              <Button variant="primary" className='Kosargomb'>Kosárba rakom</Button>
             </Card.Footer>
           </Card>
         );
