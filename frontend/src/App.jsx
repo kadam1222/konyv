@@ -11,6 +11,7 @@ import Termek from './components/termek';
 import Ászf from './components/ÁSZF'
 import Rolunk from './components/rolunk';
 import Elerhetosegek from './components/elerhetosegek';
+import Kosar from './components/kosar';
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -107,6 +108,9 @@ function App() {
           <Route path="/ASZF" element={<Ászf />} />
           <Route path="/rolunk" element={<Rolunk />} />
           <Route path="/elerhetosegek" element={<Elerhetosegek />} />
+          <Route path="/cart" element={<Kosar/>} />
+
+
         </Routes>
 
         <Footer />

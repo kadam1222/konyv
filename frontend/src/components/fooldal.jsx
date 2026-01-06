@@ -107,12 +107,12 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
       {lista.map((t, index) => {
         const isLast = index === lista.length - 1;
         return (
-          <Card onClick={() => navigate(`/termek/${t.ISBN}`) } border='secondary' style={{ width: '18rem' }} key={`${t.ISBN}-${index}`} ref={isLast ? lastItemRef : null} className='kartya'>
-            <Card.Img variant="top" src={`/kepek/${t.ISBN}.jpg`} className='termek_kep' />
-            <Card.Body style={{padding:"1rem"}}>
+          <Card border='secondary' style={{ width: '18rem' }} key={`${t.ISBN}-${index}`} ref={isLast ? lastItemRef : null} className='kartya'>
+            <Card.Img onClick={() => navigate(`/termek/${t.ISBN}`) } variant="top" src={`/kepek/${t.ISBN}.jpg`} className='termek_kep' />
+            <Card.Body onClick={() => navigate(`/termek/${t.ISBN}`) } style={{padding:"1rem"}}>
               <Card.Title >{t.cim}</Card.Title>
               <Card.Subtitle>{t.szerzok}</Card.Subtitle>
-              <Card.Text>{t.leiras ? t.leiras.substring(0, 100)+"..." : "Nincs leírás"} {t.borito_tipus}</Card.Text>
+              <Card.Text>{t.leiras ? t.leiras.substring(0, 100)+"..." : "Nincs leírás"}</Card.Text>
             </Card.Body>
             <ListGroup className="list-group-flush">
               <ListGroup.Item>{t.kiado_nev}</ListGroup.Item>
@@ -120,7 +120,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
               <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
             </ListGroup>
             <Card.Footer>
-              <Button variant="primary" className='Kosargomb'>Kosárba rakom</Button>
+              <Button onClick={() => {localStorage.setItem("termek", JSON.stringify(t)) }} variant="primary">Kosárba rakom</Button>
             </Card.Footer>
           </Card>
         );

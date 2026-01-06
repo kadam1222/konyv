@@ -71,8 +71,9 @@ class Konyvek {
       throw error;
     }
   }
-  static async filter(kiado,kat,nyelv,illusztrator,borito, relevanciabe) {
+  static async filter(kiado,kat,nyelv,illusztrator,borito, relevanciabe, tipus , page=1, limit=10) {
       try{
+        const offset = (page - 1) * limit;
         const feltetelek_sql = []
         const feltetelek_parameter = []
         if(kiado){
@@ -95,16 +96,18 @@ class Konyvek {
           feltetelek_sql.push("borito_tipus LIKE ?")
           feltetelek_parameter.push(`%${borito}%`)
         }
-        
-        const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" AND ") : ""
-
-        if(relevanciabe != "Relevancia"){
-          const rendezes = await this.rendezes(relevanciabe);
-          const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} ${rendezes}`, feltetelek_parameter,);
-          return rows
+        if(tipus){
+          feltetelek_sql.push("tipus_nev LIKE ?")
+          feltetelek_parameter.push(`%${tipus}%`)
         }
         
-        const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} ORDER BY RAND()`, feltetelek_parameter);
+        const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" AND ") : ""
+        let rendezes = "";
+        if(relevanciabe != "Relevancia"){
+          const rendezes = await this.rendezes(relevanciabe);
+        }
+        
+        const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} ${rendezes} LIMIT ? OFFSET ?`, [...feltetelek_parameter, limit, offset]);
         return rows
        
       }
@@ -166,6 +169,16 @@ class Konyvek {
  static async borito(){
     try{
       const [rows] = await db.query('SELECT * FROM borito');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+  static async tipus(){
+    try{
+      const [rows] = await db.query('SELECT * FROM tipus');
       return rows;
     }
     catch(error){

@@ -35,7 +35,10 @@ exports.filter = async (req, res) => {
     const nyelv = req.query.nyelv
     const illusztrator = req.query.illusz
     const borito = req.query.borito
-    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia" );
+    const tipus = req.query.tipus
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia",tipus , page, limit);
     res.json(konyvek_filter); 
   } catch (err) {
     console.error(err);
@@ -114,6 +117,18 @@ exports.borito = async (req,res) => {
   try{
     const kateg = await konyvek.borito();
     res.json(kateg);
+  }
+  catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+}
+
+exports.tipus = async (req,res) => {
+  try{
+    const tipusok = await konyvek.tipus();
+    res.json(tipusok);
   }
   catch(err)
   {
@@ -205,8 +220,3 @@ exports.refreshToken = (req, res) => {
     return res.status(403).json({ message: "Érvénytelen refresh token" });
   }
 };
-
-
-
-
-
