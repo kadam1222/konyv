@@ -8,7 +8,7 @@ import Termek from './termek.jsx';
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSearch, setTalalatok, page, setPage, hasMore, setHasMore , setHasMoreSearch, kivalasztottisbn, setKivalasztottisbn}) { 
+function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSearch, setTalalatok, page, setPage, hasMore, setHasMore , setHasMoreSearch, kivalasztottisbn, setKivalasztottisbn, activeCategory}) { 
   const [adatok, setAdatok] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,23 +35,29 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
     } finally { setLoading(false); }
   };
 
-  const fetchSearchData = async (query, pagenum) => {
-    if(!query || !hasMoreSearch) return;
-    try {
-      setLoading(true);
-      const response = await httpCommon.get(`/konyvek/fokereso?page=${pagenum}&limit=10&cim=${query}&szerzo=${query}`);
-      const uj = response.data;
+  const fetchSearchData = async (query, pagenum, category = null) => {
+  if(!query && !category) return;
+  try {
+    setLoading(true);
+    let response;
+    if(category) {
+      response = await httpCommon.get(`/konyvek/search?kat=${category}&page=${pagenum}&limit=10`);
+    } else {
+      response = await httpCommon.get(`/konyvek/fokereso?page=${pagenum}&limit=10&cim=${query}&szerzo=${query}`);
+    }
+    const uj = response.data;
 
-      if(uj.length === 0) setHasMoreSearch(false);
-      setTalalatok(prev => {
+    if(uj.length === 0) setHasMoreSearch(false);
+    setTalalatok(prev => {
       const combined = [...prev, ...uj];
       const unique = Array.from(new Map(combined.map(item => [item.ISBN, item])).values());
       return unique;
-  });
-    } catch(err) {
-      console.error(err);
-    } finally { setLoading(false); }
-  };
+    });
+  } catch(err) {
+    console.error(err);
+  } finally { setLoading(false); }
+};
+
 
   useEffect(() => { if(!searchQuery) fetchData(page); }, [page, searchQuery]);
   useEffect(() => {
@@ -63,10 +69,10 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
 }, [searchQuery]);
 
   useEffect(() => { 
-    if(searchQuery) {
-      fetchSearchData(searchQuery, searchPage); 
+    if(searchQuery || activeCategory) {
+      fetchSearchData(searchQuery, searchPage, activeCategory); 
     }
-  }, [searchPage]);
+  }, [searchPage, activeCategory]);
   
 
   const lastItemRef = useCallback((node) => {
@@ -74,13 +80,16 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
     if(observerRef.current) observerRef.current.disconnect();
 
     observerRef.current = new IntersectionObserver((entries) => {
-      if(entries[0].isIntersecting && !loading ){
-        if(searchQuery){
-          if(hasMoreSearch) setSearchPage(prev => prev + 1);
-        } else {
-          if(hasMore) setPage(prev => prev + 1);
-        }
-      }
+      if (entries[0].isIntersecting && !loading) {
+  if (activeCategory) {
+    if (hasMoreSearch) setSearchPage(prev => prev + 1);
+  } else if (searchQuery) {
+    if (hasMoreSearch) setSearchPage(prev => prev + 1);
+  } else {
+    if (hasMore) setPage(prev => prev + 1);
+  }
+}
+
     });
 
     if(node) observerRef.current.observe(node);

@@ -19,6 +19,10 @@ function App() {
   const [hasMore, setHasMore] = useState(true);
   const [rawResults, setRawResults] = useState([]);
   const [accessToken, setAccessToken] = useState("");
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [allBooks, setAllBooks] = useState([]);
+
+
   
 
   useEffect(() => {
@@ -43,8 +47,10 @@ function App() {
     let url;
     if (category) {
       url = `/konyvek/search?kat=${category}&page=${pageNum}&limit=10`;
+      setActiveCategory(category);
     } else {
       url = `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`;
+      setActiveCategory(null)
     }
 
     const res = await fetch(url);
@@ -95,6 +101,7 @@ function App() {
                     setPage={setPage}
                     hasMore={hasMore}
                     setHasMore={setHasMore}
+                    activeCategory={activeCategory}
                   />
                 </div>
               </>
