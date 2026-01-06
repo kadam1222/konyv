@@ -16,7 +16,7 @@ export default function Kosar( {accestoken} ){
                 
                 <div className='termekek'>
                     
-                    <img src='/kepek/2399977867906.jpg'></img>
+                    <img src='/kepek/${}.jpg'></img>
                     <div className='Termekinfo'>
                         <h4>{gettermek.cim}</h4>
                         <span>{gettermek.szerzok}</span><br></br>
