@@ -25,3 +25,8 @@
     height: 100%;
     object-fit: cover;
 }
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(1) brightness(0);
+}
