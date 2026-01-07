@@ -7,7 +7,7 @@
 .kosarfodiv{
     margin-top: 20px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     margin-bottom: 20px
 }

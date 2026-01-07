@@ -3,6 +3,10 @@
   background: #ceb795ff;
   border-top: 1px solid #c3af89;
   font-family: Inter, sans-serif;
+
+  left: 0;
+  bottom: 0;  
+  width: 100%;
 }
 
 

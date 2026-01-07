@@ -3,6 +3,8 @@
   box-sizing: border-box;
 }
 
+
+
 body {
   margin: 0;
   font-family: 'Inter', 'Segoe UI', sans-serif;
@@ -38,3 +40,12 @@ header{
   background: #555;
   z-index: 99;
 }
+
+.termek-vissza {
+  align-self: flex-start;
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: #9f8d73;
+  text-decoration: none;
+}
+
