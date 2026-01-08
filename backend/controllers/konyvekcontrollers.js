@@ -220,3 +220,27 @@ exports.refreshToken = (req, res) => {
     return res.status(403).json({ message: "Érvénytelen refresh token" });
   }
 };
+const blacklistedTokens = [];
+
+exports.logout = (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(400).json({ message: "Nincs token" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  blacklistedTokens.push(token);
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "Lax",
+    secure: process.env.NODE_ENV === "production"
+  });
+
+  res.json({ message: "Sikeres kijelentkezés" });
+};
+
+exports.blacklistedTokens = blacklistedTokens;
+

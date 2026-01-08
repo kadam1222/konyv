@@ -129,7 +129,17 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
               <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
             </ListGroup>
             <Card.Footer>
-              <Button onClick={() => {localStorage.setItem("termek", JSON.stringify(t)) }} variant="primary">Kosárba rakom</Button>
+              <Button onClick={() => {const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
+                        const letezo = kosar.find(item => item.ISBN === t.ISBN);
+                        if (letezo) {
+                            letezo.mennyiseg += 1;
+                        } else {
+                            kosar.push({ ...t, mennyiseg: 1 });
+                      }
+
+                      localStorage.setItem("kosar", JSON.stringify(kosar));
+
+              }} variant="primary">Kosárba rakom</Button>
             </Card.Footer>
           </Card>
         );
