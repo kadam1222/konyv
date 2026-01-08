@@ -12,8 +12,10 @@ import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import LoginForm from "./loginform";
 import RegisterForm from "./registerform";
+import { useNavigate } from "react-router-dom";
 
 export default function Header({ onSearch, accessToken, setAccessToken }) {
+   const navigate = useNavigate();
   const [fokat, setFokat] = useState([]);
   const [keresett, setKeresett] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -75,9 +77,29 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
     <NavDropdown title="Profilom" id="asd">
           <NavDropdown.Item >Rendeléseim</NavDropdown.Item>
           <NavDropdown.Item >Segítség</NavDropdown.Item>
-          <NavDropdown.Item >Kijelentkezés</NavDropdown.Item>    
+          <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );
+const handleLogout = async () => {
+  try {
+    await http.post(
+      "/auth/logout",
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + accessToken
+        },
+        withCredentials: true
+      }
+    );
+  } catch (error) {
+    console.error("Logout hiba:", error);
+  } finally {
+    setAccessToken(null);
+    localStorage.removeItem("accessToken");
+    navigate("/")
+  }
+};
 
   return (
     <header style={{backgroundColor:"#ceb795ff"}}>
@@ -112,8 +134,8 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                     <FaMagnifyingGlass />
                   </button>
                 </div>
-
-                <Popup
+                {accessToken ?  <Profildropdown title="Profil" /> :
+                    <Popup
                   trigger={
                     <div
                       style={{
@@ -179,7 +201,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                     </div>
                   )}
                 </Popup>
-
+                }
                 <a href="/cart">
                   <TfiShoppingCartFull />
                 </a>
