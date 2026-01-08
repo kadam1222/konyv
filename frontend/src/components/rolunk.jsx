@@ -4,7 +4,7 @@ import Card from 'react-bootstrap/Card';
 export default function Rolunk(){
     return(
         <>
-        <a href='/' style={{textDecoration:"none"}}>Vissza</a>
+        <a href='/' style={{textDecoration:"none", fontSize:"16px"}} className="termek-vissza">Vissza</a>
         <Card style={{marginLeft: "250px", marginRight:"250px", borderColor: "#dbc38c", marginBottom:"30px",marginTop:"30px" }}>
       <Card.Header as="h5" style={{backgroundColor:"#c3af89",color:"#ffffff"}}>Rólunk</Card.Header>
       <Card.Body>

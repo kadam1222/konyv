@@ -76,30 +76,36 @@ class Konyvek {
         const offset = (page - 1) * limit;
         const feltetelek_sql = []
         const feltetelek_parameter = []
-        if(kiado){
-          feltetelek_sql.push("kiado_nev LIKE ?")
-          feltetelek_parameter.push(`%${kiado}%`)
+        if (kiado) {
+          feltetelek_sql.push("kiado_nev LIKE ?");
+          feltetelek_parameter.push(`%${kiado}%`);
         }
-        if(kat){
-          feltetelek_sql.push("kat_nev LIKE ?")
-          feltetelek_parameter.push(`%${kat}%`)
+
+        if (kat) {
+          feltetelek_sql.push("kat_nev = ?");
+          feltetelek_parameter.push(kat);
         }
-        if(nyelv){
-          feltetelek_sql.push("nyelv_nev LIKE ?")
-          feltetelek_parameter.push(`%${nyelv}%`)
+
+        if (nyelv) {
+          feltetelek_sql.push("nyelv_nev LIKE ?");
+          feltetelek_parameter.push(`%${nyelv}%`);
         }
-        if(illusztrator){
-          feltetelek_sql.push("illusztratorok LIKE ?")
-          feltetelek_parameter.push(`%${illusztrator}%`)
+
+        if (illusztrator) {
+          feltetelek_sql.push("illusztratorok LIKE ?");
+          feltetelek_parameter.push(`%${illusztrator}%`);
         }
-        if(borito){
-          feltetelek_sql.push("borito_tipus LIKE ?")
-          feltetelek_parameter.push(`%${borito}%`)
+
+        if (borito) {
+          feltetelek_sql.push("borito_tipus = ?");
+          feltetelek_parameter.push(borito);
         }
-        if(tipus){
-          feltetelek_sql.push("tipus_nev LIKE ?")
-          feltetelek_parameter.push(`%${tipus}%`)
+
+        if (tipus) {
+          feltetelek_sql.push("tipus_nev = ?");
+          feltetelek_parameter.push(tipus);
         }
+
         
         const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" AND ") : ""
         let rendezes = "";

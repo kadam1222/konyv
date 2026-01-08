@@ -9,7 +9,15 @@ const authRoutes = require("./routes/tokens")
 var app = express();
 
 const cors = require('cors')
-var corsOptions = { origin: "http://localhost:5173", credentials : true}
+const corsOptions = { 
+    origin: [
+    "http://localhost:5173", 
+    "http://localhost:8081"]
+    , credentials : true,
+
+}
+
+
 
 app.use(cors(corsOptions))
 app.use(logger('dev'));

@@ -12,8 +12,10 @@ import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import LoginForm from "./loginform";
 import RegisterForm from "./registerform";
+import { useNavigate } from "react-router-dom";
 
 export default function Header({ onSearch, accessToken, setAccessToken }) {
+   const navigate = useNavigate();
   const [fokat, setFokat] = useState([]);
   const [keresett, setKeresett] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -75,13 +77,33 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
     <NavDropdown title="Profilom" id="asd">
           <NavDropdown.Item >Rendeléseim</NavDropdown.Item>
           <NavDropdown.Item >Segítség</NavDropdown.Item>
-          <NavDropdown.Item >Kijelentkezés</NavDropdown.Item>    
+          <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );
+const handleLogout = async () => {
+  try {
+    await http.post(
+      "/auth/logout",
+      {},
+      {
+        headers: {
+          Authorization: "Bearer " + accessToken
+        },
+        withCredentials: true
+      }
+    );
+  } catch (error) {
+    console.error("Logout hiba:", error);
+  } finally {
+    setAccessToken(null);
+    localStorage.removeItem("accessToken");
+    navigate("/")
+  }
+};
 
   return (
-    <header>
-      <Navbar expand="lg" className="bg-body-tertiary">
+    <header style={{backgroundColor:"#ceb795ff"}}>
+      <Navbar expand="lg">
         <NavItem style={{ marginLeft: "14px" }}>
           <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
             <h2>Bolt</h2>
@@ -90,67 +112,30 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
 
         <Container>
           <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
+            style={{display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%",}}>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-            <Navbar.Collapse
-              id="basic-navbar-nav"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <Nav
-                className="me-auto"
-                style={{ display: "flex", flexDirection: "row", gap: "20px" }}
-              >
+            <Navbar.Collapse id="basic-navbar-nav" style={{ display: "flex", alignItems: "center",justifyContent: "space-between",width: "100%"}}>
+              <Nav className="me-auto"style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
                 <CategoryDropdown title="Kategóriák" />
               </Nav>
 
-              <NavItem
-                style={{ display: "flex", alignItems: "center", gap: "15px" }}
-              >
+              <NavItem style={{ display: "flex", alignItems: "center", gap: "15px" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <input
-                    placeholder="Keresés..."
-                    style={{
-                      width: "300px",
-                      height: "30px",
-                      border: "1px solid rgba(0,0,0,0.25)",
-                    }}
-                    value={keresett}
-                    onChange={(e) => setKeresett(e.target.value)}
-                    type="search"
+                  <input placeholder="Keresés..." style={{ width: "300px", height: "30px", border: "1px solid rgba(0,0,0,0.25)", borderRadius: "4px",padding: "4px 8px",color: "#3a3a3a",fontSize: "14px",outlineColor: "#9f8d73",transition: "outline-color 0.2s ease", backgroundColor: "#ffffffec"}} value={keresett} onChange={(e) => setKeresett(e.target.value)} type="search"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleSearch();
                     }}
                   />
 
-                  <button
-                    style={{
-                      width: "40px",
-                      height: "30px",
-                      border: "1px solid rgba(0,0,0,0.25)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      padding: 0,
-                    }}
+                  <button style={{width: "40px",height: "30px", border: "1px solid rgba(0,0,0,0.25)",borderRadius: "0 4px 4px 0" ,display: "flex", alignItems: "center",  justifyContent: "center", padding: 0, backgroundColor: "#ffffffec", cursor: "pointer",color: "#9f8d73", transition: "color 0.2s ease"}}
                     onClick={handleSearch}
                   >
                     <FaMagnifyingGlass />
                   </button>
                 </div>
-
-                <Popup
+                {accessToken ?  <Profildropdown title="Profil" /> :
+                    <Popup
                   trigger={
                     <div
                       style={{
@@ -158,6 +143,10 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                         border: "none",
                         cursor: "pointer",
                         padding: 0,
+                        color: "#3a3a3a",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        transition: "color 0.2s ease",
                       }}
                       onClick={() => {
                         if (accessToken) {
@@ -212,7 +201,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
                     </div>
                   )}
                 </Popup>
-
+                }
                 <a href="/cart">
                   <TfiShoppingCartFull />
                 </a>
