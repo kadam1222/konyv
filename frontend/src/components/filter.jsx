@@ -4,7 +4,7 @@ import httpCommon from '../http-common';
 import { useSearchParams } from "react-router-dom";
 
 
-export default function Filters( { onSearch, talalatok }){
+export default function Filters( { onSearch, talalatok, allBooks  }){
     const [kiadok, setKiadok] = useState([]);
     const [nyelv, setNyelv] = useState([]);
     const [borito, setBorito] = useState([]);
@@ -21,33 +21,24 @@ export default function Filters( { onSearch, talalatok }){
     });
     const [searchParams, setSearchParams] = useSearchParams();
   const handleFilter = (kiado, nyelv, borito, kat, tipus) => {
-    let lista = talalatok ?? [];
+  let lista = talalatok ?? [];
 
-    if (!lista.length) return; 
+  if (!lista.length) return;
 
-    if (kat) {
-      lista = lista.filter(k => k.kat_nev?.includes(kat));
-    }
+  // helper to normalize strings: trim + lowercase
+  const normalize = (str) => str?.toLowerCase().trim();
 
-    if (borito) {
-      lista = lista.filter(k => k.borito_tipus?.includes(borito));
-    }
+  if (kat) lista = lista.filter(k => normalize(k.kat_nev) === normalize(kat));
+  if (borito) lista = lista.filter(k => normalize(k.borito_tipus).includes(normalize(borito)));
+  if (kiado) lista = lista.filter(k => normalize(k.kiado_nev).includes(normalize(kiado)));
+  if (nyelv) lista = lista.filter(k => normalize(k.nyelv_nev).includes(normalize(nyelv)));
+  if (tipus) lista = lista.filter(k => normalize(k.tipus_nev).includes(normalize(tipus)));
 
-    if (kiado) {
-      lista = lista.filter(k => k.kiado_nev?.includes(kiado));
-    }
-
-    if (nyelv) {
-      lista = lista.filter(k => k.nyelv_nev?.includes(nyelv));
-    }
-
-    if(tipus) {
-        lista = lista.filter(k => k.tipus_nev?.includes(tipus));
-    }
-
-    setFilteredTalalatok(lista);
-    onSearch(lista);
+  // Update filtered results
+  setFilteredTalalatok(lista);
+  onSearch(lista);
 };
+
 
     
     const fetchData = async (nev, setter) =>{
