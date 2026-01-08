@@ -1,8 +1,11 @@
 import axios from "axios";
+
 export default axios.create({
     baseURL: "http://localhost:8080",
     timeout: 50000,
     headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",        
     }
 });
