@@ -11,5 +11,6 @@ router.get('/tipus',konyvekcontrollers.tipus)
 router.get('/kiadok', konyvekcontrollers.kiado);
 router.post('/ISBN',konyvekcontrollers.getbyISBN);
 router.delete('/:ISBN', konyvekcontrollers.delete);
+router.get('/profil', konyvekcontrollers.Profilleker);
 router.get('/', konyvekcontrollers.getAllKonyvek);
 module.exports = router;

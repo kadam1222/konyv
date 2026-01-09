@@ -202,16 +202,28 @@ class Konyvek {
       throw error
     }
   }
-   static async findByEmail (email){
+   static async profilleker (id){
     try{
-        const [rows] = await db.query("SELECT * FROM vevo WHERE email = ?", [email])
+        const [rows] = await db.query("SELECT vevo_nev,lakcim,email,adoszam FROM vevo WHERE id = ?", [id])
         return rows[0]
     }
     catch(err){
         throw err
     }
-
+  }
+  static async findByEmail(email) {
+  try {
+    const [rows] = await db.query(
+      "SELECT vevo_nev, email, jelszo FROM vevo WHERE email = ?",
+      [email]
+    );
+    return rows[0];
+  } catch (err) {
+    throw err;
+  }
 }
+
+
 }
 
 module.exports = Konyvek;

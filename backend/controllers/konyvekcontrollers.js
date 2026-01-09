@@ -220,19 +220,7 @@ exports.refreshToken = (req, res) => {
     return res.status(403).json({ message: "Érvénytelen refresh token" });
   }
 };
-const blacklistedTokens = [];
-
 exports.logout = (req, res) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(400).json({ message: "Nincs token" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  blacklistedTokens.push(token);
-
   res.clearCookie("refreshToken", {
     httpOnly: true,
     sameSite: "Lax",
@@ -242,5 +230,22 @@ exports.logout = (req, res) => {
   res.json({ message: "Sikeres kijelentkezés" });
 };
 
-exports.blacklistedTokens = blacklistedTokens;
+
+exports.Profilleker = async (req, res) => {
+  try {
+        console.log("REQ USER:", req.user);
+    const { id } = req.user;
+    const felhasznalo = await konyvek.profillekerById(id);
+
+    if (!felhasznalo) {
+      return res.status(404).json({ message: "Felhasználó nem található" });
+    }
+
+    res.json(felhasznalo);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a profil lekérdezésekor (SERVER ERROR)' });
+  }
+};
+
 
