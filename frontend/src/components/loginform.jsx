@@ -49,7 +49,7 @@ export default function LoginForm( { setAccessToken, onClose, switchToRegister }
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <Button variant="primary" type="submit">
+      <Button variant="primary" type="submit" id="bejelentkezesgomb">
         Bejelentkezés
       </Button>
       <p style={{ marginTop: "10px", textAlign: "center" }}>

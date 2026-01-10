@@ -64,7 +64,9 @@ body{
 }
 
 .Kosargomb:hover{
-    background-color: #c3af89;
+    background-color: #8c6b2f;
+    border-color: #8c6b2f;
+    color: #fff;
     box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
     transform: translateY(-2px);
 }

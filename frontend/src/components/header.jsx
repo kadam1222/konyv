@@ -133,6 +133,7 @@ const handleLogout = async () => {
                     <FaMagnifyingGlass />
                   </button>
                 </div>
+                
                 {accessToken ?  <Profildropdown title="Profil" /> :
                     <Popup
                   trigger={
@@ -161,10 +162,17 @@ const handleLogout = async () => {
                         : "Belépés / Regisztráció"}
                     </div>
                   }
+                  className="auth-popup"
                   modal
                   nested
                   open={showAuthPopup}
                   onClose={() => setShowAuthPopup(false)}
+                  contentStyle={{
+                    width: "480px",
+                    maxWidth: "90%",
+                    padding: "25px",
+                    borderRadius: "12px",
+                  }}
                 >
                   {(close) => (
                     <div
@@ -175,7 +183,12 @@ const handleLogout = async () => {
                         width: "400px",
                         maxWidth: "90%",
                       }}
-                    >{showLoginForm ? (
+                    >
+                     <div className="popup-close-icon" onClick={close}>
+                        ×
+                      </div> 
+                      {showLoginForm ? (
+                        
                         <LoginForm
                           setAccessToken={setAccessToken}
                           onClose={() => {
@@ -194,9 +207,7 @@ const handleLogout = async () => {
                         />
                       )}
 
-                      <div style={{ textAlign: "right", marginTop: "10px" }}>
-                        <button onClick={close}>Bezárás</button>
-                      </div>
+                      
                     </div>
                   )}
                 </Popup>
