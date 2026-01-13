@@ -1,0 +1,46 @@
+.fodivprofil{
+        display: flex;
+    border: 3px solid #7641345b ;
+    width: 450px;
+    flex-direction: column;
+    justify-content: space-evenly;  
+    margin: 15px auto 15px auto;
+    
+}
+
+.fodivprofil > h2{
+    text-align: center;
+    margin-top: 5px;
+}
+
+.fodivprofil > p {
+    margin-left: 10px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fodivprofil button {
+    margin-right: 10px;
+}
+
+.profilgomb{
+    padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #dbc38c;
+  color: #3a2f1f;
+  transition: all 0.2s ease;
+}
+
+.profilgomb:hover{
+    background-color: #8c6b2f;
+    border-color: #8c6b2f;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
+    transform: translateY(-2px);
+}

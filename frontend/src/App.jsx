@@ -13,6 +13,7 @@ import Rolunk from './components/rolunk';
 import Elerhetosegek from './components/elerhetosegek';
 import Kosar from './components/kosar';
 import Profil from './components/profil';
+import Fizetes from './components/fizetes';
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -118,6 +119,7 @@ useEffect(() => {
           <Route path="/rolunk" element={<Rolunk />} />
           <Route path="/elerhetosegek" element={<Elerhetosegek />} />
           <Route path="/cart" element={<Kosar/>} />
+          <Route path="/fizetes" element={<Fizetes/>} />
           <Route path="/profil" element={<Profil accessToken={accessToken} />} />
 
 
