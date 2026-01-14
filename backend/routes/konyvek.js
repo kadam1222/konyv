@@ -13,6 +13,7 @@ router.get('/kiadok', konyvekcontrollers.kiado);
 router.post('/ISBN',konyvekcontrollers.getbyISBN);
 router.delete('/:ISBN', konyvekcontrollers.delete);
 router.get('/profil',auth ,konyvekcontrollers.Profilleker);
+router.post("/szamla", auth,konyvekcontrollers.szamlakeszites)
 
 
 router.get('/', konyvekcontrollers.getAllKonyvek);
