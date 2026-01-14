@@ -85,7 +85,7 @@ export default function Fizetes(){
     </Form>
     </div>
 
-    <div className='teljesar'> <h4 id='rendelescim'>Rendelésed:</h4> 
+    <div className='teljesarfizetes'> <h4 id='rendelescim'>Rendelésed:</h4> 
             <div className='RendelesInfo'> 
                 <span className='rendeles'>{mennyiseg} db termék</span> 
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
