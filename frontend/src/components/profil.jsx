@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import httpCommon from '../http-common';
+import "./profil.css"
+import Button from 'react-bootstrap/Button';
 
 export default function Profil({ accessToken }) {
   const [nev, setNev] = useState("");
@@ -31,12 +33,18 @@ console.log("AccessToken:", accessToken);
   }, [accessToken]);
 
   return (
-    <div>
-      <h2>Profil</h2>
-      <p>Név: {nev}</p>
-      <p>Lakcím: {lakcim}</p>
-      <p>E-mail: {email}</p>
-      <p>Adószám: {adoszam}</p>
-    </div>
+    <>
+    <a href='/' style={{textDecoration:"none", fontSize:"16px"}} className="termek-vissza">← Vissza</a>
+      <div className='fodivprofil'>
+        <h2>Profil</h2>
+        <p>Név: {nev} <Button className='profilgomb'>Módosítás</Button> </p>
+        
+        {lakcim ? <p>L akcím: {lakcim} <Button className='profilgomb'>Módosítás</Button> </p> : ""}
+        <p>E-mail: {email} <Button className='profilgomb'>Módosítás</Button> </p>
+        
+        {adoszam ? <p> Adószám: {adoszam} <Button className='profilgomb'>Módosítás</Button> </p> : ""}
+        
+      </div>
+    </>
   );
 }
