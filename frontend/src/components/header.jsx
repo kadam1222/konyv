@@ -77,7 +77,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
     <NavDropdown title="Profilom" id="asd">
           <NavDropdown.Item onClick={() => navigate("/profil")}>Személyes adatok</NavDropdown.Item>
           <NavDropdown.Item >Rendeléseim</NavDropdown.Item>
-          <NavDropdown.Item >Segítség</NavDropdown.Item>
+          <NavDropdown.Item onClick={() => navigate("/segitseg")}>Segítség</NavDropdown.Item>
           <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );

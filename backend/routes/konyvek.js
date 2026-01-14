@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const konyvekcontrollers = require('../controllers/konyvekcontrollers');
+const auth = require('../middleware/auth');
 
 router.get('/search', konyvekcontrollers.filter);
 router.get('/fokereso', konyvekcontrollers.fokereso);
@@ -11,6 +12,8 @@ router.get('/tipus',konyvekcontrollers.tipus)
 router.get('/kiadok', konyvekcontrollers.kiado);
 router.post('/ISBN',konyvekcontrollers.getbyISBN);
 router.delete('/:ISBN', konyvekcontrollers.delete);
-router.get('/profil', konyvekcontrollers.Profilleker);
+router.get('/profil',auth ,konyvekcontrollers.Profilleker);
+
+
 router.get('/', konyvekcontrollers.getAllKonyvek);
 module.exports = router;

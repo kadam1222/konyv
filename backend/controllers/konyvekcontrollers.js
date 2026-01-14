@@ -234,8 +234,8 @@ exports.logout = (req, res) => {
 exports.Profilleker = async (req, res) => {
   try {
         console.log("REQ USER:", req.user);
-    const { id } = req.user;
-    const felhasznalo = await konyvek.profillekerById(id);
+    const { email } = req.user;
+    const felhasznalo = await konyvek.profilleker(email);
 
     if (!felhasznalo) {
       return res.status(404).json({ message: "Felhasználó nem található" });

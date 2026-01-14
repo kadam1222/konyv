@@ -202,9 +202,9 @@ class Konyvek {
       throw error
     }
   }
-   static async profilleker (id){
+   static async profilleker (email){
     try{
-        const [rows] = await db.query("SELECT vevo_nev,lakcim,email,adoszam FROM vevo WHERE id = ?", [id])
+        const [rows] = await db.query("SELECT vevo_nev,lakcim,email,adoszam FROM vevo WHERE email = ?", [email])
         return rows[0]
     }
     catch(err){
