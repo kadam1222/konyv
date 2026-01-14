@@ -12,6 +12,9 @@ import Ászf from './components/ÁSZF'
 import Rolunk from './components/rolunk';
 import Elerhetosegek from './components/elerhetosegek';
 import Kosar from './components/kosar';
+import Profil from './components/profil';
+import Segitseg from './components/segitseg';
+import Fizetes from './components/fizetes';
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -28,23 +31,24 @@ function App() {
 
   
 
-  useEffect(() => {
-    const refreshToken = async () => {
-      try {
-        const res = await fetch("http://localhost:8080/auth/refresh", {
-          method: "POST",
-          credentials: "include",
-        });
-        if (!res.ok) return;
-          const data = await res.json();
-          setAccessToken(data.accessToken);
-      } 
-      catch(err){
+useEffect(() => {
+  const refreshToken = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/auth/refresh", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      console.log("Refresh token response:", data); // <-- ide log
+      setAccessToken(data.accessToken);
+    } catch(err){
+      console.error(err);
+    }
+  };
+  refreshToken();
+}, []);
 
-      }
-    };
-    refreshToken();
-  }, []);
   const handleSearch = async (query, pageNum = 1, category = null) => {
   try {
     let url;
@@ -116,6 +120,9 @@ function App() {
           <Route path="/rolunk" element={<Rolunk />} />
           <Route path="/elerhetosegek" element={<Elerhetosegek />} />
           <Route path="/cart" element={<Kosar/>} />
+          <Route path="/fizetes" element={<Fizetes/>} />
+          <Route path="/profil" element={<Profil accessToken={accessToken} />} />
+          <Route path="/segitseg" element={<Segitseg/>} />
 
 
         </Routes>

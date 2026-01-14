@@ -75,8 +75,9 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
 
   const Profildropdown = () => (
     <NavDropdown title="Profilom" id="asd">
+          <NavDropdown.Item onClick={() => navigate("/profil")}>Személyes adatok</NavDropdown.Item>
           <NavDropdown.Item >Rendeléseim</NavDropdown.Item>
-          <NavDropdown.Item >Segítség</NavDropdown.Item>
+          <NavDropdown.Item onClick={() => navigate("/segitseg")}>Segítség</NavDropdown.Item>
           <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );
@@ -86,20 +87,18 @@ const handleLogout = async () => {
       "/auth/logout",
       {},
       {
-        headers: {
-          Authorization: "Bearer " + accessToken
-        },
-        withCredentials: true
+        withCredentials: true // csak a refresh token miatt
       }
     );
   } catch (error) {
     console.error("Logout hiba:", error);
   } finally {
     setAccessToken(null);
-    localStorage.removeItem("accessToken");
-    navigate("/")
+    localStorage.removeItem("accessToken"); // ha még ott van
+    navigate("/");
   }
 };
+
 
   return (
     <header style={{backgroundColor:"#ceb795ff"}}>
@@ -134,6 +133,7 @@ const handleLogout = async () => {
                     <FaMagnifyingGlass />
                   </button>
                 </div>
+                
                 {accessToken ?  <Profildropdown title="Profil" /> :
                     <Popup
                   trigger={
@@ -162,10 +162,17 @@ const handleLogout = async () => {
                         : "Belépés / Regisztráció"}
                     </div>
                   }
+                  className="auth-popup"
                   modal
                   nested
                   open={showAuthPopup}
                   onClose={() => setShowAuthPopup(false)}
+                  contentStyle={{
+                    width: "480px",
+                    maxWidth: "90%",
+                    padding: "25px",
+                    borderRadius: "12px",
+                  }}
                 >
                   {(close) => (
                     <div
@@ -176,7 +183,12 @@ const handleLogout = async () => {
                         width: "400px",
                         maxWidth: "90%",
                       }}
-                    >{showLoginForm ? (
+                    >
+                     <div className="popup-close-icon" onClick={close}>
+                        ×
+                      </div> 
+                      {showLoginForm ? (
+                        
                         <LoginForm
                           setAccessToken={setAccessToken}
                           onClose={() => {
@@ -195,9 +207,7 @@ const handleLogout = async () => {
                         />
                       )}
 
-                      <div style={{ textAlign: "right", marginTop: "10px" }}>
-                        <button onClick={close}>Bezárás</button>
-                      </div>
+                      
                     </div>
                   )}
                 </Popup>
