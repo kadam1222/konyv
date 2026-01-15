@@ -34,8 +34,7 @@ function Fooldal({
       const response = await httpCommon.get(`/konyvek?page=${pagenum}&limit=10`);
       const uj = Array.isArray(response.data) ? response.data : [];
 
-      if (uj.length === 0) setHasMore(false);
-
+      setHasMoreSearch(uj.length === 10);
       setTalalatok(prev => {
         const combined = [...prev, ...uj];
         return Array.from(new Map(combined.map(item => [item.ISBN, item])).values());
@@ -72,7 +71,7 @@ function Fooldal({
       const response = await httpCommon.get(`/konyvek/search?${params.toString()}`);
       const uj = Array.isArray(response.data) ? response.data : [];
 
-      if (uj.length === 0) setHasMoreSearch(false);
+      setHasMoreSearch(uj.length === 10);
 
       setTalalatok(prev => {
         const combined = [...prev, ...uj];
@@ -101,9 +100,9 @@ function Fooldal({
     }
   }, [searchQuery, searchPage, activeCategory, safeFilters, page]);
 
-  const lastItemRef = useCallback(
+const lastItemRef = useCallback(
   (node) => {
-    if (loading || lista.length === 0) return; 
+    if (loading) return;
     if (observerRef.current) observerRef.current.disconnect();
 
     observerRef.current = new IntersectionObserver((entries) => {
@@ -118,8 +117,16 @@ function Fooldal({
 
     if (node) observerRef.current.observe(node);
   },
-  [loading, hasMore, hasMoreSearch, searchQuery, activeCategory, safeFilters, lista]
+  [loading, hasMore, hasMoreSearch, searchQuery, activeCategory, safeFilters]
 );
+
+useEffect(() => {
+  if (lista.length > 0 && searchQuery || activeCategory || Object.values(safeFilters).some(f => f)) {
+    setHasMoreSearch(prev => prev || true);
+  } else if (lista.length > 0) {
+    setHasMore(prev => prev || true);
+  }
+}, []); 
 
   return (
     <div style={{ textAlign: 'center' }}>
@@ -154,7 +161,6 @@ function Fooldal({
                 <ListGroup.Item>{t.kiado_nev}</ListGroup.Item>
                 <ListGroup.Item>{t.kiadas_eve}</ListGroup.Item>
                 <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
-                <ListGroup.Item>{t.borito_tipus} Ft</ListGroup.Item>
               </ListGroup>
               <Card.Footer>
                 <Button

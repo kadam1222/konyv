@@ -74,10 +74,6 @@ const handleSearch = async (query, pageNum = 1, category = null) => {
   }
 };
 
-
-
-
-
   return (
     <Router>
 
