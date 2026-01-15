@@ -2,6 +2,7 @@ import { useState } from "react"
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import httpCommon from "../http-common";
+import "./registerform.css"
 export default function RegisterForm( { onClose, switchToLogin } ){
     const [nev,setNev] = useState("")
     const [email, setEmail] = useState("");
@@ -31,7 +32,7 @@ export default function RegisterForm( { onClose, switchToLogin } ){
 };
 
     return(
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className="register-form">
         <Form.Group className="mb-3" controlId="formBasicName">
         <Form.Label>Név</Form.Label>
         <Form.Control
@@ -63,7 +64,7 @@ export default function RegisterForm( { onClose, switchToLogin } ){
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <Button variant="primary" type="submit">
+      <Button variant="primary" type="submit" id="regisztraciogomb">
         Regisztracio
       </Button>
       <p style={{ marginTop: "10px", textAlign: "center" }}>

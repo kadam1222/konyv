@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const Konyvek = require('../models/konyvek');
 exports.getAllKonyvek = async (req, res) => {
   try {
     const page = req.query.page
@@ -220,19 +221,7 @@ exports.refreshToken = (req, res) => {
     return res.status(403).json({ message: "Érvénytelen refresh token" });
   }
 };
-const blacklistedTokens = [];
-
 exports.logout = (req, res) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(400).json({ message: "Nincs token" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  blacklistedTokens.push(token);
-
   res.clearCookie("refreshToken", {
     httpOnly: true,
     sameSite: "Lax",
@@ -242,5 +231,51 @@ exports.logout = (req, res) => {
   res.json({ message: "Sikeres kijelentkezés" });
 };
 
-exports.blacklistedTokens = blacklistedTokens;
+
+exports.Profilleker = async (req, res) => {
+  try {
+        console.log("REQ USER:", req.user);
+    const { email } = req.user;
+    const felhasznalo = await konyvek.profilleker(email);
+
+    if (!felhasznalo) {
+      return res.status(404).json({ message: "Felhasználó nem található" });
+    }
+
+    res.json(felhasznalo);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a profil lekérdezésekor (SERVER ERROR)' });
+  }
+};
+
+exports.szamlakeszites = async (req, res) => {
+  try {
+    const { email } = req.user; 
+    const { fizetesi_mod, szallitas_mod, termekek } = req.body; 
+
+    if (!fizetesi_mod || !szallitas_mod || !termekek || termekek.length === 0) {
+      return res.status(400).json({
+        message: "Hiányzó fizetési mód, szállítási mód vagy termékek"
+      });
+    }
+
+    const result = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod);
+
+    await Konyvek.kapcsoloSzamlaFeltoltese(result.szamla_id, termekek);
+
+    res.status(201).json({
+      message: "Számla sikeresen létrehozva",
+      szamla_id: result.szamla_id
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Számla létrehozása sikertelen"
+    });
+  }
+};
+
+
 

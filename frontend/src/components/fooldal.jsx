@@ -129,7 +129,7 @@ function Fooldal({ talalatok, searchQuery, searchPage, setSearchPage, hasMoreSea
               <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
             </ListGroup>
             <Card.Footer>
-              <Button onClick={() => {const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
+              <Button className='Kosargomb' onClick={() => {const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
                         const letezo = kosar.find(item => item.ISBN === t.ISBN);
                         if (letezo) {
                             letezo.mennyiseg += 1;

@@ -1,0 +1,128 @@
+
+.auth-popup-content {
+    width: 500px;
+    max-width: 92%;
+    padding: 28px 32px;
+    background-color: #f8f1dc;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+
+.register-form {
+    background: transparent;
+    padding: 0;
+    max-width: 100%;
+}
+
+
+.register-form h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #3a2f1f;
+}
+
+
+.register-form label {
+    font-weight: 600;
+    color: #3a2f1f;
+    margin-bottom: 4px;
+}
+
+
+.register-form .form-control {
+    border-radius: 10px;
+    border: 1px solid #c9b48a;
+    padding: 11px 14px;
+    font-size: 14px;
+}
+
+.register-form .form-control:focus {
+    border-color: #8c6b2f;
+    box-shadow: 0 0 0 0.2rem rgba(140, 107, 47, 0.25);
+}
+
+
+#regisztraciogomb {
+    width: 100%;
+    margin-top: 18px;
+    padding: 13px;
+    border-radius: 12px;
+    background-color: #dbc38c;
+    border: none;
+    color: #3a2f1f;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.25s ease;
+}
+
+#regisztraciogomb:hover {
+    background-color: #8c6b2f;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(140, 107, 47, 0.4);
+}
+
+
+.error-text {
+    color: #b00020;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 12px;
+}
+
+
+.login-link {
+    color: #8c6b2f;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.login-link:hover {
+    color: #5e451c;
+}
+
+
+.popup-close-btn {
+    background: none;
+    border: none;
+    color: #8c6b2f;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 10px;
+}
+
+.popup-close-btn:hover {
+    text-decoration: underline;
+}
+
+
+.auth-popup-content {
+    position: relative;
+}
+
+
+.popup-close-icon {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #8c6b2f;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+
+.popup-close-icon:hover {
+    background-color: rgba(140, 107, 47, 0.15);
+    color: #5e451c;
+    transform: scale(1.1);
+}
