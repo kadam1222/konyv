@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import httpCommon from '../http-common';
 import { useSearchParams } from 'react-router-dom';
 
+
 export default function Filters({ onSearch, talalatok, activeFilters, setActiveFilters, searchQuery, activeCategory }) {
   const [kiadok, setKiadok] = useState([]);
   const [nyelvek, setNyelvek] = useState([]);
@@ -10,7 +11,6 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
   const [tipusok, setTipusok] = useState([]);
   const [error, setError] = useState();
   const [searchParams, setSearchParams] = useSearchParams();
-
   const [filters, setFilters] = useState({
     kiado: '',
     nyelv: '',
@@ -85,6 +85,14 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
 
   return (
     <div className="filter_fodiv">
+        <div className="filter_buttons">
+            <button className="apply-filters-btn" onClick={handleApplyFilters}>
+                Szűrés
+            </button>
+            <button className="clear-filters-btn" onClick={handleClearFilters}>
+                TÖRLÉS
+            </button>
+      </div>
       <div className="selected_filters">
         {Object.entries(filters).map(([key, value]) =>
           value ? (
@@ -169,14 +177,7 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
         <span>Ft</span>
       </div>
 
-      <div className="filter_buttons">
-        <button className="apply-filters-btn" onClick={handleApplyFilters}>
-          Apply Filters
-        </button>
-        <button className="clear-filters-btn" onClick={handleClearFilters}>
-          Clear All
-        </button>
-      </div>
+     
     </div>
   );
 }

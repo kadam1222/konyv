@@ -25,7 +25,14 @@ function Fooldal({
   const observerRef = useRef();
   const navigate = useNavigate();
 
-  const lista = Array.isArray(talalatok) ? talalatok : [];
+const lista = Array.from(
+  new Map((Array.isArray(talalatok) ? talalatok : [])
+    .map(item => [item.ISBN, item])
+  ).values()
+);
+
+  
+
   const safeFilters = activeFilters || {};
 
   const fetchData = async (pagenum) => {
@@ -84,21 +91,42 @@ function Fooldal({
     }
   };
 
-  useEffect(() => {
-    if (searchQuery || activeCategory || Object.values(safeFilters).some(f => f)) {
-      setTalalatok([]);
-      setSearchPage(1);
-      setHasMoreSearch(true);
+useEffect(() => {
+  const fetchResults = async () => {
+    if (!searchQuery && !activeCategory && !Object.values(safeFilters).some(f => f)) {
+      try {
+        setLoading(true);
+        const res = await httpCommon.get(`/konyvek?page=${page}&limit=10`);
+        const uj = Array.isArray(res.data) ? res.data : [];
+        setTalalatok(prev => [...prev, ...uj]);
+        setHasMore(uj.length === 10);
+      } finally {
+        setLoading(false);
+      }
+      return;
     }
-  }, [searchQuery, activeCategory, safeFilters, setTalalatok, setSearchPage, setHasMoreSearch]);
 
-  useEffect(() => {
-    if (searchQuery || activeCategory || Object.values(safeFilters).some(f => f)) {
-      fetchSearchData(searchQuery, searchPage, activeCategory, safeFilters);
-    } else {
-      fetchData(page);
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({ page: searchPage, limit: 10 });
+      if (searchQuery) params.set("cim", searchQuery) && params.set("szerzo", searchQuery);
+      if (activeCategory) params.set("kat", activeCategory);
+      Object.entries(safeFilters).forEach(([k,v]) => v && params.set(k,v));
+
+      const res = await httpCommon.get(`/konyvek/search?${params.toString()}`);
+      const uj = Array.isArray(res.data) ? res.data : [];
+
+      setTalalatok(prev => searchPage === 1 ? uj : [...prev, ...uj]);
+      setHasMoreSearch(uj.length === 10);
+    } finally {
+      setLoading(false);
     }
-  }, [searchQuery, searchPage, activeCategory, safeFilters, page]);
+  };
+
+  fetchResults();
+}, [searchQuery, activeCategory, safeFilters, page, searchPage]);
+
+
 
 const lastItemRef = useCallback(
   (node) => {
@@ -119,14 +147,6 @@ const lastItemRef = useCallback(
   },
   [loading, hasMore, hasMoreSearch, searchQuery, activeCategory, safeFilters]
 );
-
-useEffect(() => {
-  if (lista.length > 0 && searchQuery || activeCategory || Object.values(safeFilters).some(f => f)) {
-    setHasMoreSearch(prev => prev || true);
-  } else if (lista.length > 0) {
-    setHasMore(prev => prev || true);
-  }
-}, []); 
 
   return (
     <div style={{ textAlign: 'center' }}>

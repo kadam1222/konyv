@@ -17,6 +17,7 @@ import Segitseg from './components/segitseg';
 import Fizetes from './components/fizetes';
 import Koszonjuk from './components/Koszonjuk';
 
+
 function App() {
   const [talalatok, setTalalatok] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,6 +31,9 @@ function App() {
   const [allBooks, setAllBooks] = useState([]);
   const [activeFilters, setActiveFilters] = useState({});
   const [hasSearchOrCategory, setHasSearchOrCategory] = useState(false);
+
+
+
 
 useEffect(() => {
   const refreshToken = async () => {
@@ -49,30 +53,25 @@ useEffect(() => {
   refreshToken();
 }, []);
 
-const handleSearch = async (query, pageNum = 1, category = null) => {
-  try {
-    let url;
-    if (category) {
-      url = `/konyvek/search?kat=${category}&page=${pageNum}&limit=10`;
-      setActiveCategory(category);
-    } else {
-      url = `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`;
-      setActiveCategory(null)
-    }
+const handleSearch = async (query, pageNum = 1, category = null, filters = {}) => {
+  setSearchQuery(query);        
+  setActiveCategory(category);
+  setActiveFilters(filters);
+  setSearchPage(pageNum);
 
-    const res = await fetch(url);
-    const data = await res.json();
+  const params = new URLSearchParams({ page: pageNum, limit: 10 });
+  if (category) params.set("kat", category);
+  if (query) params.set("cim", query) && params.set("szerzo", query);
+  Object.entries(filters).forEach(([key, val]) => { if(val) params.set(key, val); });
 
-    setTalalatok(prev => pageNum === 1 ? data : [...prev, ...data]);
-    setSearchQuery(query);
-    setSearchPage(pageNum);
-    setHasMoreSearch(data.length === 10);
-    setRawResults(data);
-    setHasSearchOrCategory(true);
-  } catch (err) {
-    console.error(err);
-  }
+  const res = await fetch(`/konyvek/search?${params.toString()}`);
+  const data = await res.json();
+
+  setTalalatok(data);
+  setHasMoreSearch(data.length === 10);s
+  setHasSearchOrCategory(true);
 };
+
 
   return (
     <Router>
@@ -85,12 +84,13 @@ const handleSearch = async (query, pageNum = 1, category = null) => {
 
           <Route path="/" element={
               <>
-                {!hasSearchOrCategory && talalatok.length === 0 && <Main />}
+               {!searchQuery && !activeCategory && <Main />}
+
 
                 <div style={{ display: "flex" }}>
                 {hasSearchOrCategory && talalatok.length > 0 && (
                   <Filters
-                    onSearch={setTalalatok}
+                    onSearch={handleSearch}
                     talalatok={talalatok}
                     activeFilters={activeFilters}
                     setActiveFilters={setActiveFilters}
