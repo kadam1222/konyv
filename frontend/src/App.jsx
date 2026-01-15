@@ -28,9 +28,8 @@ function App() {
   const [accessToken, setAccessToken] = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
   const [allBooks, setAllBooks] = useState([]);
-
-
-  
+  const [activeFilters, setActiveFilters] = useState({});
+  const [hasSearchOrCategory, setHasSearchOrCategory] = useState(false);
 
 useEffect(() => {
   const refreshToken = async () => {
@@ -41,7 +40,7 @@ useEffect(() => {
       });
       if (!res.ok) return;
       const data = await res.json();
-      console.log("Refresh token response:", data); // <-- ide log
+      console.log("Refresh token response:", data);
       setAccessToken(data.accessToken);
     } catch(err){
       console.error(err);
@@ -50,7 +49,7 @@ useEffect(() => {
   refreshToken();
 }, []);
 
-  const handleSearch = async (query, pageNum = 1, category = null) => {
+const handleSearch = async (query, pageNum = 1, category = null) => {
   try {
     let url;
     if (category) {
@@ -69,11 +68,14 @@ useEffect(() => {
     setSearchPage(pageNum);
     setHasMoreSearch(data.length === 10);
     setRawResults(data);
-
+    setHasSearchOrCategory(true);
   } catch (err) {
     console.error(err);
   }
 };
+
+
+
 
 
   return (
@@ -87,31 +89,37 @@ useEffect(() => {
 
           <Route path="/" element={
               <>
-                {talalatok.length === 0 && <Main />}
+                {!hasSearchOrCategory && talalatok.length === 0 && <Main />}
 
                 <div style={{ display: "flex" }}>
-                  {talalatok.length > 0 && (
-                    <Filters
-                      onSearch={setTalalatok}
-                      talalatok={talalatok}
-                    />
-                  )}
-
-                  <Fooldal
+                {hasSearchOrCategory && talalatok.length > 0 && (
+                  <Filters
+                    onSearch={setTalalatok}
                     talalatok={talalatok}
-                    setTalalatok={setTalalatok}
+                    activeFilters={activeFilters}
+                    setActiveFilters={setActiveFilters}
                     searchQuery={searchQuery}
-                    searchPage={searchPage}
-                    setSearchPage={setSearchPage}
-                    hasMoreSearch={hasMoreSearch}
-                    setHasMoreSearch={setHasMoreSearch}
-                    page={page}
-                    setPage={setPage}
-                    hasMore={hasMore}
-                    setHasMore={setHasMore}
                     activeCategory={activeCategory}
                   />
-                </div>
+                )}
+
+                <Fooldal
+                  talalatok={talalatok}
+                  setTalalatok={setTalalatok}
+                  searchQuery={searchQuery}
+                  searchPage={searchPage}
+                  setSearchPage={setSearchPage}
+                  hasMoreSearch={hasMoreSearch}
+                  setHasMoreSearch={setHasMoreSearch}
+                  page={page}
+                  setPage={setPage}
+                  hasMore={hasMore}
+                  setHasMore={setHasMore}
+                  activeCategory={activeCategory}
+                  activeFilters={activeFilters}
+                  setActiveFilters={setActiveFilters}
+                />
+              </div>
               </>
             }
           />
