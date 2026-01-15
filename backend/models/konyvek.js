@@ -22,30 +22,6 @@ class Konyvek {
     }
   }
 
-  static async fokereso(cim,szerzo, page){
-    try{
-      const limit = 10;
-      const offset = (page-1) * limit
-      const feltetelek_sql = []
-      const feltetelek_parameter = []
-      if(cim){
-          feltetelek_sql.push("cim LIKE ?")
-          feltetelek_parameter.push(`%${cim}%`)
-      }
-      if(szerzo){
-          feltetelek_sql.push("szerzok LIKE ?")
-          feltetelek_parameter.push(`%${szerzo}%`)
-      }
-      const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" OR ") : ""
-      const params = [...feltetelek_parameter];
-      const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} limit ${limit} offset ${offset}`, params);
-      return rows
-    }
-    catch(error){
-        console.error(error)
-        throw error;
-    }
-  }
 
   static async rendezes(relevancia){
     let rendezes = "";
