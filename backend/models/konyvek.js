@@ -22,30 +22,6 @@ class Konyvek {
     }
   }
 
-  static async fokereso(cim,szerzo, page){
-    try{
-      const limit = 10;
-      const offset = (page-1) * limit
-      const feltetelek_sql = []
-      const feltetelek_parameter = []
-      if(cim){
-          feltetelek_sql.push("cim LIKE ?")
-          feltetelek_parameter.push(`%${cim}%`)
-      }
-      if(szerzo){
-          feltetelek_sql.push("szerzok LIKE ?")
-          feltetelek_parameter.push(`%${szerzo}%`)
-      }
-      const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" OR ") : ""
-      const params = [...feltetelek_parameter];
-      const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} limit ${limit} offset ${offset}`, params);
-      return rows
-    }
-    catch(error){
-        console.error(error)
-        throw error;
-    }
-  }
 
   static async rendezes(relevancia){
     let rendezes = "";
@@ -71,7 +47,7 @@ class Konyvek {
       throw error;
     }
   }
-  static async filter(kiado,kat,nyelv,illusztrator,borito, relevanciabe, tipus , page=1, limit=10) {
+  static async filter(kiado,kat,nyelv,illusztrator,borito, relevanciabe, tipus , page=1, limit=10, cim="", szerzo="") {
       try{
         const offset = (page - 1) * limit;
         const feltetelek_sql = []
@@ -105,12 +81,17 @@ class Konyvek {
           feltetelek_sql.push("tipus_nev = ?");
           feltetelek_parameter.push(tipus);
         }
+        if (cim || szerzo) {
+      const q = cim || szerzo; 
+      feltetelek_sql.push("(cim LIKE ? OR szerzok LIKE ?)");
+      feltetelek_parameter.push(`%${q}%`, `%${q}%`);
+    }
 
         
         const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" AND ") : ""
         let rendezes = "";
         if(relevanciabe != "Relevancia"){
-          const rendezes = await this.rendezes(relevanciabe);
+          rendezes = await this.rendezes(relevanciabe);
         }
         
         const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} ${rendezes} LIMIT ? OFFSET ?`, [...feltetelek_parameter, limit, offset]);

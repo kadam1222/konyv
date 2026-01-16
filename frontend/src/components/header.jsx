@@ -34,12 +34,15 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   useEffect(() => {
     fetchData();
   }, []);
-  const handleSearch = () => {
-    if (!keresett.trim()) return;
-    setSearchParams({}, { replace: true });
+ const handleSearch = () => {
+  if (!keresett.trim()) return;
 
-    onSearch(keresett, 1, null);
-  };
+  navigate(`/?search=${keresett}`, { replace: true });
+
+  onSearch(keresett, 1, null, {});
+};
+
+
 
   const handleFilter = async (katNev) => {
     setSearchParams({ kat: katNev });

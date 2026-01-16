@@ -1,8 +1,6 @@
 const konyvek = require('../models/konyvek');
-const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
 const Konyvek = require('../models/konyvek');
 exports.getAllKonyvek = async (req, res) => {
   try {
@@ -38,8 +36,10 @@ exports.filter = async (req, res) => {
     const borito = req.query.borito
     const tipus = req.query.tipus
     const page = parseInt(req.query.page) || 1;
+    const cim = req.query.cim || "";
+    const szerzo = req.query.szerzo || "";
     const limit = 10;
-    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia",tipus , page, limit);
+    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia",tipus , page, limit, cim, szerzo);
     res.json(konyvek_filter); 
   } catch (err) {
     console.error(err);
@@ -47,20 +47,7 @@ exports.filter = async (req, res) => {
   }
 };
 
-exports.fokereso = async (req,res) => {
-  try{
-    const cim = req.query.cim || ""
-    const szerzo = req.query.szerzo || ""
-    const page = parseInt(req.query.page) || 1;
-    const konyvek_filter = await konyvek.fokereso(cim,szerzo, page);
-    res.json(konyvek_filter);
-  }
-  catch(err)
-  {
-    console.error(err);
-    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
-  }
-}
+
 
 exports.delete = async (req, res) =>{
   try{
