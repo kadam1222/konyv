@@ -1,8 +1,7 @@
 const konyvek = require('../models/konyvek');
-const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+const Konyvek = require('../models/konyvek');
 exports.getAllKonyvek = async (req, res) => {
   try {
     const page = req.query.page
@@ -37,8 +36,10 @@ exports.filter = async (req, res) => {
     const borito = req.query.borito
     const tipus = req.query.tipus
     const page = parseInt(req.query.page) || 1;
+    const cim = req.query.cim || "";
+    const szerzo = req.query.szerzo || "";
     const limit = 10;
-    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia",tipus , page, limit);
+    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia",tipus , page, limit, cim, szerzo);
     res.json(konyvek_filter); 
   } catch (err) {
     console.error(err);
@@ -46,20 +47,7 @@ exports.filter = async (req, res) => {
   }
 };
 
-exports.fokereso = async (req,res) => {
-  try{
-    const cim = req.query.cim || ""
-    const szerzo = req.query.szerzo || ""
-    const page = parseInt(req.query.page) || 1;
-    const konyvek_filter = await konyvek.fokereso(cim,szerzo, page);
-    res.json(konyvek_filter);
-  }
-  catch(err)
-  {
-    console.error(err);
-    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
-  }
-}
+
 
 exports.delete = async (req, res) =>{
   try{
@@ -247,5 +235,34 @@ exports.Profilleker = async (req, res) => {
     res.status(500).json({ message: 'Hiba történt a profil lekérdezésekor (SERVER ERROR)' });
   }
 };
+
+exports.szamlakeszites = async (req, res) => {
+  try {
+    const { email } = req.user; 
+    const { fizetesi_mod, szallitas_mod, termekek } = req.body; 
+
+    if (!fizetesi_mod || !szallitas_mod || !termekek || termekek.length === 0) {
+      return res.status(400).json({
+        message: "Hiányzó fizetési mód, szállítási mód vagy termékek"
+      });
+    }
+
+    const result = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod);
+
+    await Konyvek.kapcsoloSzamlaFeltoltese(result.szamla_id, termekek);
+
+    res.status(201).json({
+      message: "Számla sikeresen létrehozva",
+      szamla_id: result.szamla_id
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Számla létrehozása sikertelen"
+    });
+  }
+};
+
 
 
