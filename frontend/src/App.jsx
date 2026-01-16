@@ -15,6 +15,8 @@ import Kosar from './components/kosar';
 import Profil from './components/profil';
 import Segitseg from './components/segitseg';
 import Fizetes from './components/fizetes';
+import Koszonjuk from './components/Koszonjuk';
+
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -27,9 +29,11 @@ function App() {
   const [accessToken, setAccessToken] = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
   const [allBooks, setAllBooks] = useState([]);
+  const [activeFilters, setActiveFilters] = useState({});
+  const [hasSearchOrCategory, setHasSearchOrCategory] = useState(false);
 
 
-  
+
 
 useEffect(() => {
   const refreshToken = async () => {
@@ -40,7 +44,7 @@ useEffect(() => {
       });
       if (!res.ok) return;
       const data = await res.json();
-      console.log("Refresh token response:", data); // <-- ide log
+      console.log("Refresh token response:", data);
       setAccessToken(data.accessToken);
     } catch(err){
       console.error(err);
@@ -49,29 +53,23 @@ useEffect(() => {
   refreshToken();
 }, []);
 
-  const handleSearch = async (query, pageNum = 1, category = null) => {
-  try {
-    let url;
-    if (category) {
-      url = `/konyvek/search?kat=${category}&page=${pageNum}&limit=10`;
-      setActiveCategory(category);
-    } else {
-      url = `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`;
-      setActiveCategory(null)
-    }
+const handleSearch = async (query, pageNum = 1, category = null, filters = {}) => {
+  setSearchQuery(query);        
+  setActiveCategory(category);
+  setActiveFilters(filters);
+  setSearchPage(pageNum);
 
-    const res = await fetch(url);
-    const data = await res.json();
+  const params = new URLSearchParams({ page: pageNum, limit: 10 });
+  if (category) params.set("kat", category);
+  if (query) params.set("cim", query) && params.set("szerzo", query);
+  Object.entries(filters).forEach(([key, val]) => { if(val) params.set(key, val); });
 
-    setTalalatok(prev => pageNum === 1 ? data : [...prev, ...data]);
-    setSearchQuery(query);
-    setSearchPage(pageNum);
-    setHasMoreSearch(data.length === 10);
-    setRawResults(data);
+  const res = await fetch(`/konyvek/search?${params.toString()}`);
+  const data = await res.json();
 
-  } catch (err) {
-    console.error(err);
-  }
+  setTalalatok(data);
+  setHasMoreSearch(data.length === 10);s
+  setHasSearchOrCategory(true);
 };
 
 
@@ -86,31 +84,38 @@ useEffect(() => {
 
           <Route path="/" element={
               <>
-                {talalatok.length === 0 && <Main />}
+               {!searchQuery && !activeCategory && <Main />}
+
 
                 <div style={{ display: "flex" }}>
-                  {talalatok.length > 0 && (
-                    <Filters
-                      onSearch={setTalalatok}
-                      talalatok={talalatok}
-                    />
-                  )}
-
-                  <Fooldal
+                {hasSearchOrCategory && talalatok.length > 0 && (
+                  <Filters
+                    onSearch={handleSearch}
                     talalatok={talalatok}
-                    setTalalatok={setTalalatok}
+                    activeFilters={activeFilters}
+                    setActiveFilters={setActiveFilters}
                     searchQuery={searchQuery}
-                    searchPage={searchPage}
-                    setSearchPage={setSearchPage}
-                    hasMoreSearch={hasMoreSearch}
-                    setHasMoreSearch={setHasMoreSearch}
-                    page={page}
-                    setPage={setPage}
-                    hasMore={hasMore}
-                    setHasMore={setHasMore}
                     activeCategory={activeCategory}
                   />
-                </div>
+                )}
+
+                <Fooldal
+                  talalatok={talalatok}
+                  setTalalatok={setTalalatok}
+                  searchQuery={searchQuery}
+                  searchPage={searchPage}
+                  setSearchPage={setSearchPage}
+                  hasMoreSearch={hasMoreSearch}
+                  setHasMoreSearch={setHasMoreSearch}
+                  page={page}
+                  setPage={setPage}
+                  hasMore={hasMore}
+                  setHasMore={setHasMore}
+                  activeCategory={activeCategory}
+                  activeFilters={activeFilters}
+                  setActiveFilters={setActiveFilters}
+                />
+              </div>
               </>
             }
           />
@@ -119,10 +124,11 @@ useEffect(() => {
           <Route path="/ASZF" element={<Ászf />} />
           <Route path="/rolunk" element={<Rolunk />} />
           <Route path="/elerhetosegek" element={<Elerhetosegek />} />
-          <Route path="/cart" element={<Kosar/>} />
-          <Route path="/fizetes" element={<Fizetes/>} />
+          <Route path="/cart" element={<Kosar accestoken={accessToken}/>} />
+          <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
           <Route path="/profil" element={<Profil accessToken={accessToken} />} />
           <Route path="/segitseg" element={<Segitseg/>} />
+          <Route path='/koszonjuk' element={<Koszonjuk/>}/>
 
 
         </Routes>

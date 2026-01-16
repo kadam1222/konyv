@@ -1,172 +1,183 @@
-import './filter.css'
-import { useState,useEffect } from 'react';
+import './filter.css';
+import { useState, useEffect } from 'react';
 import httpCommon from '../http-common';
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from 'react-router-dom';
 
 
-export default function Filters( { onSearch, talalatok, allBooks  }){
-    const [kiadok, setKiadok] = useState([]);
-    const [nyelv, setNyelv] = useState([]);
-    const [borito, setBorito] = useState([]);
-    const [tipus, setTipus] = useState([]);
-    const [error,setError] = useState();
-    const [filteredTalalatok, setFilteredTalalatok] = useState([]);
-    const [formData, setFormData] = useState({
-        borito: "",
-        armin: "",
-        armax: "",
-        kiado: "",
-        nyelv: "",
-        tipus:"",
-    });
-    const [searchParams, setSearchParams] = useSearchParams();
-  const handleFilter = (kiado, nyelv, borito, kat, tipus) => {
-  let lista = talalatok ?? [];
+export default function Filters({ onSearch, talalatok, activeFilters, setActiveFilters, searchQuery, activeCategory }) {
+  const [kiadok, setKiadok] = useState([]);
+  const [nyelvek, setNyelvek] = useState([]);
+  const [boritok, setBoritok] = useState([]);
+  const [tipusok, setTipusok] = useState([]);
+  const [error, setError] = useState();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [filters, setFilters] = useState({
+    kiado: '',
+    nyelv: '',
+    borito: '',
+    tipus: '',
+    armin: '',
+    armax: ''
+  });
 
-  if (!lista.length) return;
-
-  // helper to normalize strings: trim + lowercase
-  const normalize = (str) => str?.toLowerCase().trim();
-
-  if (kat) lista = lista.filter(k => normalize(k.kat_nev) === normalize(kat));
-  if (borito) lista = lista.filter(k => normalize(k.borito_tipus).includes(normalize(borito)));
-  if (kiado) lista = lista.filter(k => normalize(k.kiado_nev).includes(normalize(kiado)));
-  if (nyelv) lista = lista.filter(k => normalize(k.nyelv_nev).includes(normalize(nyelv)));
-  if (tipus) lista = lista.filter(k => normalize(k.tipus_nev).includes(normalize(tipus)));
-
-  // Update filtered results
-  setFilteredTalalatok(lista);
-  onSearch(lista);
-};
-
-
-    
-    const fetchData = async (nev, setter) =>{
-        try{ 
-            const response = await httpCommon.get(`/konyvek/${nev}`);
-            setter(response.data)
-        }
-        catch(error){
-            setError(error.message);
-            console.error('Error fetching data: ', error);
-        }
+  const fetchData = async (endpoint, setter) => {
+    try {
+      const response = await httpCommon.get(`/konyvek/${endpoint}`);
+      setter(response.data);
+    } catch (err) {
+      console.error(`Error fetching ${endpoint}:`, err);
+      setError(err.message);
     }
-    
-useEffect(() => {
-    fetchData("kiadok", setKiadok);
-    fetchData("nyelv", setNyelv);
-    fetchData("borito", setBorito);
-    fetchData("tipus", setTipus)
-}, []);
+  };
 
-useEffect(() => {
-    const borito = searchParams.get("borito") || "";
-    const nyelv = searchParams.get("nyelv") || "";
-    const kiado = searchParams.get("kiado") || "";
-    const kat = searchParams.get("kat") || "";
-    const tipus = searchParams.get("tipus") || "";
+  useEffect(() => {
+    fetchData('kiadok', setKiadok);
+    fetchData('nyelv', setNyelvek);
+    fetchData('borito', setBoritok);
+    fetchData('tipus', setTipusok);
+  }, []);
 
-    handleFilter(kiado, nyelv, borito, kat, tipus);
-}, [searchParams]);
+  useEffect(() => {
+    const params = Object.fromEntries([...searchParams]);
+    setFilters({
+      kiado: params.kiado || '',
+      nyelv: params.nyelv || '',
+      borito: params.borito || '',
+      tipus: params.tipus || '',
+      armin: params.armin || '',
+      armax: params.armax || ''
+    });
+  }, [searchParams]);
 
+  const handleSelectFilter = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
 
+  const handleApplyFilters = () => {
+    const newParams = new URLSearchParams();
 
-    return(
-        <>
-        <div className="filter_fodiv">
-            <div className="selected_filter">
+    if (searchQuery) newParams.set("search", searchQuery);
+    if (activeCategory) newParams.set("kat", activeCategory);
 
-            </div>
-            <div className="sort_by">
-                <h3>Rendezés szerint:</h3>
-                <select>
-                    <option value="Relevancia">Relevancia</option>
-                    <option value="Ár (csökennő)">Ár (csökennő)</option>
-                    <option value="Ár (növekvő)">Ár (növekvő)</option>
-                    <option value="Kiadás éve (növekvő)">Kiadás éve (növekvő)</option>
-                    <option value="Kiadás éve (csökkenő)">Kiadás éve (csökkenő)</option>
-                </select>
-            </div>
-            <div className="borito">
-                <h3>Borító: </h3>
-                {borito.map((t, index) => (
-                <span 
-                    key={index}
-                    className="kat"
-                    style={{ cursor: "pointer", textTransform: "capitalize" }}
-                    onClick={() => {
-                        const newParams = new URLSearchParams(searchParams);
-                        newParams.set("borito", t.borito_nev);
-                        setSearchParams(newParams); 
-                    }}
-                >
-                    {t.borito_nev}
-                </span>
-                ))}
-            </div>
-            <div className="borito">
-                <h3>Típusok: </h3>
-                {tipus.map((t, index) => (
-                <span 
-                    key={index}
-                    className="kat"
-                    style={{ cursor: "pointer", textTransform: "capitalize" }}
-                    onClick={() => {
-                        const newParams = new URLSearchParams(searchParams);
-                        newParams.set("tipus", t.tipus_nev);
-                        setSearchParams(newParams); 
-                    }}
-                >
-                    {t.tipus_nev}
-                </span>
-                ))}
-            </div>
-            <div className="ar">
-                <h3>Ár: </h3>
-                <div className='arak_range'>
-                    <input type='number' className='min-max_ar'></input><span>Ft</span> - <input type='number' className='min-max_ar'></input><span>Ft</span>
-                </div>
-            </div>
-            <div className="kiadok">
-                <h3>Kiadó: </h3>
-                {kiadok.map((t, index) => (
-                <span 
-                    key={index}
-                    className="kat"
-                    style={{ cursor: "pointer", textTransform: "capitalize" }}
-                    onClick={() => {
-                        const newParams = new URLSearchParams(searchParams);
-                        newParams.set("kiado", t.kiado_nev);
-                        setSearchParams(newParams); 
-                    }}
-                >
-                    {t.kiado_nev}
-                </span>
-                ))}
-                
-            </div>
-            <div className="language">
-                <h3>Nyelv: </h3>
-                {nyelv.map((t, index) => (
-                    <>
-                <span 
-                    key={index}
-                    className="kat"
-                    style={{ cursor: "pointer", textTransform: "capitalize" }}
-                    onClick={() => {
-                        const newParams = new URLSearchParams(searchParams);
-                        newParams.set("nyelv", t.nyelv_nev);
-                        setSearchParams(newParams); 
-                    }}
-                >
-                    {t.nyelv_nev}
-                </span>
-                    </>
-                    
-                ))}
-            </div>
-            
-        </div>
-        </>
-    )
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) newParams.set(key, value);
+    });
+
+    setSearchParams(newParams);
+    setActiveFilters(filters);
+    onSearch(searchQuery, 1, activeCategory, filters);
+  };
+
+  const handleClearFilters = () => {
+    const empty = {
+      kiado: '',
+      nyelv: '',
+      borito: '',
+      tipus: '',
+      armin: '',
+      armax: ''
+    };
+    setFilters(empty);
+    setActiveFilters(empty);
+    onSearch(searchQuery, 1, activeCategory, empty);
+    setSearchParams(activeCategory ? { kat: activeCategory } : {});
+  };
+
+  return (
+    <div className="filter_fodiv">
+        <div className="filter_buttons">
+            <button className="apply-filters-btn" onClick={handleApplyFilters}>
+                Szűrés
+            </button>
+            <button className="clear-filters-btn" onClick={handleClearFilters}>
+                TÖRLÉS
+            </button>
+      </div>
+      <div className="selected_filters">
+        {Object.entries(filters).map(([key, value]) =>
+          value ? (
+            <span
+              key={key}
+              className="selected_filter_tag"
+              onClick={() => handleSelectFilter(key, '')}
+            >
+              {value} ×
+            </span>
+          ) : null
+        )}
+      </div>
+
+      <h3>Kiadó:</h3>
+      <div className="filter_options">
+        {kiadok.map(k => (
+          <span
+            key={k.id}
+            className={`kat ${filters.kiado === k.kiado_nev ? 'active' : ''}`}
+            onClick={() => handleSelectFilter('kiado', k.kiado_nev)}
+          >
+            {k.kiado_nev}
+          </span>
+        ))}
+      </div>
+
+      <h3>Nyelv:</h3>
+      <div className="filter_options">
+        {nyelvek.map(n => (
+          <span
+            key={n.id}
+            className={`kat ${filters.nyelv === n.nyelv_nev ? 'active' : ''}`}
+            onClick={() => handleSelectFilter('nyelv', n.nyelv_nev)}
+          >
+            {n.nyelv_nev}
+          </span>
+        ))}
+      </div>
+
+      <h3>Borító:</h3>
+      <div className="filter_options">
+        {boritok.map(b => (
+          <span
+            key={b.id}
+            className={`kat ${filters.borito === b.borito_nev ? 'active' : ''}`}
+            onClick={() => handleSelectFilter('borito', b.borito_nev)}
+          >
+            {b.borito_nev}
+          </span>
+        ))}
+      </div>
+
+      <h3>Típus:</h3>
+      <div className="filter_options">
+        {tipusok.map(t => (
+          <span
+            key={t.id}
+            className={`kat ${filters.tipus === t.tipus_nev ? 'active' : ''}`}
+            onClick={() => handleSelectFilter('tipus', t.tipus_nev)}
+          >
+            {t.tipus_nev}
+          </span>
+        ))}
+      </div>
+
+      <h3>Ár:</h3>
+      <div className="arak_range">
+        <input
+          type="number"
+          placeholder="Min"
+          value={filters.armin}
+          onChange={e => handleSelectFilter('armin', e.target.value)}
+        />
+        <span>Ft - </span>
+        <input
+          type="number"
+          placeholder="Max"
+          value={filters.armax}
+          onChange={e => handleSelectFilter('armax', e.target.value)}
+        />
+        <span>Ft</span>
+      </div>
+
+     
+    </div>
+  );
 }

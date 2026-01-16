@@ -22,30 +22,6 @@ class Konyvek {
     }
   }
 
-  static async fokereso(cim,szerzo, page){
-    try{
-      const limit = 10;
-      const offset = (page-1) * limit
-      const feltetelek_sql = []
-      const feltetelek_parameter = []
-      if(cim){
-          feltetelek_sql.push("cim LIKE ?")
-          feltetelek_parameter.push(`%${cim}%`)
-      }
-      if(szerzo){
-          feltetelek_sql.push("szerzok LIKE ?")
-          feltetelek_parameter.push(`%${szerzo}%`)
-      }
-      const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" OR ") : ""
-      const params = [...feltetelek_parameter];
-      const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} limit ${limit} offset ${offset}`, params);
-      return rows
-    }
-    catch(error){
-        console.error(error)
-        throw error;
-    }
-  }
 
   static async rendezes(relevancia){
     let rendezes = "";
@@ -71,7 +47,7 @@ class Konyvek {
       throw error;
     }
   }
-  static async filter(kiado,kat,nyelv,illusztrator,borito, relevanciabe, tipus , page=1, limit=10) {
+  static async filter(kiado,kat,nyelv,illusztrator,borito, relevanciabe, tipus , page=1, limit=10, cim="", szerzo="") {
       try{
         const offset = (page - 1) * limit;
         const feltetelek_sql = []
@@ -105,12 +81,17 @@ class Konyvek {
           feltetelek_sql.push("tipus_nev = ?");
           feltetelek_parameter.push(tipus);
         }
+        if (cim || szerzo) {
+      const q = cim || szerzo; 
+      feltetelek_sql.push("(cim LIKE ? OR szerzok LIKE ?)");
+      feltetelek_parameter.push(`%${q}%`, `%${q}%`);
+    }
 
         
         const sikeres = feltetelek_sql.length ? "WHERE " + feltetelek_sql.join(" AND ") : ""
         let rendezes = "";
         if(relevanciabe != "Relevancia"){
-          const rendezes = await this.rendezes(relevanciabe);
+          rendezes = await this.rendezes(relevanciabe);
         }
         
         const [rows] = await db.query(`SELECT * FROM osszes_konyv ${sikeres} ${rendezes} LIMIT ? OFFSET ?`, [...feltetelek_parameter, limit, offset]);
@@ -219,6 +200,80 @@ class Konyvek {
     );
     return rows[0];
   } catch (err) {
+    throw err;
+  }
+
+  
+}
+
+static async szamlakeszites(email, fizetesi_mod, szallitas_mod) {
+  try {
+    const [vevoRows] = await db.query(
+      "SELECT id FROM vevo WHERE email = ?",
+      [email]
+    );
+
+    if (vevoRows.length === 0) {
+      throw new Error("Vevő nem található");
+    }
+
+    const vevo_id = vevoRows[0].id;
+
+    const [result] = await db.query(
+      `
+      INSERT INTO szamla (
+        fizetesi_mod,
+        szallitas_id,
+        fizetesi_hatarido,
+        vevo_id,
+        szamlaszam
+      )
+      SELECT
+        ?,           
+        ?,         
+        CURDATE() + INTERVAL 7 DAY,
+        ?,       
+        CONCAT(
+          YEAR(CURDATE()), '/',
+          ?, '/',
+          (
+            SELECT COUNT(*) + 1
+            FROM szamla
+            WHERE vevo_id = ?
+              AND YEAR(szamla_kelte) = YEAR(CURDATE())
+          )
+        )
+      `,
+      [fizetesi_mod, szallitas_mod, vevo_id, vevo_id, vevo_id]
+    );
+
+    return {
+      szamla_id: result.insertId
+    };
+
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+static async kapcsoloSzamlaFeltoltese(szamla_id, termekek) {
+  try {
+    if (!termekek || termekek.length === 0) return;
+    const values = [];
+    const placeholders = termekek.map(item => {
+      values.push(item.ISBN, szamla_id, item.darab);
+      return "(?, ?, ?)";
+    }).join(", ");
+
+    const sql = `
+      INSERT INTO kapcsolo_szamla (ISBN, szamla_id, darab)
+      VALUES ${placeholders}
+    `;
+
+    await db.query(sql, values);
+
+  } catch (err) {
+    console.error("Kapcsolótábla feltöltés hiba:", err);
     throw err;
   }
 }
