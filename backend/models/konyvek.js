@@ -277,7 +277,26 @@ static async kapcsoloSzamlaFeltoltese(szamla_id, termekek) {
     throw err;
   }
 }
+static async modositas (email, nev, regiemail){
+    try {
 
+      const [result] = await db.query('UPDATE vevo set email = ?, vevo_nev=? where email= ?', [email,nev,regiemail])
+      return result.affectedRows > 0;
+    } 
+    catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+
+  static async rendelesek(vevoid) {
+    try {
+      const [rows] = await db.query(`SELECT * FROM rendelesek where email LIKE ?`, [vevoid]);
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  }
 
 }
 

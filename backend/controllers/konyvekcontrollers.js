@@ -264,5 +264,34 @@ exports.szamlakeszites = async (req, res) => {
   }
 };
 
+exports.modositas = async (req,res) =>{
+    try{
+      const { email } = req.user;   
+      const { valtoztatemail } = req.body; 
+      const { felhasznalonev } = req.body;
+      const result = await Konyvek.modositas(valtoztatemail, felhasznalonev, email);  
+      
+      if(result){
+        res.json({message: `Profil frissítve.`})
+      }
+    }
+    catch (err) {
+      console.error(err);
+      res.status(500).json({
+      message: "Módosítás sikertelen"
+    });
+    }
+};
 
+exports.Rendelesek = async (req, res) => {
+  try {
+    console.log('req.user:', req.user);
+    const { email } = req.user; 
+    const konyvek_all = await konyvek.rendelesek(email);
+    res.json(konyvek_all); 
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+};
 

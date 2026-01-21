@@ -16,6 +16,7 @@ import Profil from './components/profil';
 import Segitseg from './components/segitseg';
 import Fizetes from './components/fizetes';
 import Koszonjuk from './components/Koszonjuk';
+import Rendelesek from './components/Rendelesek';
 
 
 function App() {
@@ -126,7 +127,8 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
           <Route path="/elerhetosegek" element={<Elerhetosegek />} />
           <Route path="/cart" element={<Kosar accestoken={accessToken}/>} />
           <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
-          <Route path="/profil" element={<Profil accessToken={accessToken} />} />
+          <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken} />} />
+          <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken}/>} />
           <Route path="/segitseg" element={<Segitseg/>} />
           <Route path='/koszonjuk' element={<Koszonjuk/>}/>
 
