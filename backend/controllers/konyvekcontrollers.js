@@ -285,7 +285,6 @@ exports.modositas = async (req,res) =>{
 
 exports.Rendelesek = async (req, res) => {
   try {
-    console.log('req.user:', req.user);
     const { email } = req.user; 
     const konyvek_all = await konyvek.rendelesek(email);
     res.json(konyvek_all); 

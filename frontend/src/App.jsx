@@ -128,7 +128,7 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
           <Route path="/cart" element={<Kosar accestoken={accessToken}/>} />
           <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
           <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken} />} />
-          <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken}/>} />
+          <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken} setAccessToken={setAccessToken} />}/>
           <Route path="/segitseg" element={<Segitseg/>} />
           <Route path='/koszonjuk' element={<Koszonjuk/>}/>
 

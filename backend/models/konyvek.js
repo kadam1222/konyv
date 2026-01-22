@@ -289,9 +289,9 @@ static async modositas (email, nev, regiemail){
     }
   }
 
-  static async rendelesek(vevoid) {
+  static async rendelesek(email) {
     try {
-      const [rows] = await db.query(`SELECT * FROM rendelesek where email LIKE ?`, [vevoid]);
+      const [rows] = await db.query(`SELECT * FROM rendelesek where email = ?`, [email]);
       return rows;
     } catch (err) {
       throw err;

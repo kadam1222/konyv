@@ -1,23 +1,24 @@
 import { useState, useEffect } from "react";
+import httpCommon from "../http-common";
 
-
-export default function Rendelesek({accessToken}){
+export default function Rendelesek({accessToken, setAccessToken}){
     const [rendeleseim, setRendeleseim] = useState([]);
     useEffect (() =>{
         const fetchData = async() =>{
         try{
            const response = await httpCommon.get("/konyvek/rendelesek", {
             headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-            })
+                Authorization: `Bearer ${accessToken}`, 
+
+            }
+            });
             setRendeleseim(response.data)
         }
         catch(err){
-            throw err
+            console.error("Error fetching data:", err);
         }
     }
-    if (accessToken) fetchData();
+    fetchData();
 }, [accessToken]);
     return(
         <>
@@ -25,10 +26,11 @@ export default function Rendelesek({accessToken}){
         <div className='fodivrendeles'>
         <h2>Rendeléseim</h2>
         <div>
-            {rendeleseim.map((index, r) =>(
+            {rendeleseim.map((r,index) =>(
                 <>
                 <div key={index}>
-                    {r.ISBN}
+                    {console.log(r.cim)}
+                    {r.cim}
                 </div>
                 </>
             ))}
