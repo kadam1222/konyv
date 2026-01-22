@@ -79,7 +79,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   const Profildropdown = () => (
     <NavDropdown title="Profilom" id="asd">
           <NavDropdown.Item onClick={() => navigate("/profil")}>Személyes adatok</NavDropdown.Item>
-          <NavDropdown.Item >Rendeléseim</NavDropdown.Item>
+          <NavDropdown.Item onClick={() => navigate("/rendelesek")} >Rendeléseim</NavDropdown.Item>
           <NavDropdown.Item onClick={() => navigate("/segitseg")}>Segítség</NavDropdown.Item>
           <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
@@ -90,14 +90,14 @@ const handleLogout = async () => {
       "/auth/logout",
       {},
       {
-        withCredentials: true // csak a refresh token miatt
+        withCredentials: true
       }
     );
   } catch (error) {
     console.error("Logout hiba:", error);
   } finally {
     setAccessToken(null);
-    localStorage.removeItem("accessToken"); // ha még ott van
+    localStorage.removeItem("accessToken"); 
     navigate("/");
   }
 };
