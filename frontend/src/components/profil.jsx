@@ -46,7 +46,7 @@ export default function Profil({ accessToken , setAccessToken}) {
           }
           
         );
-        const { token, user  } = response.data;
+        {/*const { token, user  } = response.data;
         if (token) setAccessToken(token);
         if (user) {
               setNev(user.vevo_nev);
@@ -54,7 +54,17 @@ export default function Profil({ accessToken , setAccessToken}) {
             } else {
               setNev(ujnev.trim() !== "" ? ujnev : nev);
               setEmail(ujemail.trim() !== "" ? ujemail : email);
-            }
+            }*/}
+
+        await fetch("http://localhost:8080/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+        
+        setAccessToken("");
+       window.location.href = "/";
+        setNev("");
+        setEmail("");
         setUjnev("");
         setUjemail("");
         setModositNev(true);
