@@ -21,6 +21,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(true)
 
   const fetchData = async () => {
     try {
@@ -81,6 +82,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
           <NavDropdown.Item onClick={() => navigate("/profil")}>Személyes adatok</NavDropdown.Item>
           <NavDropdown.Item onClick={() => navigate("/rendelesek")} >Rendeléseim</NavDropdown.Item>
           <NavDropdown.Item onClick={() => navigate("/segitseg")}>Segítség</NavDropdown.Item>
+          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminmodosit")}>Rendelések módosítása</NavDropdown.Item> : ""}
           <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );

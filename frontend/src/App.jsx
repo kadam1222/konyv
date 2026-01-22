@@ -17,6 +17,7 @@ import Segitseg from './components/segitseg';
 import Fizetes from './components/fizetes';
 import Koszonjuk from './components/Koszonjuk';
 import Rendelesek from './components/Rendelesek';
+import AdminModositasok from './components/adminmodositas';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
   const [allBooks, setAllBooks] = useState([]);
   const [activeFilters, setActiveFilters] = useState({});
   const [hasSearchOrCategory, setHasSearchOrCategory] = useState(false);
+  const [jogosultsag, setJogosultsag] = useState("")
 
 
 
@@ -129,6 +131,7 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
           <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
           <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken} />} />
           <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken} setAccessToken={setAccessToken} />}/>
+          <Route path="/adminmodositasok" element={<AdminModositasok/>} />
           <Route path="/segitseg" element={<Segitseg/>} />
           <Route path='/koszonjuk' element={<Koszonjuk/>}/>
 

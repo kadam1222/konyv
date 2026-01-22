@@ -162,7 +162,7 @@ exports.bejelentkezes = async (req, res, next) =>{
             return res.status(401).json({ error: "Hibás a felhasználónév vagy jelszó" });
         }
       const accessToken = jwt.sign(
-      { id: felhasznalo.id, nev: felhasznalo.vevo_nev, email: felhasznalo .email},
+      { id: felhasznalo.id, nev: felhasznalo.vevo_nev, email: felhasznalo .email, jogosultsag: felhasznalo.jogosultsag},
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN } 
     );        
@@ -293,4 +293,15 @@ exports.Rendelesek = async (req, res) => {
     res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
   }
 };
+exports.OsszesRendeles = async (req, res) =>{
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const rendelesek_all = await Konyvek.osszesRendeles(page, limit)
+    res.json(rendelesek_all)
+  }
+  catch(err){
+    res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
+  }
+}
 

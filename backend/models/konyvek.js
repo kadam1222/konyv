@@ -298,6 +298,17 @@ static async modositas (email, nev, regiemail){
     }
   }
 
+  static async osszesRendeles(page=1, limit=10,){
+    try{
+      const offset = (page - 1) * limit;
+      const [rows] = await db.query(`SELECT * FROM rendelesek order by keletkezes ASC limit ? offset ?`, [limit, offset])
+      return rows
+    }
+    catch(err){
+      throw err
+    }
+  }
+
 }
 
 module.exports = Konyvek;
