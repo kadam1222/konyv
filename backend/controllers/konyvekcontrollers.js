@@ -162,7 +162,7 @@ exports.bejelentkezes = async (req, res, next) =>{
             return res.status(401).json({ error: "Hibás a felhasználónév vagy jelszó" });
         }
       const accessToken = jwt.sign(
-      { id: felhasznalo.id, nev: felhasznalo.vevo_nev, email: felhasznalo .email, jogosultsag: felhasznalo.jogosultsag},
+      { id: felhasznalo.id, nev: felhasznalo.vevo_nev, email: felhasznalo .email, jogosultsag: Number(felhasznalo.jogosultsag)},
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN } 
     );        

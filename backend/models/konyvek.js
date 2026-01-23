@@ -185,7 +185,7 @@ class Konyvek {
   }
    static async profilleker (email){
     try{
-        const [rows] = await db.query("SELECT vevo_nev,lakcim,email,adoszam FROM vevo WHERE email = ?", [email])
+        const [rows] = await db.query("SELECT vevo_id,vevo_nev,lakcim,email,adoszam, jogosultsag FROM vevo WHERE email = ?", [email])
         return rows[0]
     }
     catch(err){
@@ -195,7 +195,7 @@ class Konyvek {
   static async findByEmail(email) {
   try {
     const [rows] = await db.query(
-      "SELECT vevo_nev, email, jelszo FROM vevo WHERE email = ?",
+      "SELECT vevo_nev, email, jelszo, jogosultsag FROM vevo WHERE email = ?",
       [email]
     );
     return rows[0];
