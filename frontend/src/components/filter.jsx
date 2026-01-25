@@ -2,7 +2,7 @@ import './filter.css';
 import { useState, useEffect } from 'react';
 import httpCommon from '../http-common';
 import { useSearchParams } from 'react-router-dom';
-
+import Button from 'react-bootstrap/Button';
 
 export default function Filters({ onSearch, talalatok, activeFilters, setActiveFilters, searchQuery, activeCategory }) {
   const [kiadok, setKiadok] = useState([]);
@@ -86,12 +86,12 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
   return (
     <div className="filter_fodiv">
         <div className="filter_buttons">
-            <button className="apply-filters-btn" onClick={handleApplyFilters}>
+            <Button className="apply-filters-btn" onClick={handleApplyFilters}>
                 Szűrés
-            </button>
-            <button className="clear-filters-btn" onClick={handleClearFilters}>
+            </Button>
+            <Button  className="clear-filters-btn" onClick={handleClearFilters}>
                 TÖRLÉS
-            </button>
+            </Button>
       </div>
       <div className="selected_filters">
         {Object.entries(filters).map(([key, value]) =>

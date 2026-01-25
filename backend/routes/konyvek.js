@@ -13,7 +13,7 @@ router.post('/ISBN',konyvekcontrollers.getbyISBN);
 router.delete('/:ISBN', konyvekcontrollers.delete);
 router.get('/profil',auth ,konyvekcontrollers.Profilleker);
 router.post("/szamla", auth,konyvekcontrollers.szamlakeszites)
-
-
+router.put('/modosit',auth ,konyvekcontrollers.modositas);
+router.get("/rendelesek", auth, konyvekcontrollers.Rendelesek)
 router.get('/', konyvekcontrollers.getAllKonyvek);
 module.exports = router;
