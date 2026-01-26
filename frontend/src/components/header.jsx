@@ -94,6 +94,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
           <NavDropdown.Item onClick={() => navigate("/segitseg")}>Segítség</NavDropdown.Item>
           {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminmodosit")}>Rendelések módosítása</NavDropdown.Item> : ""}
           {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminuser")}>Felhasználók módosítása</NavDropdown.Item> : ""}
+          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminbook")}>Könyvek módosítása</NavDropdown.Item> : ""}
           <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );

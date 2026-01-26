@@ -20,5 +20,6 @@ router.get("/adminmodosit",auth,requireAdmin, konyvekcontrollers.OsszesRendeles)
 router.get("/adminuser",auth,requireAdmin, konyvekcontrollers.OsszesUser)
 router.put("/adminuserdelete",auth,requireAdmin, konyvekcontrollers.deleteUser)
 router.put("/updatejogosultsag",auth,requireAdmin, konyvekcontrollers.UpdateJogosultsag)
+router.get("/adminosszeskonyv",auth,requireAdmin, konyvekcontrollers.OsszesKonyv)
 router.get('/', konyvekcontrollers.getAllKonyvek);
 module.exports = router;

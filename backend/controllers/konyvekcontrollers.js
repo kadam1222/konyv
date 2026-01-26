@@ -370,3 +370,15 @@ exports.UpdateJogosultsag = async (req, res) =>{
     res.status(500).json({ message: 'Hiba történt a felhasználó törlésekor (SERVER ERROR)' });
   }
 }
+
+exports.OsszesKonyv = async (req, res) =>{
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const rendelesek_all = await Konyvek.osszesKonyv(page, limit)
+    res.json(rendelesek_all)
+  }
+  catch(err){
+    res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
+  }
+}
