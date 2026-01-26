@@ -183,20 +183,21 @@ exports.bejelentkezes = async (req, res, next) =>{
     next(error)
   }
 }
-exports.refreshToken = (req, res) => {
+exports.refreshToken = async (req, res) => {
   const token = req.cookies.refreshToken;
-
   if (!token) {
     return res.status(401).json({ message: "Nincs refresh token" });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.REFRESH_JWT_SECRET);
-
+    const felhasznalo = await Konyvek.findByEmail(decoded.email)
     const newAccessToken = jwt.sign(
       {
-        id: decoded.id,
-        email: decoded.email
+        id: Number(felhasznalo.id),
+        nev: felhasznalo.vevo_nev,
+        email: felhasznalo.email,
+        jogosultsag: Number(felhasznalo.jogosultsag),
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }

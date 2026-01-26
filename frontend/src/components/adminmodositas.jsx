@@ -6,27 +6,29 @@ import httpCommon from "../http-common";
 export default function AdminModositasok( {accessToken}){
     const [osszesRendeles, setOsszesRendeles] = useState([])
 
-    useEffect(() =>{
-        const fetchData = async () =>{
-            try{
+   useEffect(() => {
+    const fetchData = async () => {
+        try {
             const response = await httpCommon.get("/konyvek/adminmodosit", {
-                headers :{
+                headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
             })
-            console.log(response.data)
             setOsszesRendeles(response.data)
+        } catch (err) {
+            console.error(err)
         }
-        catch(err){
-            throw err
-        }
-       if (accessToken) fetchData() 
-    }},[accessToken])
+    }
+    if (accessToken) {
+        fetchData()  
+    }
+}, [accessToken])
+
     return(
         <>
         {osszesRendeles.map((o_r, index) =>(
             <>
-            <span>{o_r.cim}</span>
+            <span>{o_r.cim}, {o_r.email}, {o_r.keletkezes} <button>Rendelés törlése</button> <button>Rendelés módosítása</button></span>
             </>
         ))}
         </>
