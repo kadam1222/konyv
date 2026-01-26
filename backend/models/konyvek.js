@@ -301,7 +301,18 @@ static async modositas (email, nev, regiemail){
   static async osszesRendeles(page=1, limit=10,){
     try{
       const offset = (page - 1) * limit;
-      const [rows] = await db.query(`SELECT * FROM rendelesek order by keletkezes ASC limit ? offset ?`, [limit, offset])
+      const [rows] = await db.query(`
+      SELECT r.*
+      FROM rendelesek r
+      JOIN (
+        SELECT szamlaszam, MIN(keletkezes) AS min_keletkezes
+        FROM rendelesek
+        GROUP BY szamlaszam
+        ORDER BY min_keletkezes ASC
+        LIMIT ? OFFSET ?
+      ) s ON r.szamlaszam = s.szamlaszam
+      ORDER BY r.keletkezes ASC;
+      `, [limit, offset])
       return rows
     }
     catch(err){

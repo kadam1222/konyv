@@ -64,14 +64,14 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
 
   const params = new URLSearchParams({ page: pageNum, limit: 10 });
   if (category) params.set("kat", category);
-  if (query) params.set("cim", query) && params.set("szerzo", query);
+  if (query) params.set("cim", query) ; params.set("szerzo", query);
   Object.entries(filters).forEach(([key, val]) => { if(val) params.set(key, val); });
 
   const res = await fetch(`/konyvek/search?${params.toString()}`);
   const data = await res.json();
 
   setTalalatok(data);
-  setHasMoreSearch(data.length === 10);s
+  setHasMoreSearch(data.length === 10);
   setHasSearchOrCategory(true);
 };
 
@@ -127,7 +127,7 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
           <Route path="/ASZF" element={<Ászf />} />
           <Route path="/rolunk" element={<Rolunk />} />
           <Route path="/elerhetosegek" element={<Elerhetosegek />} />
-          <Route path="/cart" element={<Kosar accestoken={accessToken}/>} />
+          <Route path="/cart" element={<Kosar accesToken={accessToken}/>} />
           <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
           <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken} />} />
           <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken} setAccessToken={setAccessToken} />}/>
