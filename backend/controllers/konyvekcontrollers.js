@@ -124,6 +124,16 @@ exports.tipus = async (req,res) => {
     res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
   }
 }
+exports.rendeles_statusza = async (req,res) => {
+  try{
+    const statuszok = await konyvek.rendeles_statusza();
+    res.json(statuszok);
+  }
+  catch(err){
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+}
 
 exports.regisztracio = async ( req, res, next) =>{
   try{

@@ -173,6 +173,16 @@ class Konyvek {
         throw error;
     }
   }
+   static async rendeles_statusza(){
+    try{
+      const [rows] = await db.query('SELECT * FROM rendeles_statusz');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
 
   static async regisztracio (nev, email, jelszo){
     try {

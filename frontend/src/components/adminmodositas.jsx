@@ -6,7 +6,8 @@ export default function AdminModositasok( {accessToken}){
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [modositas, setModositas] = useState(false)
+    const [modositas, setModositas] = useState(null)
+    const [statuszok, setStatuszok] = useState([])
      useEffect(() => {
     if (accessToken) {
         setOsszesRendeles([]);
@@ -81,13 +82,35 @@ osszesRendeles.forEach(row => {
     });
 
     const groupedOrders = Array.from(groupedOrdersMap.values());
+    useEffect(() =>{
+        const fetchData = async () =>{
+            try{
+                const response = await httpCommon.get("/konyvek/statusz")
+                setModositas(response.data)
+            }
+            catch(err){
+                console.error(err)
+            }
+        }
+        fetchData()
+    }, [])
+
+    const statuszokModositas = async () =>(
+        <>
+        <select name="statuszok" id="statuszok">
+            {statuszok.map((s, index) =>(
+                <option>{s.rendeles_jelenlegi_statusza}</option>
+            ))}
+        </select>
+        </>
+    )
 
     return(
         <>
         {groupedOrders.map(order => (
                 <div key={order.szamlaszam} className="order">
                 <h4>Rendelés száma: {order.szamlaszam}</h4>
-                <span><h4>Rendelés státusza: {order.rendeles_jelenlegi_statusza}</h4> <button onClick={() => !modositas}>Módosítás</button></span>
+               { !modositas ? <span><h4>Rendelés státusza: {order.rendeles_jelenlegi_statusza}</h4> <button onClick={() => setModositas(!modositas)}>Módosítás</button></span> : statuszokModositas()}
                 <strong><p>Számla létrejötte: {new Date(order.keletkezes).toLocaleDateString()}</p></strong>
                 <strong><p>Rendelő email címe: {order.email}</p></strong>
                 <strong><p>Megrendelt termékek:</p></strong>
