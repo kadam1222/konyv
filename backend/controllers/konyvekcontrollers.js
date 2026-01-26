@@ -162,7 +162,7 @@ exports.bejelentkezes = async (req, res, next) =>{
             return res.status(401).json({ error: "Hibás a felhasználónév vagy jelszó" });
         }
       const accessToken = jwt.sign(
-      { id: felhasznalo.id, nev: felhasznalo.vevo_nev, email: felhasznalo .email},
+      { id: Number(felhasznalo.id), nev: felhasznalo.vevo_nev, email: felhasznalo .email, jogosultsag: Number(felhasznalo.jogosultsag)},
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN } 
     );        
@@ -183,20 +183,21 @@ exports.bejelentkezes = async (req, res, next) =>{
     next(error)
   }
 }
-exports.refreshToken = (req, res) => {
+exports.refreshToken = async (req, res) => {
   const token = req.cookies.refreshToken;
-
   if (!token) {
     return res.status(401).json({ message: "Nincs refresh token" });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.REFRESH_JWT_SECRET);
-
+    const felhasznalo = await Konyvek.findByEmail(decoded.email)
     const newAccessToken = jwt.sign(
       {
-        id: decoded.id,
-        email: decoded.email
+        id: Number(felhasznalo.id),
+        nev: felhasznalo.vevo_nev,
+        email: felhasznalo.email,
+        jogosultsag: Number(felhasznalo.jogosultsag),
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
@@ -293,4 +294,15 @@ exports.Rendelesek = async (req, res) => {
     res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
   }
 };
+exports.OsszesRendeles = async (req, res) =>{
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const rendelesek_all = await Konyvek.osszesRendeles(page, limit)
+    res.json(rendelesek_all)
+  }
+  catch(err){
+    res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
+  }
+}
 

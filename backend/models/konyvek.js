@@ -185,7 +185,7 @@ class Konyvek {
   }
    static async profilleker (email){
     try{
-        const [rows] = await db.query("SELECT vevo_nev,lakcim,email,adoszam FROM vevo WHERE email = ?", [email])
+        const [rows] = await db.query("SELECT id,vevo_nev,lakcim,email,adoszam, jogosultsag FROM vevo WHERE email = ?", [email])
         return rows[0]
     }
     catch(err){
@@ -195,7 +195,7 @@ class Konyvek {
   static async findByEmail(email) {
   try {
     const [rows] = await db.query(
-      "SELECT vevo_nev, email, jelszo FROM vevo WHERE email = ?",
+      "SELECT id,vevo_nev, email, jelszo, jogosultsag FROM vevo WHERE email = ?",
       [email]
     );
     return rows[0];
@@ -295,6 +295,17 @@ static async modositas (email, nev, regiemail){
       return rows;
     } catch (err) {
       throw err;
+    }
+  }
+
+  static async osszesRendeles(page=1, limit=10,){
+    try{
+      const offset = (page - 1) * limit;
+      const [rows] = await db.query(`SELECT * FROM rendelesek order by keletkezes ASC limit ? offset ?`, [limit, offset])
+      return rows
+    }
+    catch(err){
+      throw err
     }
   }
 

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const konyvekcontrollers = require('../controllers/konyvekcontrollers');
 const auth = require('../middleware/auth');
+const requireAdmin = require('../middleware/adminOnly')
 
 router.get('/search', konyvekcontrollers.filter);
 router.get('/kategoria', konyvekcontrollers.kategoria);
@@ -15,5 +16,6 @@ router.get('/profil',auth ,konyvekcontrollers.Profilleker);
 router.post("/szamla", auth,konyvekcontrollers.szamlakeszites)
 router.put('/modosit',auth ,konyvekcontrollers.modositas);
 router.get("/rendelesek", auth, konyvekcontrollers.Rendelesek)
+router.get("/adminmodosit",auth,requireAdmin, konyvekcontrollers.OsszesRendeles)
 router.get('/', konyvekcontrollers.getAllKonyvek);
 module.exports = router;
