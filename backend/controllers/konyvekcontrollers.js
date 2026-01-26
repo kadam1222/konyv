@@ -52,6 +52,7 @@ exports.filter = async (req, res) => {
 exports.delete = async (req, res) =>{
   try{
       const ISBN = req.params.ISBN
+      console.log("EMAIL PARAM:", email);
       const success = await konyvek.delete(ISBN)
       if(success){
         res.status(204).json()
@@ -306,3 +307,66 @@ exports.OsszesRendeles = async (req, res) =>{
   }
 }
 
+exports.OsszesUser = async (req, res) =>{
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const rendelesek_all = await Konyvek.osszesUser(page, limit)
+    res.json(rendelesek_all)
+  }
+  catch(err){
+    res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
+  }
+}
+
+exports.deleteUser = async (req, res) =>{
+  try{
+      const { email } = req.body
+      if (!email) {
+      return res.status(400).json({ error: "Email hiányzik" });
+      }
+
+      const success = await konyvek.deleteUser(email)
+
+      if(success){
+        res.status(204).json()
+      }
+      else{
+        res.status(404).json({error: 'Nincs ilyen user'})
+     }
+  }
+    catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a felhasználó törlésekor (SERVER ERROR)' });
+  }
+}
+
+
+exports.UpdateJogosultsag = async (req, res) =>{
+  try{
+      const { email } = req.body
+      const { jogosultsag } = req.body
+      if (!email) {
+      return res.status(400).json({ error: "Email hiányzik" });
+      }
+
+      if (!jogosultsag) {
+      return res.status(400).json({ error: "Jogosultság hiányzik" });
+      }
+
+      const success = await konyvek.Updatejogosultsag(email, jogosultsag)
+      
+      if(success){
+        res.status(204).json()
+      }
+      else{
+        res.status(404).json({error: 'Nincs ilyen user'})
+     }
+  }
+    catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a felhasználó törlésekor (SERVER ERROR)' });
+  }
+}

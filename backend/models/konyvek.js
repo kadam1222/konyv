@@ -309,6 +309,66 @@ static async modositas (email, nev, regiemail){
     }
   }
 
+  static async osszesUser(page=1, limit=10,){
+    try{
+      const offset = (page - 1) * limit;
+      const [rows] = await db.query(`select * from vevo limit ? offset ?`, [limit, offset])
+      return rows
+    }
+    catch(err){
+      throw err
+    }
+  }
+
+  static async deleteUser(email) {
+    try{
+      
+      const [result] = await db.query(`UPDATE vevo
+       SET vevo_nev = 'TÖRÖLT',
+           lakcim = 'TÖRÖLT',
+           adoszam = 'TÖRÖLT',
+           jelszo = 'TÖRÖLT',
+           jogosultsag = 0
+       WHERE email = ?`,
+      [email]);
+
+    return result.affectedRows > 0;
+
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+
+  static async Updatejogosultsag(email,jogosultsag) {
+    try{
+      
+      const [result] = await db.query(`UPDATE vevo
+       SET jogosultsag = ?
+       WHERE email = ?`,
+      [jogosultsag,email]);
+
+    return result.affectedRows > 0;
+    
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+
+  static async osszesKonyv(page=1, limit=10,){
+    try{
+      const offset = (page - 1) * limit;
+      const [rows] = await db.query(`SELECT * FROM osszes_konyv ASC limit ? offset ?`, [limit, offset])
+      return rows
+    }
+    catch(err){
+      throw err
+    }
+  }
+
 }
 
 module.exports = Konyvek;

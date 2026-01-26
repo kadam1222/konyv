@@ -11,11 +11,14 @@ router.get('/borito', konyvekcontrollers.borito);
 router.get('/tipus',konyvekcontrollers.tipus)
 router.get('/kiadok', konyvekcontrollers.kiado);
 router.post('/ISBN',konyvekcontrollers.getbyISBN);
-router.delete('/:ISBN', konyvekcontrollers.delete);
+//router.delete('/:ISBN', konyvekcontrollers.delete);
 router.get('/profil',auth ,konyvekcontrollers.Profilleker);
 router.post("/szamla", auth,konyvekcontrollers.szamlakeszites)
 router.put('/modosit',auth ,konyvekcontrollers.modositas);
 router.get("/rendelesek", auth, konyvekcontrollers.Rendelesek)
 router.get("/adminmodosit",auth,requireAdmin, konyvekcontrollers.OsszesRendeles)
+router.get("/adminuser",auth,requireAdmin, konyvekcontrollers.OsszesUser)
+router.put("/adminuserdelete",auth,requireAdmin, konyvekcontrollers.deleteUser)
+router.put("/updatejogosultsag",auth,requireAdmin, konyvekcontrollers.UpdateJogosultsag)
 router.get('/', konyvekcontrollers.getAllKonyvek);
 module.exports = router;

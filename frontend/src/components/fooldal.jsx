@@ -191,6 +191,10 @@ const lastItemRef = useCallback(
                     if (letezo) letezo.mennyiseg += 1;
                     else kosar.push({ ...t, mennyiseg: 1 });
                     localStorage.setItem('kosar', JSON.stringify(kosar));
+                    if (typeof window !== "undefined") {
+                        window.dispatchEvent(new Event("storage"));
+                    }
+                    
                   }}
                   variant='primary'
                 >
