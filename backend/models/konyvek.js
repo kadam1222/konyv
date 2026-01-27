@@ -339,6 +339,16 @@ static async modositas (email, nev, regiemail){
     }
   }
 
+  static async darabszam_modositas(darab, ISBN){
+    try{
+      const [rows] = await db.query(`UPDATE termek SET raktar = raktar - ? WHERE ISBN = ? `,[darab,ISBN])
+      return rows.affectedRows > 0
+    }
+    catch(err){
+      throw err
+    }
+  }
+
 }
 
 module.exports = Konyvek;

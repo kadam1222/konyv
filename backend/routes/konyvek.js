@@ -19,5 +19,6 @@ router.put('/modosit',auth ,konyvekcontrollers.modositas);
 router.get("/rendelesek", auth, konyvekcontrollers.Rendelesek)
 router.get("/adminmodosit",auth,requireAdmin, konyvekcontrollers.OsszesRendeles)
 router.put("/rendeles_statusz_modositas",auth,requireAdmin,konyvekcontrollers.rendeles_statusza_modositasa)
+router.put("/raktar_modosit", konyvekcontrollers.darabszamModositas)
 router.get('/', konyvekcontrollers.getAllKonyvek);
 module.exports = router;

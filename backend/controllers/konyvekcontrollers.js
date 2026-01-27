@@ -327,3 +327,17 @@ exports.rendeles_statusza_modositasa = async (req, res) =>{
   }
 }
 
+
+exports.darabszamModositas = async (req, res) =>{
+  try{
+    const {ISBN} = req.body
+    const {raktar} = req.body
+    const result = await Konyvek.darabszam_modositas(raktar, ISBN)
+    console.log("küldött raktar:", raktar, typeof raktar);
+    if (result) res.json({message: "Raktár frissítve"})
+  }
+  catch(err){
+    res.status(500).json({message:"Server error"})
+  }
+}
+

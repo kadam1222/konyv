@@ -92,7 +92,16 @@ useEffect(() => {
             setLoading(false);
         }
     };
-
+        const updateRaktar = async (raktar, ISBN) =>{
+            try {
+                await http_common.put("/konyvek/raktar_modosit",{
+                    raktar : Number(raktar),
+                    ISBN : ISBN
+                    });
+        } catch (error) {
+                    console.error("Sikertelen módosítás:", error);
+                }
+            };
     return(
 
     <div style={{display:"flex", gap:"40px" , alignItems:"flex-start"}}>
@@ -140,7 +149,8 @@ useEffect(() => {
             <Form.Check type="radio" label="Személyes átvétel (INGYENES)" value="2" checked={shippingMethod === "2"} onChange={(e) => setShippingMethod(e.target.value)}/>
         </Form.Group>
 
-<Button variant="primary" type="submit" disabled={loading}>
+
+<Button variant="primary" type="submit" disabled={loading} onClick={() => {updateRaktar(Number(localStorage.getItem("mennyiseg")),localStorage.getItem("ISBN"))}}>
     {loading ? "Feldolgozás..." : "Vásárlás!"}
 </Button>
 
