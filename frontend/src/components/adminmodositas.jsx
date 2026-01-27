@@ -8,6 +8,7 @@ export default function AdminModositasok( {accessToken}){
     const [hasMore, setHasMore] = useState(true);
     const [modositas, setModositas] = useState(null)
     const [statuszok, setStatuszok] = useState([])
+    const [ujstatusz, setUjstatusz] = useState("")
      useEffect(() => {
     if (accessToken) {
         setOsszesRendeles([]);
@@ -34,6 +35,7 @@ export default function AdminModositasok( {accessToken}){
       }
 
       setOsszesRendeles(prev => [...prev, ...response.data]);
+      setUjstatusz("")
     } catch (err) {
       console.error(err);
     }
@@ -86,7 +88,7 @@ osszesRendeles.forEach(row => {
         const fetchData = async () =>{
             try{
                 const response = await httpCommon.get("/konyvek/statusz")
-                setModositas(response.data)
+                setStatuszok(response.data)
             }
             catch(err){
                 console.error(err)
@@ -94,23 +96,53 @@ osszesRendeles.forEach(row => {
         }
         fetchData()
     }, [])
-
-    const statuszokModositas = async () =>(
-        <>
-        <select name="statuszok" id="statuszok">
-            {statuszok.map((s, index) =>(
-                <option>{s.rendeles_jelenlegi_statusza}</option>
-            ))}
-        </select>
-        </>
-    )
-
+        const statusz_modositas = async (szamlaszam) => {
+          try {
+           await httpCommon.put(
+              "/konyvek/rendeles_statusz_modositas",{
+                szamlaszam : szamlaszam,
+                r_statusz: ujstatusz
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              }
+              
+            );
+          setOsszesRendeles(prev =>
+            prev.map(r =>
+              r.szamlaszam === szamlaszam
+                ? {
+                    ...r,
+                    rendeles_jelenlegi_statusza:
+                      statuszok.find(s => s.id === ujstatusz)?.statusz,
+                  }
+                : r
+            )
+          );
+          } catch (error) {
+            console.error("Sikertelen módosítás:", error);
+          }
+        };
     return(
         <>
         {groupedOrders.map(order => (
                 <div key={order.szamlaszam} className="order">
                 <h4>Rendelés száma: {order.szamlaszam}</h4>
-               { !modositas ? <span><h4>Rendelés státusza: {order.rendeles_jelenlegi_statusza}</h4> <button onClick={() => setModositas(!modositas)}>Módosítás</button></span> : statuszokModositas()}
+               { modositas === order.szamlaszam ?
+               (
+                <>
+               <select value={ujstatusz} onChange={(e) => setUjstatusz(Number(e.target.value))}>
+                {statuszok.map((s) =>(
+                  <option key={s.id} value={s.id}>
+                    {s.statusz}
+                  </option>
+                ))}
+               </select>
+               <button onClick={(()=>{statusz_modositas(order.szamlaszam); setModositas(null)})}>Mentés</button>
+               <button onClick={(() =>{setModositas(null)})}>Mégse</button></>) :(
+                <span><h4>Rendelés státusza: {order.rendeles_jelenlegi_statusza}</h4> <button onClick={() => {setModositas(order.szamlaszam); const current = statuszok.find(s => s.statusz === order.rendeles_jelenlegi_statusza);setUjstatusz(current?.id ?? "");}}>Módosítás</button></span>)}
                 <strong><p>Számla létrejötte: {new Date(order.keletkezes).toLocaleDateString()}</p></strong>
                 <strong><p>Rendelő email címe: {order.email}</p></strong>
                 <strong><p>Megrendelt termékek:</p></strong>

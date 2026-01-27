@@ -315,4 +315,15 @@ exports.OsszesRendeles = async (req, res) =>{
     res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
   }
 }
+exports.rendeles_statusza_modositasa = async (req, res) =>{
+  try{
+    const {r_statusz} = req.body
+    const {szamlaszam }= req.body
+    const result = await Konyvek.rendeles_statusza_modositas(r_statusz, szamlaszam)
+    if (result) res.json({message: "Rendelés státusza sikeresen megváltoztatva"})
+  }
+  catch(err){
+    res.status(500).json({message : 'Hiba történt a rendelés státuszának módosítása közben'})
+  }
+}
 

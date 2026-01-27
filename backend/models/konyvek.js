@@ -329,6 +329,15 @@ static async modositas (email, nev, regiemail){
       throw err
     }
   }
+  static async rendeles_statusza_modositas(r_statusz, szamlaszam){
+    try{
+      const [rows] = await db.query('UPDATE szamla SET r_statusz = ? WHERE szamlaszam= ?', [r_statusz, szamlaszam])
+      return rows.affectedRows > 0
+    }
+    catch(err){
+      throw err
+    }
+  }
 
 }
 
