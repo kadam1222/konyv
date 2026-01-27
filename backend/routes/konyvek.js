@@ -10,6 +10,7 @@ router.get('/nyelv', konyvekcontrollers.nyelv);
 router.get('/borito', konyvekcontrollers.borito);
 router.get('/tipus',konyvekcontrollers.tipus)
 router.get('/kiadok', konyvekcontrollers.kiado);
+router.get('/statusz', konyvekcontrollers.rendeles_statusza);
 router.post('/ISBN',konyvekcontrollers.getbyISBN);
 //router.delete('/:ISBN', konyvekcontrollers.delete);
 router.get('/profil',auth ,konyvekcontrollers.Profilleker);
