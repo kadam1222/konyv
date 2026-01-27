@@ -9,17 +9,23 @@ router.get('/kategoria', konyvekcontrollers.kategoria);
 router.get('/nyelv', konyvekcontrollers.nyelv);
 router.get('/borito', konyvekcontrollers.borito);
 router.get('/tipus',konyvekcontrollers.tipus)
+router.get('/forditok',konyvekcontrollers.fordito)
+router.get('/szerzok',konyvekcontrollers.szerzok)
+router.get('/illusztratorok',konyvekcontrollers.illusztratorok)
+router.get('/illusztracio',konyvekcontrollers.illusztracio)
 router.get('/kiadok', konyvekcontrollers.kiado);
 router.post('/ISBN',konyvekcontrollers.getbyISBN);
-//router.delete('/:ISBN', konyvekcontrollers.delete);
+router.delete('/konyvtorol',auth,requireAdmin, konyvekcontrollers.delete);
 router.get('/profil',auth ,konyvekcontrollers.Profilleker);
 router.post("/szamla", auth,konyvekcontrollers.szamlakeszites)
 router.put('/modosit',auth ,konyvekcontrollers.modositas);
 router.get("/rendelesek", auth, konyvekcontrollers.Rendelesek)
 router.get("/adminmodosit",auth,requireAdmin, konyvekcontrollers.OsszesRendeles)
 router.get("/adminuser",auth,requireAdmin, konyvekcontrollers.OsszesUser)
+router.put("/konyvmodositas",auth,requireAdmin,konyvekcontrollers.UpdateKonyv)
 router.put("/adminuserdelete",auth,requireAdmin, konyvekcontrollers.deleteUser)
 router.put("/updatejogosultsag",auth,requireAdmin, konyvekcontrollers.UpdateJogosultsag)
 router.get("/adminosszeskonyv",auth,requireAdmin, konyvekcontrollers.OsszesKonyv)
 router.get('/', konyvekcontrollers.getAllKonyvek);
+
 module.exports = router;

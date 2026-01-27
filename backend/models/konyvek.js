@@ -163,6 +163,46 @@ class Konyvek {
         throw error;
     }
   }
+  static async szerzok(){
+    try{
+      const [rows] = await db.query('SELECT * FROM szerző');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+  static async forditok(){
+    try{
+      const [rows] = await db.query('SELECT * FROM fordito');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+  static async illusztratorok(){
+    try{
+      const [rows] = await db.query('SELECT * FROM illusztrator');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+  static async illusztracio(){
+    try{
+      const [rows] = await db.query('SELECT * FROM illusztracio');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
   static async tipus(){
     try{
       const [rows] = await db.query('SELECT * FROM tipus');
@@ -379,6 +419,101 @@ static async modositas (email, nev, regiemail){
       throw err
     }
   }
+
+  static async updatekonyv(adatok, REGIISBN) {
+ 
+    try {
+    const mezok = [];
+    const ertekek = [];
+
+    for (const [kulcs, ertek] of Object.entries(adatok)) {
+      if (ertek !== undefined) {
+        mezok.push(`${kulcs} = ?`);
+        ertekek.push(ertek);
+      }
+    }
+
+    if (mezok.length === 0) {
+      return false; 
+    }
+
+    ertekek.push(REGIISBN);
+
+    const [result] = await db.query(
+      `UPDATE termek SET ${mezok.join(', ')} WHERE ISBN = ?`,
+      ertekek
+    );
+
+    return result.affectedRows > 0;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+static async updateSzerzok(ISBN, szerzoIds) {
+  try {
+    // törlés a régi kapcsolatokból
+    await db.query("DELETE FROM kapcsolo_szerzo WHERE ISBN = ?", [ISBN]);
+
+    // új kapcsolatok beszúrása
+    if (szerzoIds && szerzoIds.length > 0) {
+      const values = szerzoIds.map(id => [ISBN, id]);
+      await db.query(
+        "INSERT INTO kapcsolo_szerzo (ISBN, szerzo_id) VALUES ?",
+        [values]
+      );
+    }
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+static async updateIllusztratorok(ISBN, illusztrator_ids) {
+  try {
+    
+    await db.query("DELETE FROM kapcsolo_illusztrator WHERE ISBN = ?", [ISBN]);
+
+
+    if (illusztrator_ids && illusztrator_ids.length > 0) {
+      const values = illusztrator_ids.map(id => [ISBN, id]);
+      await db.query(
+        "INSERT INTO kapcsolo_illusztrator (ISBN, illusztrator_id) VALUES ?",
+        [values]
+      );
+    }
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+static async updateForditok(ISBN, fordito_id) {
+  try {
+    
+    await db.query("DELETE FROM kapcsolo_fordito WHERE ISBN = ?", [ISBN]);
+
+
+    if (fordito_id && fordito_id.length > 0) {
+      const values = fordito_id.map(id => [ISBN, id]);
+      await db.query(
+        "INSERT INTO kapcsolo_fordito (ISBN, fordito_id) VALUES ?",
+        [values]
+      );
+    }
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
 
 }
 
