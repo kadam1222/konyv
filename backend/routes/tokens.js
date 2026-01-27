@@ -7,4 +7,5 @@ router.post("/register", tokenscontroller.regisztracio);
 router.post("/login", tokenscontroller.bejelentkezes);
 router.post("/refresh", tokenscontroller.refreshToken);
 router.post("/logout", tokenscontroller.logout)
+
 module.exports = router;

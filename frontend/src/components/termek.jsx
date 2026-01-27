@@ -90,17 +90,20 @@ return (
 
         <div className="termek-footer">
           <div className="termek-ar">{adatok.ar} Ft</div>
-          <button className="termek-kosar"  onClick={() => {const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
-                        const letezo = kosar.find(item => item.ISBN === adatok.ISBN);
-                        if (letezo) {
-                            letezo.mennyiseg += 1;
-                        } else {
-                            kosar.push({ ...adatok, mennyiseg: 1 });
-                      }
+          <button className="termek-kosar"  onClick={() => {
+                  const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
+                  const letezo = kosar.find(item => item.ISBN === adatok.ISBN);
+                  if (letezo) {
+                    letezo.mennyiseg += 1;
+                  } else {
+                    kosar.push({ ...adatok, mennyiseg: 1 });
+                  }
 
-                      localStorage.setItem("kosar", JSON.stringify(kosar));
+                  localStorage.setItem("kosar", JSON.stringify(kosar));
 
-              }}>Kosárba</button>
+                  // Trigger event to update Header
+                  window.dispatchEvent(new Event("storage"));
+                }}>Kosárba</button>
         </div>
 
       </div>

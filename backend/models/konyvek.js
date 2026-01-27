@@ -185,7 +185,7 @@ class Konyvek {
   }
    static async profilleker (email){
     try{
-        const [rows] = await db.query("SELECT vevo_nev,lakcim,email,adoszam FROM vevo WHERE email = ?", [email])
+        const [rows] = await db.query("SELECT id,vevo_nev,lakcim,email,adoszam, jogosultsag FROM vevo WHERE email = ?", [email])
         return rows[0]
     }
     catch(err){
@@ -195,7 +195,7 @@ class Konyvek {
   static async findByEmail(email) {
   try {
     const [rows] = await db.query(
-      "SELECT vevo_nev, email, jelszo FROM vevo WHERE email = ?",
+      "SELECT id,vevo_nev, email, jelszo, jogosultsag FROM vevo WHERE email = ?",
       [email]
     );
     return rows[0];
@@ -277,7 +277,108 @@ static async kapcsoloSzamlaFeltoltese(szamla_id, termekek) {
     throw err;
   }
 }
+static async modositas (email, nev, regiemail){
+    try {
 
+      const [result] = await db.query('UPDATE vevo set email = ?, vevo_nev=? where email= ?', [email,nev,regiemail])
+      return result.affectedRows > 0;
+    } 
+    catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+
+  static async rendelesek(email) {
+    try {
+      const [rows] = await db.query(`SELECT * FROM rendelesek where email = ?`, [email]);
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static async osszesRendeles(page=1, limit=10,){
+    try{
+      const offset = (page - 1) * limit;
+      const [rows] = await db.query(`
+      SELECT r.*
+      FROM rendelesek r
+      JOIN (
+        SELECT szamlaszam, MIN(keletkezes) AS min_keletkezes
+        FROM rendelesek
+        GROUP BY szamlaszam
+        ORDER BY min_keletkezes ASC
+        LIMIT ? OFFSET ?
+      ) s ON r.szamlaszam = s.szamlaszam
+      ORDER BY r.keletkezes ASC;
+      `, [limit, offset])
+      return rows
+    }
+    catch(err){
+      throw err
+    }
+  }
+
+  static async osszesUser(page=1, limit=10,){
+    try{
+      const offset = (page - 1) * limit;
+      const [rows] = await db.query(`select * from vevo limit ? offset ?`, [limit, offset])
+      return rows
+    }
+    catch(err){
+      throw err
+    }
+  }
+
+  static async deleteUser(email) {
+    try{
+      
+      const [result] = await db.query(`UPDATE vevo
+       SET vevo_nev = 'TÖRÖLT',
+           lakcim = 'TÖRÖLT',
+           adoszam = 'TÖRÖLT',
+           jelszo = 'TÖRÖLT',
+           jogosultsag = 0
+       WHERE email = ?`,
+      [email]);
+
+    return result.affectedRows > 0;
+
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+
+  static async Updatejogosultsag(email,jogosultsag) {
+    try{
+      
+      const [result] = await db.query(`UPDATE vevo
+       SET jogosultsag = ?
+       WHERE email = ?`,
+      [jogosultsag,email]);
+
+    return result.affectedRows > 0;
+    
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+
+  static async osszesKonyv(page=1, limit=10,){
+    try{
+      const offset = (page - 1) * limit;
+      const [rows] = await db.query(`SELECT * FROM osszes_konyv limit ? offset ?`, [limit, offset])
+      return rows
+    }
+    catch(err){
+      throw err
+    }
+  }
 
 }
 

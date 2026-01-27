@@ -1,0 +1,21 @@
+.koszonjukgomb{
+    padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #dbc38c;
+  color: #3a2f1f;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.koszonjukgomb:hover{
+    background-color: #8c6b2f;
+    border-color: #8c6b2f;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
+    transform: translateY(-2px);
+}
+

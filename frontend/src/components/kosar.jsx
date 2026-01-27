@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import "./kosar.css"
 
 
-export default function Kosar( {accestoken} ){
+export default function Kosar( {accesToken} ){
 
     
 
@@ -84,7 +84,7 @@ export default function Kosar( {accestoken} ){
             <div className='RendelesInfo'> 
                 <span className='rendeles'>{mennyiseg} db termék</span> 
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
-                {kosar.length > 0 && accestoken ? <Button className='rendelesgombok' onClick={() => {navigate("/fizetes")}}>Tovább a fizetéshez!</Button> : <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>}
+                {kosar.length > 0 && accesToken ? <Button className='rendelesgombok' onClick={() => {navigate("/fizetes")}}>Tovább a fizetéshez!</Button> : <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>}
                 <Button style={{marginBottom:"5px"}} className='rendelesgombok' onClick={()=>{navigate("/")}}>Vásárlás folytatása!</Button>
                 </div> 
             </div>
