@@ -1,8 +1,7 @@
 const konyvek = require('../models/konyvek');
-const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+const Konyvek = require('../models/konyvek');
 exports.getAllKonyvek = async (req, res) => {
   try {
     const page = req.query.page
@@ -35,7 +34,12 @@ exports.filter = async (req, res) => {
     const nyelv = req.query.nyelv
     const illusztrator = req.query.illusz
     const borito = req.query.borito
-    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia" );
+    const tipus = req.query.tipus
+    const page = parseInt(req.query.page) || 1;
+    const cim = req.query.cim || "";
+    const szerzo = req.query.szerzo || "";
+    const limit = 10;
+    const konyvek_filter = await konyvek.filter(kiado,kategoria,nyelv,illusztrator, borito, "Relevancia",tipus , page, limit, cim, szerzo);
     res.json(konyvek_filter); 
   } catch (err) {
     console.error(err);
@@ -43,24 +47,12 @@ exports.filter = async (req, res) => {
   }
 };
 
-exports.fokereso = async (req,res) => {
-  try{
-    const cim = req.query.cim || ""
-    const szerzo = req.query.szerzo || ""
-    const page = parseInt(req.query.page) || 1;
-    const konyvek_filter = await konyvek.fokereso(cim,szerzo, page);
-    res.json(konyvek_filter);
-  }
-  catch(err)
-  {
-    console.error(err);
-    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
-  }
-}
+
 
 exports.delete = async (req, res) =>{
   try{
       const ISBN = req.params.ISBN
+      console.log("EMAIL PARAM:", email);
       const success = await konyvek.delete(ISBN)
       if(success){
         res.status(204).json()
@@ -122,6 +114,28 @@ exports.borito = async (req,res) => {
   }
 }
 
+exports.tipus = async (req,res) => {
+  try{
+    const tipusok = await konyvek.tipus();
+    res.json(tipusok);
+  }
+  catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+}
+exports.rendeles_statusza = async (req,res) => {
+  try{
+    const statuszok = await konyvek.rendeles_statusza();
+    res.json(statuszok);
+  }
+  catch(err){
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+}
+
 exports.regisztracio = async ( req, res, next) =>{
   try{
     const {nev, email, jelszo} = req.body;
@@ -159,7 +173,7 @@ exports.bejelentkezes = async (req, res, next) =>{
             return res.status(401).json({ error: "Hibás a felhasználónév vagy jelszó" });
         }
       const accessToken = jwt.sign(
-      { id: felhasznalo.id, nev: felhasznalo.vevo_nev, email: felhasznalo .email},
+      { id: Number(felhasznalo.id), nev: felhasznalo.vevo_nev, email: felhasznalo .email, jogosultsag: Number(felhasznalo.jogosultsag)},
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN } 
     );        
@@ -180,20 +194,21 @@ exports.bejelentkezes = async (req, res, next) =>{
     next(error)
   }
 }
-exports.refreshToken = (req, res) => {
+exports.refreshToken = async (req, res) => {
   const token = req.cookies.refreshToken;
-
   if (!token) {
     return res.status(401).json({ message: "Nincs refresh token" });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.REFRESH_JWT_SECRET);
-
+    const felhasznalo = await Konyvek.findByEmail(decoded.email)
     const newAccessToken = jwt.sign(
       {
-        id: decoded.id,
-        email: decoded.email
+        id: Number(felhasznalo.id),
+        nev: felhasznalo.vevo_nev,
+        email: felhasznalo.email,
+        jogosultsag: Number(felhasznalo.jogosultsag),
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
@@ -205,8 +220,175 @@ exports.refreshToken = (req, res) => {
     return res.status(403).json({ message: "Érvénytelen refresh token" });
   }
 };
+exports.logout = (req, res) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "Lax",
+    secure: process.env.NODE_ENV === "production"
+  });
+
+  res.json({ message: "Sikeres kijelentkezés" });
+};
 
 
+exports.Profilleker = async (req, res) => {
+  try {
+        console.log("REQ USER:", req.user);
+    const { email } = req.user;
+    const felhasznalo = await konyvek.profilleker(email);
+
+    if (!felhasznalo) {
+      return res.status(404).json({ message: "Felhasználó nem található" });
+    }
+
+    res.json(felhasznalo);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a profil lekérdezésekor (SERVER ERROR)' });
+  }
+};
+
+exports.szamlakeszites = async (req, res) => {
+  try {
+    const { email } = req.user; 
+    const { fizetesi_mod, szallitas_mod, termekek } = req.body; 
+
+    if (!fizetesi_mod || !szallitas_mod || !termekek || termekek.length === 0) {
+      return res.status(400).json({
+        message: "Hiányzó fizetési mód, szállítási mód vagy termékek"
+      });
+    }
+
+    const result = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod);
+
+    await Konyvek.kapcsoloSzamlaFeltoltese(result.szamla_id, termekek);
+
+    res.status(201).json({
+      message: "Számla sikeresen létrehozva",
+      szamla_id: result.szamla_id
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Számla létrehozása sikertelen"
+    });
+  }
+};
+
+exports.modositas = async (req,res) =>{
+    try{
+      const { email } = req.user;   
+      const { valtoztatemail } = req.body; 
+      const { felhasznalonev } = req.body;
+      const result = await Konyvek.modositas(valtoztatemail, felhasznalonev, email);  
+      
+      if(result){
+        res.json({message: `Profil frissítve.`})
+      }
+    }
+    catch (err) {
+      console.error(err);
+      res.status(500).json({
+      message: "Módosítás sikertelen"
+    });
+    }
+};
+
+exports.Rendelesek = async (req, res) => {
+  try {
+    const { email } = req.user; 
+    const konyvek_all = await konyvek.rendelesek(email);
+    res.json(konyvek_all); 
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+};
+exports.OsszesRendeles = async (req, res) =>{
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const rendelesek_all = await Konyvek.osszesRendeles(page, limit)
+    res.json(rendelesek_all)
+  }
+  catch(err){
+    res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
+  }
+}
+
+exports.OsszesUser = async (req, res) =>{
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const rendelesek_all = await Konyvek.osszesUser(page, limit)
+    res.json(rendelesek_all)
+  }
+  catch(err){
+    res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
+  }
+}
+
+exports.deleteUser = async (req, res) =>{
+  try{
+      const { email } = req.body
+      if (!email) {
+      return res.status(400).json({ error: "Email hiányzik" });
+      }
+
+      const success = await konyvek.deleteUser(email)
+
+      if(success){
+        res.status(204).json()
+      }
+      else{
+        res.status(404).json({error: 'Nincs ilyen user'})
+     }
+  }
+    catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a felhasználó törlésekor (SERVER ERROR)' });
+  }
+}
 
 
+exports.UpdateJogosultsag = async (req, res) =>{
+  try{
+      const { email } = req.body
+      const { jogosultsag } = req.body
+      if (!email) {
+      return res.status(400).json({ error: "Email hiányzik" });
+      }
 
+      if (!jogosultsag) {
+      return res.status(400).json({ error: "Jogosultság hiányzik" });
+      }
+
+      const success = await konyvek.Updatejogosultsag(email, jogosultsag)
+      
+      if(success){
+        res.status(204).json()
+      }
+      else{
+        res.status(404).json({error: 'Nincs ilyen user'})
+     }
+  }
+    catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a felhasználó törlésekor (SERVER ERROR)' });
+  }
+}
+
+exports.OsszesKonyv = async (req, res) =>{
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const rendelesek_all = await Konyvek.osszesKonyv(page, limit)
+    res.json(rendelesek_all)
+  }
+  catch(err){
+    res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
+  }
+}

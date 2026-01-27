@@ -1,0 +1,33 @@
+.faq-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  font-family: 'Arial', sans-serif;
+}
+
+/* Kérdés blokk */
+.faq-item {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Kérdés címe (h4 a komponensben) */
+.faq-item h4 {
+  font-size: 1.1rem;
+  color: #34495e;
+  margin-bottom: 0.5rem;
+}
+
+/* Válasz szöveg */
+.faq-item p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* Kiemelések */
+.faq-item strong {
+  color: #2c3e50;
+}

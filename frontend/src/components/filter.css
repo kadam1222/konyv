@@ -5,16 +5,17 @@
   padding: 15px;
   width: 250px;            
   box-sizing: border-box;
-  background-color: #f9f9f9; 
+  background-color: #c6ab8077; 
   margin-top: 0;
   margin-bottom: 0; 
   min-height: 100vh;       
   position: sticky;        
   top: 0;
+  font-size: 17px;
 }
 
 h3{
-    background-color: rgba(219, 219, 219, 0.7);
+    background-color: #c6ab80dc;
     border: 1px solid rgba(0, 0, 0, 0.123);
     width: 170px;
     font-size: larger;
@@ -23,7 +24,7 @@ h3{
 select{
     width: 170px;
     margin-bottom: 7px;
-
+    background-color: #ffffffc5;
 }
 
 .min-max_ar{
@@ -32,9 +33,8 @@ select{
     margin: 5px;
     border:1px solid rgba(0, 0, 0, 0.25)
 }
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
+.min-max_ar input[type="number"]::-webkit-outer-spin-button,
+.min-max_ar input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
@@ -43,4 +43,39 @@ input::-webkit-inner-spin-button {
   display: block;
   margin-top: 5px;
   margin-bottom: 5px;
+}
+
+.kat:hover{
+  transform: translateY(-3px);
+}
+
+
+.clear-filters-btn{
+  background-color: rgba(182, 7, 7, 0.747);
+  border-color: rgba(136, 3, 3, 0.384) ;
+  margin-bottom: 10px;
+  color: black;
+}
+
+.clear-filters-btn:hover{
+  background-color: #a78139a6;
+  border-color: #a07a355d;
+    background-color: rgba(151, 5, 5, 0.747);
+    border-color: rgba(136, 3, 3, 0.384) ;
+    color: black;
+    transform: translateY(-0.5px);
+}
+
+.apply-filters-btn{
+  margin-bottom: 10px;
+  margin-right: 15px;
+  color: black;
+}
+
+.apply-filters-btn:hover{
+  background-color: #a78039;
+  border-color: #8c6b2fcb;
+  color: black;
+  box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
+  transform: translateY(-2px);
 }

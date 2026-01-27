@@ -25,10 +25,6 @@ export default function LoginForm( { setAccessToken, onClose, switchToRegister }
     setError(err.response?.data?.message || "Hiba a bejelentkezéskor");
   }
 };
-const kijelentkezes = async () =>{
-  setAccessToken("")
-}
-
     return(
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -53,7 +49,7 @@ const kijelentkezes = async () =>{
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <Button variant="primary" type="submit">
+      <Button variant="primary" type="submit" id="bejelentkezesgomb">
         Bejelentkezés
       </Button>
       <p style={{ marginTop: "10px", textAlign: "center" }}>

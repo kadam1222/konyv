@@ -1,157 +1,183 @@
-import './filter.css'
-import { useState,useEffect } from 'react';
+import './filter.css';
+import { useState, useEffect } from 'react';
 import httpCommon from '../http-common';
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
+export default function Filters({ onSearch, talalatok, activeFilters, setActiveFilters, searchQuery, activeCategory }) {
+  const [kiadok, setKiadok] = useState([]);
+  const [nyelvek, setNyelvek] = useState([]);
+  const [boritok, setBoritok] = useState([]);
+  const [tipusok, setTipusok] = useState([]);
+  const [error, setError] = useState();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [filters, setFilters] = useState({
+    kiado: '',
+    nyelv: '',
+    borito: '',
+    tipus: '',
+    armin: '',
+    armax: ''
+  });
 
-export default function Filters( { onSearch, talalatok }){
-    const [kiadok, setKiadok] = useState([]);
-    const [nyelv, setNyelv] = useState([]);
-    const [borito, setBorito] = useState([]);
-    const [error,setError] = useState();
-    const [filteredTalalatok, setFilteredTalalatok] = useState([]);
-    const [formData, setFormData] = useState({
-        borito: "",
-        armin: "",
-        armax: "",
-        kiado: "",
-        nyelv: "",
+  const fetchData = async (endpoint, setter) => {
+    try {
+      const response = await httpCommon.get(`/konyvek/${endpoint}`);
+      setter(response.data);
+    } catch (err) {
+      console.error(`Error fetching ${endpoint}:`, err);
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchData('kiadok', setKiadok);
+    fetchData('nyelv', setNyelvek);
+    fetchData('borito', setBoritok);
+    fetchData('tipus', setTipusok);
+  }, []);
+
+  useEffect(() => {
+    const params = Object.fromEntries([...searchParams]);
+    setFilters({
+      kiado: params.kiado || '',
+      nyelv: params.nyelv || '',
+      borito: params.borito || '',
+      tipus: params.tipus || '',
+      armin: params.armin || '',
+      armax: params.armax || ''
     });
-    const [searchParams, setSearchParams] = useSearchParams();
-  const handleFilter = (kiado, nyelv, borito, kat) => {
-    let lista = talalatok ?? [];
+  }, [searchParams]);
 
-    if (!lista.length) return; 
+  const handleSelectFilter = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
 
-    if (kat) {
-      lista = lista.filter(k => k.kat_nev?.includes(kat));
-    }
+  const handleApplyFilters = () => {
+    const newParams = new URLSearchParams();
 
-    if (borito) {
-      lista = lista.filter(k => k.borito_tipus?.includes(borito));
-    }
+    if (searchQuery) newParams.set("search", searchQuery);
+    if (activeCategory) newParams.set("kat", activeCategory);
 
-    if (kiado) {
-      lista = lista.filter(k => k.kiado_nev?.includes(kiado));
-    }
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) newParams.set(key, value);
+    });
 
-    if (nyelv) {
-      lista = lista.filter(k => k.nyelv_nev?.includes(nyelv));
-    }
+    setSearchParams(newParams);
+    setActiveFilters(filters);
+    onSearch(searchQuery, 1, activeCategory, filters);
+  };
 
-    setFilteredTalalatok(lista);
-    onSearch(lista);
-};
+  const handleClearFilters = () => {
+    const empty = {
+      kiado: '',
+      nyelv: '',
+      borito: '',
+      tipus: '',
+      armin: '',
+      armax: ''
+    };
+    setFilters(empty);
+    setActiveFilters(empty);
+    onSearch(searchQuery, 1, activeCategory, empty);
+    setSearchParams(activeCategory ? { kat: activeCategory } : {});
+  };
 
-    
-    const fetchData = async (nev, setter) =>{
-        try{ 
-            const response = await httpCommon.get(`/konyvek/${nev}`);
-            setter(response.data)
-        }
-        catch(error){
-            setError(error.message);
-            console.error('Error fetching data: ', error);
-        }
-    }
-    
-useEffect(() => {
-    fetchData("kiadok", setKiadok);
-    fetchData("nyelv", setNyelv);
-    fetchData("borito", setBorito);
-}, []);
+  return (
+    <div className="filter_fodiv">
+        <div className="filter_buttons">
+            <Button className="apply-filters-btn" onClick={handleApplyFilters}>
+                Szűrés
+            </Button>
+            <Button  className="clear-filters-btn" onClick={handleClearFilters}>
+                TÖRLÉS
+            </Button>
+      </div>
+      <div className="selected_filters">
+        {Object.entries(filters).map(([key, value]) =>
+          value ? (
+            <span
+              key={key}
+              className="selected_filter_tag"
+              onClick={() => handleSelectFilter(key, '')}
+            >
+              {value} ×
+            </span>
+          ) : null
+        )}
+      </div>
 
-useEffect(() => {
-    const borito = searchParams.get("borito") || "";
-    const nyelv = searchParams.get("nyelv") || "";
-    const kiado = searchParams.get("kiado") || "";
-    const kat = searchParams.get("kat") || "";
+      <h3>Kiadó:</h3>
+      <div className="filter_options">
+        {kiadok.map(k => (
+          <span
+            key={k.id}
+            className={`kat ${filters.kiado === k.kiado_nev ? 'active' : ''}`}
+            onClick={() => handleSelectFilter('kiado', k.kiado_nev)}
+          >
+            {k.kiado_nev}
+          </span>
+        ))}
+      </div>
 
-    handleFilter(kiado, nyelv, borito, kat);
-}, [searchParams]);
+      <h3>Nyelv:</h3>
+      <div className="filter_options">
+        {nyelvek.map(n => (
+          <span
+            key={n.id}
+            className={`kat ${filters.nyelv === n.nyelv_nev ? 'active' : ''}`}
+            onClick={() => handleSelectFilter('nyelv', n.nyelv_nev)}
+          >
+            {n.nyelv_nev}
+          </span>
+        ))}
+      </div>
 
+      <h3>Borító:</h3>
+      <div className="filter_options">
+        {boritok.map(b => (
+          <span
+            key={b.id}
+            className={`kat ${filters.borito === b.borito_nev ? 'active' : ''}`}
+            onClick={() => handleSelectFilter('borito', b.borito_nev)}
+          >
+            {b.borito_nev}
+          </span>
+        ))}
+      </div>
 
+      <h3>Típus:</h3>
+      <div className="filter_options">
+        {tipusok.map(t => (
+          <span
+            key={t.id}
+            className={`kat ${filters.tipus === t.tipus_nev ? 'active' : ''}`}
+            onClick={() => handleSelectFilter('tipus', t.tipus_nev)}
+          >
+            {t.tipus_nev}
+          </span>
+        ))}
+      </div>
 
-    return(
-        <>
-        <div className="filter_fodiv">
-            <div className="selected_filter">
+      <h3>Ár:</h3>
+      <div className="arak_range">
+        <input
+          type="number"
+          placeholder="Min"
+          value={filters.armin}
+          onChange={e => handleSelectFilter('armin', e.target.value)}
+        />
+        <span>Ft - </span>
+        <input
+          type="number"
+          placeholder="Max"
+          value={filters.armax}
+          onChange={e => handleSelectFilter('armax', e.target.value)}
+        />
+        <span>Ft</span>
+      </div>
 
-            </div>
-            <div className="sort_by">
-                <h3>Rendezés szerint:</h3>
-                <select>
-                    <option value="Relevancia">Relevancia</option>
-                    <option value="Ár (csökennő)">Ár (csökennő)</option>
-                    <option value="Ár (növekvő)">Ár (növekvő)</option>
-                    <option value="Kiadás éve (növekvő)">Kiadás éve (növekvő)</option>
-                    <option value="Kiadás éve (csökkenő)">Kiadás éve (csökkenő)</option>
-                </select>
-            </div>
-            <div className="borito">
-                <h3>Borító: </h3>
-                {borito.map((t, index) => (
-                <span 
-                    key={index}
-                    className="kat"
-                    style={{ cursor: "pointer", textTransform: "capitalize" }}
-                    onClick={() => {
-                        const newParams = new URLSearchParams(searchParams);
-                        newParams.set("borito", t.borito_nev);
-                        setSearchParams(newParams); 
-                    }}
-                >
-                    {t.borito_nev}
-                </span>
-                ))}
-            </div>
-            <div className="ar">
-                <h3>Ár: </h3>
-                <div className='arak_range'>
-                    <input type='number' className='min-max_ar'></input><span>Ft</span> - <input type='number' className='min-max_ar'></input><span>Ft</span>
-                </div>
-            </div>
-            <div className="kiadok">
-                <h3>Kiadó: </h3>
-                {kiadok.map((t, index) => (
-                <span 
-                    key={index}
-                    className="kat"
-                    style={{ cursor: "pointer", textTransform: "capitalize" }}
-                    onClick={() => {
-                        const newParams = new URLSearchParams(searchParams);
-                        newParams.set("kiado", t.kiado_nev);
-                        setSearchParams(newParams); 
-                    }}
-                >
-                    {t.kiado_nev}
-                </span>
-                ))}
-                
-            </div>
-            <div className="language">
-                <h3>Nyelv: </h3>
-                {nyelv.map((t, index) => (
-                    <>
-                <span 
-                    key={index}
-                    className="kat"
-                    style={{ cursor: "pointer", textTransform: "capitalize" }}
-                    onClick={() => {
-                        const newParams = new URLSearchParams(searchParams);
-                        newParams.set("nyelv", t.nyelv_nev);
-                        setSearchParams(newParams); 
-                    }}
-                >
-                    {t.nyelv_nev}
-                </span>
-                    </>
-                    
-                ))}
-            </div>
-            
-        </div>
-        </>
-    )
+     
+    </div>
+  );
 }
-
