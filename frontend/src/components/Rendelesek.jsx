@@ -25,7 +25,7 @@ export default function Rendelesek({accessToken, setAccessToken}){
     const groupedOrdersMap = new Map();
 
     rendeleseim.forEach(row => {
-    const { szamlaszam, szamla_id, cim, darab, fizetesi_hatarido, fizetesi_mod, szallitasi_mod } = row;
+    const { szamlaszam, szamla_id, cim, darab, fizetesi_hatarido, fizetesi_mod, szallitasi_mod, vegosszeg } = row;
 
     if (!groupedOrdersMap.has(szamlaszam)) {
         groupedOrdersMap.set(szamlaszam, {
@@ -34,6 +34,7 @@ export default function Rendelesek({accessToken, setAccessToken}){
         fizetesi_hatarido,
         fizetesi_mod,
         szallitasi_mod,
+        vegosszeg,
         books: []
         });
     }
@@ -63,6 +64,7 @@ export default function Rendelesek({accessToken, setAccessToken}){
                     <li key={idx}>{book.cim} - {book.darab} db</li>
                     ))}
                 </ul>
+                <strong><h4>Végösszeg: {order.vegosszeg}</h4></strong>
                 </div>
             ))}
         </div>

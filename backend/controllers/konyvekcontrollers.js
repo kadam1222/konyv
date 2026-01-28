@@ -258,14 +258,17 @@ exports.szamlakeszites = async (req, res) => {
         message: "Hiányzó fizetési mód, szállítási mód vagy termékek"
       });
     }
-
-    const result = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod);
-
-    await Konyvek.kapcsoloSzamlaFeltoltese(result.szamla_id, termekek);
+    const vegosszeg = await Konyvek.vegosszegSzamitas(termekek, szallitas_mod)
+    for (const item of termekek) {
+      await Konyvek.darabszam_modositas(item.darab, item.ISBN);
+    }
+    const { szamla_id } = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg); 
+    await Konyvek.rendelesSnapshotFeltoltese(szamla_id, termekek);
 
     res.status(201).json({
       message: "Számla sikeresen létrehozva",
-      szamla_id: result.szamla_id
+      szamla_id: szamla_id,
+      vegosszeg
     });
 
   } catch (err) {
@@ -314,6 +317,31 @@ exports.OsszesRendeles = async (req, res) =>{
   }
   catch(err){
     res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
+  }
+}
+exports.rendeles_statusza_modositasa = async (req, res) =>{
+  try{
+    const {r_statusz} = req.body
+    const {szamlaszam }= req.body
+    const result = await Konyvek.rendeles_statusza_modositas(r_statusz, szamlaszam)
+    if (result) res.json({message: "Rendelés státusza sikeresen megváltoztatva"})
+  }
+  catch(err){
+    res.status(500).json({message : 'Hiba történt a rendelés státuszának módosítása közben'})
+  }
+}
+
+
+exports.darabszamModositas = async (req, res) =>{
+  try{
+    const {ISBN} = req.body
+    const {raktar} = req.body
+    const result = await Konyvek.darabszam_modositas(raktar, ISBN)
+    console.log("küldött raktar:", raktar, typeof raktar);
+    if (result) res.json({message: "Raktár frissítve"})
+  }
+  catch(err){
+    res.status(500).json({message:"Server error"})
   }
 }
 
