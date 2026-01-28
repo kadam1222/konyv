@@ -103,7 +103,7 @@ const ListazoInfinite = () => {
 
             <Button
               title="Kosárba"
-              onPress={() => console.log('Kosárba:', item.termek)}
+              onPress={() => console.log('Kosárba:', item.ISBN)}
             />
           </View>
         )}
