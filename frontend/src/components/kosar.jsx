@@ -7,8 +7,6 @@ import "./kosar.css"
 
 export default function Kosar( {accesToken} ){
 
-    
-
     const [mennyiseg,setMennyiseg] = useState()
     const navigate = useNavigate();
 
