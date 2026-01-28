@@ -213,6 +213,16 @@ class Konyvek {
         throw error;
     }
   }
+   static async rendeles_statusza(){
+    try{
+      const [rows] = await db.query('SELECT * FROM rendeles_statusz');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
 
   static async regisztracio (nev, email, jelszo){
     try {
@@ -246,7 +256,7 @@ class Konyvek {
   
 }
 
-static async szamlakeszites(email, fizetesi_mod, szallitas_mod) {
+static async szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg) {
   try {
     const [vevoRows] = await db.query(
       "SELECT id FROM vevo WHERE email = ?",
@@ -266,13 +276,15 @@ static async szamlakeszites(email, fizetesi_mod, szallitas_mod) {
         szallitas_id,
         fizetesi_hatarido,
         vevo_id,
+        vegosszeg,
         szamlaszam
       )
       SELECT
         ?,           
         ?,         
         CURDATE() + INTERVAL 7 DAY,
-        ?,       
+        ?, 
+        ?,      
         CONCAT(
           YEAR(CURDATE()), '/',
           ?, '/',
@@ -284,7 +296,7 @@ static async szamlakeszites(email, fizetesi_mod, szallitas_mod) {
           )
         )
       `,
-      [fizetesi_mod, szallitas_mod, vevo_id, vevo_id, vevo_id]
+      [fizetesi_mod, szallitas_mod, vevo_id,vegosszeg, vevo_id, vevo_id]
     );
 
     return {
@@ -293,27 +305,6 @@ static async szamlakeszites(email, fizetesi_mod, szallitas_mod) {
 
   } catch (err) {
     console.error(err);
-    throw err;
-  }
-}
-static async kapcsoloSzamlaFeltoltese(szamla_id, termekek) {
-  try {
-    if (!termekek || termekek.length === 0) return;
-    const values = [];
-    const placeholders = termekek.map(item => {
-      values.push(item.ISBN, szamla_id, item.darab);
-      return "(?, ?, ?)";
-    }).join(", ");
-
-    const sql = `
-      INSERT INTO kapcsolo_szamla (ISBN, szamla_id, darab)
-      VALUES ${placeholders}
-    `;
-
-    await db.query(sql, values);
-
-  } catch (err) {
-    console.error("Kapcsolótábla feltöltés hiba:", err);
     throw err;
   }
 }
@@ -342,16 +333,10 @@ static async modositas (email, nev, regiemail){
     try{
       const offset = (page - 1) * limit;
       const [rows] = await db.query(`
-      SELECT r.*
-      FROM rendelesek r
-      JOIN (
-        SELECT szamlaszam, MIN(keletkezes) AS min_keletkezes
-        FROM rendelesek
-        GROUP BY szamlaszam
-        ORDER BY min_keletkezes ASC
-        LIMIT ? OFFSET ?
-      ) s ON r.szamlaszam = s.szamlaszam
-      ORDER BY r.keletkezes ASC;
+    SELECT *
+    FROM rendelesek
+    ORDER BY szamla_kelte DESC
+    LIMIT ? OFFSET ?
       `, [limit, offset])
       return rows
     }
@@ -359,6 +344,71 @@ static async modositas (email, nev, regiemail){
       throw err
     }
   }
+  static async rendeles_statusza_modositas(r_statusz, szamlaszam){
+    try{
+      const [rows] = await db.query('UPDATE szamla SET r_statusz = ? WHERE szamlaszam= ?', [r_statusz, szamlaszam])
+      return rows.affectedRows > 0
+    }
+    catch(err){
+      throw err
+    }
+  }
+
+  static async darabszam_modositas(darab, ISBN){
+    try{
+      const [rows] = await db.query(`UPDATE termek SET raktar = raktar - ? WHERE ISBN = ? AND raktar >= ? `,[darab,ISBN, darab])
+       if (rows.affectedRows === 0) {
+        throw new Error("Nincs elég készlet: " + ISBN);
+      }
+    }
+    catch(err){
+      throw err
+    }
+  }
+static async rendelesSnapshotFeltoltese(szamla_id, termekek) {
+  try {
+    for (const item of termekek) {
+      const [rows] = await db.query(
+        "SELECT cim, ar FROM termek WHERE ISBN = ?",
+        [item.ISBN]
+      );
+      const { cim, ar } = rows[0];
+
+      await db.query(
+        `INSERT INTO rendeles_leadasa_termek
+         (szamla_id, ISBN, cim, egysegar, darab)
+         VALUES (?, ?, ?, ?, ?)`,
+        [szamla_id, item.ISBN, cim, ar, item.darab]
+      );
+    }
+  } catch (err) {
+    console.error("Snapshot mentési hiba:", err);
+    throw err;
+  }
+}
+static async vegosszegSzamitas(termekek, szallitas_mod) {
+  let osszeg = 0;
+
+  for (const item of termekek) {
+    const [rows] = await db.query(
+      "SELECT ar FROM termek WHERE ISBN = ?",
+      [item.ISBN]
+    );
+
+    if (rows.length === 0) {
+      throw new Error("Termék nem található: " + item.ISBN);
+    }
+
+    osszeg += rows[0].ar * item.darab;
+  }
+
+  if (Number(szallitas_mod) === 1) {
+    osszeg += 500;
+  }
+
+  return osszeg;
+}
+
 
   static async osszesUser(page=1, limit=10,){
     try{

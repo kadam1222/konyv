@@ -6,7 +6,9 @@ export default function AdminModositasok( {accessToken}){
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [modositas, setModositas] = useState(false)
+    const [modositas, setModositas] = useState(null)
+    const [statuszok, setStatuszok] = useState([])
+    const [ujstatusz, setUjstatusz] = useState("")
      useEffect(() => {
     if (accessToken) {
         setOsszesRendeles([]);
@@ -33,6 +35,7 @@ export default function AdminModositasok( {accessToken}){
       }
 
       setOsszesRendeles(prev => [...prev, ...response.data]);
+      setUjstatusz("")
     } catch (err) {
       console.error(err);
     }
@@ -64,31 +67,91 @@ useEffect(() => {
 
 const groupedOrdersMap = new Map();
 osszesRendeles.forEach(row => {
-    const { szamlaszam, szamla_id, cim, darab, keletkezes, email, rendeles_jelenlegi_statusza} = row;
+    const { szamlaszam, szamla_id, cim, darab, szamla_kelte, email, rendeles_jelenlegi_statusza, vegosszeg} = row;
 
     if (!groupedOrdersMap.has(szamlaszam)) {
         groupedOrdersMap.set(szamlaszam, {
         szamla_id,
         szamlaszam,
-        keletkezes,
+        szamla_kelte,
         email,
         rendeles_jelenlegi_statusza,
+        vegosszeg,
         books: []
         });
     }
+    const order = groupedOrdersMap.get(szamlaszam)
+     const alreadyExists = order.books.some(
+    b => b.cim === cim
+  );
 
-    groupedOrdersMap.get(szamlaszam).books.push({ cim, darab });
+  if (!alreadyExists) {
+    order.books.push({ cim, darab });
+  }
     });
 
     const groupedOrders = Array.from(groupedOrdersMap.values());
-
+   
+    useEffect(() =>{
+        const fetchData = async () =>{
+            try{
+                const response = await httpCommon.get("/konyvek/statusz")
+                setStatuszok(response.data)
+            }
+            catch(err){
+                console.error(err)
+            }
+        }
+        fetchData()
+    }, [])
+        const statusz_modositas = async (szamlaszam) => {
+          try {
+           await httpCommon.put(
+              "/konyvek/rendeles_statusz_modositas",{
+                szamlaszam : szamlaszam,
+                r_statusz: ujstatusz
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              }
+              
+            );
+          setOsszesRendeles(prev =>
+            prev.map(r =>
+              r.szamlaszam === szamlaszam
+                ? {
+                    ...r,
+                    rendeles_jelenlegi_statusza:
+                      statuszok.find(s => s.id === ujstatusz)?.statusz,
+                  }
+                : r
+            )
+          );
+          } catch (error) {
+            console.error("Sikertelen módosítás:", error);
+          }
+        };
     return(
         <>
         {groupedOrders.map(order => (
                 <div key={order.szamlaszam} className="order">
                 <h4>Rendelés száma: {order.szamlaszam}</h4>
-                <span><h4>Rendelés státusza: {order.rendeles_jelenlegi_statusza}</h4> <button onClick={() => !modositas}>Módosítás</button></span>
-                <strong><p>Számla létrejötte: {new Date(order.keletkezes).toLocaleDateString()}</p></strong>
+               { modositas === order.szamlaszam ?
+               (
+                <>
+               <select value={ujstatusz} onChange={(e) => setUjstatusz(Number(e.target.value))}>
+                {statuszok.map((s) =>(
+                  <option key={s.id} value={s.id}>
+                    {s.statusz}
+                  </option>
+                ))}
+               </select>
+               <button onClick={(()=>{statusz_modositas(order.szamlaszam); setModositas(null)})}>Mentés</button>
+               <button onClick={(() =>{setModositas(null)})}>Mégse</button></>) :(
+                <span><h4>Rendelés státusza: {order.rendeles_jelenlegi_statusza}</h4> <button onClick={() => {setModositas(order.szamlaszam); const current = statuszok.find(s => s.statusz === order.rendeles_jelenlegi_statusza);setUjstatusz(current?.id ?? "");}}>Módosítás</button></span>)}
+                <strong><p>Számla létrejötte: {new Date(order.szamla_kelte).toLocaleDateString()}</p></strong>
                 <strong><p>Rendelő email címe: {order.email}</p></strong>
                 <strong><p>Megrendelt termékek:</p></strong>
                 <ul>
@@ -96,6 +159,7 @@ osszesRendeles.forEach(row => {
                     <li key={idx}>{book.cim} - {book.darab} db</li>
                     ))}
                 </ul>
+                <strong><h4>Végösszeg: {order.vegosszeg} FT</h4></strong>
                 </div>
             ))}
         </>

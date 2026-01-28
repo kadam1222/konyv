@@ -92,7 +92,6 @@ useEffect(() => {
             setLoading(false);
         }
     };
-
     return(
 
     <div style={{display:"flex", gap:"40px" , alignItems:"flex-start"}}>
@@ -140,6 +139,7 @@ useEffect(() => {
             <Form.Check type="radio" label="Személyes átvétel (INGYENES)" value="2" checked={shippingMethod === "2"} onChange={(e) => setShippingMethod(e.target.value)}/>
         </Form.Group>
 
+
 <Button variant="primary" type="submit" disabled={loading}>
     {loading ? "Feldolgozás..." : "Vásárlás!"}
 </Button>
@@ -149,8 +149,8 @@ useEffect(() => {
 
     <div className='teljesarfizetes'> <h4 id='rendelescim'>Rendelésed:</h4> 
             <div className='RendelesInfo'> 
-                {kosar.map((item,index)=>(
-                    <p>{item.mennyiseg} x {item.cim}</p>
+                {kosar.map((item)=>(
+                    <p key={item.ISBN}>{item.mennyiseg} x {item.cim}</p>
                 ))}
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
                 {kosar.length > 0 ? <Button className='rendelesgombok' onClick={() => {navigate("/fizetes")}}>Tovább a fizetéshez!</Button> : <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>}
