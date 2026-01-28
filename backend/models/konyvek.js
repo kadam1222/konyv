@@ -293,11 +293,7 @@ static async modositas (email, nev, regiemail){
     try{
       const offset = (page - 1) * limit;
       const [rows] = await db.query(`
-    SELECT *
-    FROM rendelesek
-    ORDER BY szamla_kelte DESC
-    LIMIT ? OFFSET ?
-      `, [limit, offset])
+    SELECT * FROM rendelesek ORDER BY szamla_kelte DESC LIMIT ? OFFSET ?`, [limit, offset])
       return rows
     }
     catch(err){
