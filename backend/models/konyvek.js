@@ -163,6 +163,46 @@ class Konyvek {
         throw error;
     }
   }
+  static async szerzok(){
+    try{
+      const [rows] = await db.query('SELECT * FROM szerző');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+  static async forditok(){
+    try{
+      const [rows] = await db.query('SELECT * FROM fordito');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+  static async illusztratorok(){
+    try{
+      const [rows] = await db.query('SELECT * FROM illusztrator');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
+  static async illusztracio(){
+    try{
+      const [rows] = await db.query('SELECT * FROM illusztracio');
+      return rows;
+    }
+    catch(error){
+        console.error(error)
+        throw error;
+    }
+  }
   static async tipus(){
     try{
       const [rows] = await db.query('SELECT * FROM tipus');
@@ -430,6 +470,174 @@ static async vegosszegSzamitas(termekek, szallitas_mod) {
     }
   }
 
+  static async updatekonyv(adatok, REGIISBN) {
+ 
+    try {
+    const mezok = [];
+    const ertekek = [];
+
+    for (const [kulcs, ertek] of Object.entries(adatok)) {
+      if (ertek !== undefined) {
+        mezok.push(`${kulcs} = ?`);
+        ertekek.push(ertek);
+      }
+    }
+
+    if (mezok.length === 0) {
+      return false; 
+    }
+
+    ertekek.push(REGIISBN);
+
+    const [result] = await db.query(
+      `UPDATE termek SET ${mezok.join(', ')} WHERE ISBN = ?`,
+      ertekek
+    );
+
+    return result.affectedRows > 0;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+static async updateSzerzok(ISBN, szerzoIds) {
+  try {
+
+    await db.query("DELETE FROM kapcsolo_szerzo WHERE ISBN = ?", [ISBN]);
+
+
+    if (szerzoIds && szerzoIds.length > 0) {
+     
+      const values = szerzoIds.map(id => [ISBN, id]);
+      
+
+      await db.query(
+        "INSERT INTO kapcsolo_szerzo (ISBN, szerzo_id) VALUES ?",
+        [values] 
+      );
+    }
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+static async updateIllusztratorok(ISBN, illusztrator_ids) {
+  try {
+    
+    await db.query("DELETE FROM kapcsolo_illusztrator WHERE ISBN = ?", [ISBN]);
+
+
+    if (illusztrator_ids && illusztrator_ids.length > 0) {
+      const values = illusztrator_ids.map(id => [ISBN, id]);
+      await db.query(
+        "INSERT INTO kapcsolo_illusztrator (ISBN, illusztrator_id) VALUES ?",
+        [values]
+      );
+    }
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+static async updateForditok(ISBN, fordito_id) {
+  try {
+    
+    await db.query("DELETE FROM kapcsolo_fordito WHERE ISBN = ?", [ISBN]);
+
+
+    if (fordito_id && fordito_id.length > 0) {
+      const values = fordito_id.map(id => [ISBN, id]);
+      await db.query(
+        "INSERT INTO kapcsolo_fordito (ISBN, fordito_id) VALUES ?",
+        [values]
+      );
+    }
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+static async insertAdat(adatok ){
+  try{
+   const segedTablak = {
+      borito: ['borito', 'borito_nev'],
+      kiado: ['kiado', 'kiado_nev'],
+      illusztracio: ['illusztracio', 'illusztracio'],
+      nyelv: ['nyelv', 'nyelv_nev'],
+      illusztrator: ['illusztrator', 'illusztrator'],
+      fordito: ['fordito', 'fordito_nev'],
+      szerzo: ['szerző', 'szerzo_nev']
+    };
+
+    for (const [kulcs, [tabla, oszlop]] of Object.entries(segedTablak)) {
+      if (adatok[kulcs]) {
+        await db.query(
+          `INSERT INTO ${tabla} (${oszlop}) VALUES (?)`, 
+          [adatok[kulcs]]
+        );
+      }
+    }
+
+    if (adatok.kat_nev) {
+      const katMezok = ['kat_nev'];
+      const katErtekek = [adatok.kat_nev];
+      
+      if (adatok.katazon) {
+        katMezok.push('katazon');
+        katErtekek.push(adatok.katazon);
+      }
+
+      const placeholders = katMezok.map(() => '?').join(',');
+      await db.query(
+        `INSERT INTO kategoria (${katMezok.join(',')}) VALUES (${placeholders})`,
+        katErtekek
+      );
+    }
+
+    if (adatok.termekek) {
+      const t = { ...adatok.termekek };
+      if (t.ISBN) t.ISBN = String(t.ISBN).replace(/-/g, '');
+      
+      const mezok = Object.keys(t);
+      const ertekek = Object.values(t);
+      const placeholders = mezok.map(() => '?').join(',');
+
+      await db.query(`INSERT INTO termek (${mezok.join(',')}) VALUES (${placeholders})`, ertekek);
+
+      // --- ITT HÍVJUK MEG A KAPCSOLÓTÁBLÁKAT ---
+      const ujISBN = t.ISBN;
+
+      // Szerzők (adatok.szerzoIds egy tömb kell legyen a JSON-ben, pl: [1, 5, 8])
+      if (adatok.szerzoIds) {
+        await this.updateSzerzok(ujISBN, adatok.szerzoIds);
+      }
+
+      if (adatok.fordito_ids) { 
+        await this.updateForditok(ujISBN, adatok.fordito_ids);
+      }
+
+      if (adatok.illusztrator_ids) {
+        await this.updateIllusztratorok(ujISBN, adatok.illusztrator_ids);
+      }
+    }
+
+    return true
+  }
+  catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
 }
 
 module.exports = Konyvek;

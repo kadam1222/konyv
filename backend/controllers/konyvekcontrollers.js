@@ -51,8 +51,7 @@ exports.filter = async (req, res) => {
 
 exports.delete = async (req, res) =>{
   try{
-      const ISBN = req.params.ISBN
-      console.log("EMAIL PARAM:", email);
+      const { ISBN } = req.body
       const success = await konyvek.delete(ISBN)
       if(success){
         res.status(204).json()
@@ -84,6 +83,50 @@ exports.kiado = async (req,res) => {
   try{
     const kateg = await konyvek.kiadok();
     res.json(kateg);
+  }
+  catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+}
+exports.fordito = async (req,res) => {
+  try{
+    const fordito = await konyvek.forditok();
+    res.json(fordito);
+  }
+  catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+}
+exports.szerzok = async (req,res) => {
+  try{
+    const szerzo = await konyvek.szerzok();
+    res.json(szerzo);
+  }
+  catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+}
+exports.illusztratorok = async (req,res) => {
+  try{
+    const illusz = await konyvek.illusztratorok();
+    res.json(illusz);
+  }
+  catch(err)
+  {
+    console.error(err);
+    res.status(500).json({ message: 'Hiba történt a könyvek lekérdezésekor (SERVER ERROR)' });
+  }
+}
+exports.illusztracio = async (req,res) => {
+  try{
+    const illusztracio = await konyvek.illusztracio();
+    res.json(illusztracio);
   }
   catch(err)
   {
@@ -420,3 +463,41 @@ exports.OsszesKonyv = async (req, res) =>{
     res.status(500).json({message : 'Hiba történt az összes rendelés lekérdezése során'})
   }
 }
+
+exports.UpdateKonyv = async (req, res) => {
+  try {
+    const { REGIISBN, szerzo_ids, illusztrator_ids, fordito_ids, ...adatok } = req.body;
+
+    const normalize = (val) => Array.isArray(val) ? val : (val ? [val] : []);
+
+    await konyvek.updatekonyv(adatok, REGIISBN);
+
+    const aktualisISBN = adatok.ISBN || REGIISBN;
+
+    await Promise.all([
+      konyvek.updateSzerzok(aktualisISBN, normalize(szerzo_ids)),
+      konyvek.updateIllusztratorok(aktualisISBN, normalize(illusztrator_ids)),
+      konyvek.updateForditok(aktualisISBN, normalize(fordito_ids))
+    ]);
+
+    res.sendStatus(204);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Szerver hiba a módosítás során" });
+  }
+};
+
+
+exports.insertAdat = async (req,res) =>{
+  try{
+    const {...adatok} = req.body;
+    await konyvek.insertAdat(adatok)
+    res.status(204).json()
+
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Szerver hiba az INSERT során" });
+  }
+}
+
+
