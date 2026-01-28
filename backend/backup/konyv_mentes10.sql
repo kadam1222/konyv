@@ -396,9 +396,11 @@ SET @saved_cs_client     = @@character_set_client;
 /*!50001 CREATE VIEW `rendelesek` AS SELECT 
  1 AS `szamla_id`,
  1 AS `szamlaszam`,
- 1 AS `szamla_kelte`,
+ 1 AS `fizetesi_hatarido`,
  1 AS `vegosszeg`,
  1 AS `rendeles_jelenlegi_statusza`,
+ 1 AS `fizetesi_mod`,
+ 1 AS `szallitasi_mod`,
  1 AS `email`,
  1 AS `cim`,
  1 AS `darab`*/;
@@ -626,7 +628,7 @@ UNLOCK TABLES;
 /*!50001 SET collation_connection      = utf8mb3_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `rendelesek` AS select `sz`.`szamla_id` AS `szamla_id`,`sz`.`szamlaszam` AS `szamlaszam`,`sz`.`szamla_kelte` AS `szamla_kelte`,`sz`.`vegosszeg` AS `vegosszeg`,`rs`.`statusz` AS `rendeles_jelenlegi_statusza`,`v`.`email` AS `email`,`rlt`.`cim` AS `cim`,sum(`rlt`.`darab`) AS `darab` from (((`szamla` `sz` join `vevo` `v` on((`v`.`id` = `sz`.`vevo_id`))) join `rendeles_leadasa_termek` `rlt` on((`rlt`.`szamla_id` = `sz`.`szamla_id`))) join `rendeles_statusz` `rs` on((`rs`.`id` = `sz`.`r_statusz`))) group by `sz`.`szamla_id`,`sz`.`szamlaszam`,`sz`.`szamla_kelte`,`sz`.`vegosszeg`,`rs`.`statusz`,`v`.`email`,`rlt`.`cim` order by `sz`.`szamla_kelte` desc */;
+/*!50001 VIEW `rendelesek` AS select `sz`.`szamla_id` AS `szamla_id`,`sz`.`szamlaszam` AS `szamlaszam`,`sz`.`fizetesi_hatarido` AS `fizetesi_hatarido`,`sz`.`vegosszeg` AS `vegosszeg`,`rs`.`statusz` AS `rendeles_jelenlegi_statusza`,`fm`.`fizetesi_nev` AS `fizetesi_mod`,`sm`.`szallitasi_mod` AS `szallitasi_mod`,`v`.`email` AS `email`,`rlt`.`cim` AS `cim`,sum(`rlt`.`darab`) AS `darab` from (((((`szamla` `sz` join `vevo` `v` on((`v`.`id` = `sz`.`vevo_id`))) join `rendeles_leadasa_termek` `rlt` on((`rlt`.`szamla_id` = `sz`.`szamla_id`))) join `rendeles_statusz` `rs` on((`rs`.`id` = `sz`.`r_statusz`))) join `fizetesi_mod` `fm` on((`fm`.`id` = `sz`.`fizetesi_mod`))) join `szallitas` `sm` on((`sm`.`id` = `sz`.`szallitas_id`))) group by `sz`.`szamla_id`,`sz`.`szamlaszam`,`sz`.`fizetesi_hatarido`,`sz`.`vegosszeg`,`rs`.`statusz`,`fm`.`fizetesi_nev`,`sm`.`szallitasi_mod`,`v`.`email`,`rlt`.`cim` order by `sz`.`szamla_kelte` desc */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -640,4 +642,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-28 13:18:56
+-- Dump completed on 2026-01-28 13:27:33
