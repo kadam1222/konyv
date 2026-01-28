@@ -428,33 +428,38 @@ exports.OsszesKonyv = async (req, res) =>{
 
 exports.UpdateKonyv = async (req, res) => {
   try {
-    const { REGIISBN, szerzo_ids,illusztrator_ids,fordito_ids, ...adatok } = req.body;
+    const { REGIISBN, szerzo_ids, illusztrator_ids, fordito_ids, ...adatok } = req.body;
 
-    // 1️⃣ frissítjük a könyv adatait
-    const success = await konyvek.updatekonyv(adatok, REGIISBN);
-    if (!success) {
-      return res.status(404).json({ error: "Nincs ilyen könyv" });
-    }
+    const normalize = (val) => Array.isArray(val) ? val : (val ? [val] : []);
 
-    // 2️⃣ frissítjük a szerzőket, ha van szerzo_ids
-    if (szerzo_ids) {
-      await konyvek.updateSzerzok(REGIISBN, szerzo_ids);
-    }
+    await konyvek.updatekonyv(adatok, REGIISBN);
 
-    if (illusztrator_ids){
-      await konyvek.updateIllusztratorok(REGIISBN, illusztrator_ids);
-    }
+    const aktualisISBN = adatok.ISBN || REGIISBN;
 
-    if(fordito_ids){
-      await konyvek.updateForditok(REGIISBN, fordito_ids);
-    }
+    await Promise.all([
+      konyvek.updateSzerzok(aktualisISBN, normalize(szerzo_ids)),
+      konyvek.updateIllusztratorok(aktualisISBN, normalize(illusztrator_ids)),
+      konyvek.updateForditok(aktualisISBN, normalize(fordito_ids))
+    ]);
 
     res.sendStatus(204);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Szerver hiba" });
+    res.status(500).json({ message: "Szerver hiba a módosítás során" });
   }
 };
 
+
+exports.insertAdat = async (req,res) =>{
+  try{
+    const {...adatok} = req.body;
+    await konyvek.insertAdat(adatok)
+    res.status(204).json()
+
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Szerver hiba az INSERT során" });
+  }
+}
 
 

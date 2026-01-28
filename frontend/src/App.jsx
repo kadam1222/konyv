@@ -20,6 +20,7 @@ import Rendelesek from './components/Rendelesek';
 import AdminModositasok from './components/adminmodositas';
 import AdminUser from './components/adminusermodositas';
 import AdminBook from './components/adminosszeskonyv';
+import AdminInsertBook from './components/adminujadat';
 
 
 function App() {
@@ -136,6 +137,7 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
           <Route path="/adminmodosit" element={<AdminModositasok accessToken={accessToken}/>} />
           <Route path="/adminuser" element={<AdminUser accessToken={accessToken}/>} />
           <Route path="/adminbook" element={<AdminBook accessToken={accessToken}/>} />
+          <Route path="/admininsert" element={<AdminInsertBook accessToken={accessToken}/>} />
           <Route path="/segitseg" element={<Segitseg/>} />
           <Route path='/koszonjuk' element={<Koszonjuk/>}/>
 
