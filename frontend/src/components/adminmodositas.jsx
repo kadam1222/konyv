@@ -67,23 +67,31 @@ useEffect(() => {
 
 const groupedOrdersMap = new Map();
 osszesRendeles.forEach(row => {
-    const { szamlaszam, szamla_id, cim, darab, keletkezes, email, rendeles_jelenlegi_statusza} = row;
+    const { szamlaszam, szamla_id, cim, darab, szamla_kelte, email, rendeles_jelenlegi_statusza, vegosszeg} = row;
 
     if (!groupedOrdersMap.has(szamlaszam)) {
         groupedOrdersMap.set(szamlaszam, {
         szamla_id,
         szamlaszam,
-        keletkezes,
+        szamla_kelte,
         email,
         rendeles_jelenlegi_statusza,
+        vegosszeg,
         books: []
         });
     }
+    const order = groupedOrdersMap.get(szamlaszam)
+     const alreadyExists = order.books.some(
+    b => b.cim === cim
+  );
 
-    groupedOrdersMap.get(szamlaszam).books.push({ cim, darab });
+  if (!alreadyExists) {
+    order.books.push({ cim, darab });
+  }
     });
 
     const groupedOrders = Array.from(groupedOrdersMap.values());
+   
     useEffect(() =>{
         const fetchData = async () =>{
             try{
@@ -143,7 +151,7 @@ osszesRendeles.forEach(row => {
                <button onClick={(()=>{statusz_modositas(order.szamlaszam); setModositas(null)})}>Mentés</button>
                <button onClick={(() =>{setModositas(null)})}>Mégse</button></>) :(
                 <span><h4>Rendelés státusza: {order.rendeles_jelenlegi_statusza}</h4> <button onClick={() => {setModositas(order.szamlaszam); const current = statuszok.find(s => s.statusz === order.rendeles_jelenlegi_statusza);setUjstatusz(current?.id ?? "");}}>Módosítás</button></span>)}
-                <strong><p>Számla létrejötte: {new Date(order.keletkezes).toLocaleDateString()}</p></strong>
+                <strong><p>Számla létrejötte: {new Date(order.szamla_kelte).toLocaleDateString()}</p></strong>
                 <strong><p>Rendelő email címe: {order.email}</p></strong>
                 <strong><p>Megrendelt termékek:</p></strong>
                 <ul>
@@ -151,6 +159,7 @@ osszesRendeles.forEach(row => {
                     <li key={idx}>{book.cim} - {book.darab} db</li>
                     ))}
                 </ul>
+                <strong><h4>Végösszeg: {order.vegosszeg} FT</h4></strong>
                 </div>
             ))}
         </>

@@ -257,14 +257,17 @@ exports.szamlakeszites = async (req, res) => {
         message: "Hiányzó fizetési mód, szállítási mód vagy termékek"
       });
     }
-
-    const result = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod);
-
-    await Konyvek.kapcsoloSzamlaFeltoltese(result.szamla_id, termekek);
+    const vegosszeg = await Konyvek.vegosszegSzamitas(termekek, szallitas_mod)
+    for (const item of termekek) {
+      await Konyvek.darabszam_modositas(item.darab, item.ISBN);
+    }
+    const { szamla_id } = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg); 
+    await Konyvek.rendelesSnapshotFeltoltese(szamla_id, termekek);
 
     res.status(201).json({
       message: "Számla sikeresen létrehozva",
-      szamla_id: result.szamla_id
+      szamla_id: szamla_id,
+      vegosszeg
     });
 
   } catch (err) {
