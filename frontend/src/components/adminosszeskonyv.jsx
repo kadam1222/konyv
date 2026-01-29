@@ -175,27 +175,59 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
         }
     }
 
-    const konyvmodositas = async (ISBN) => {
-        const edited = editedKonyvek[ISBN];
-        if (!edited) return;
-        try {
-            const { tipus_nev, nyelv_nev, kiado_nev, borito_tipus, kat_nev, illusztracio_leiras, szerzok, forditok, illusztratorok, szerzo_ids, illusztrator_ids, fordito_ids, ...tisztaAdatok } = edited;
-            const payload = { REGIISBN: ISBN, ...tisztaAdatok, szerzo_ids: szerzo_ids || [], illusztrator_ids: illusztrator_ids || [], fordito_ids: fordito_ids || [] };
+   const konyvmodositas = async (ISBN) => {
+    const edited = editedKonyvek[ISBN];
+    if (!edited) return;
+    try {
+        // Kiemeljük azokat a mezőket, amik CSAK a frontendnek vagy a kapcsolótábláknak kellenek.
+        // Hozzáadtam a 'fordítok' (ékezettel) mezőt is a listához, hogy NE kerüljön a tisztaAdatok-ba.
+        const { 
+            tipus_nev, 
+            nyelv_nev, 
+            kiado_nev, 
+            borito_tipus, 
+            kat_nev, 
+            illusztracio_leiras, 
+            szerzok, 
+            forditok, 
+            fordítok, // <--- Ez volt a hiba forrása, ki kell venni a szórásból!
+            illusztratorok, 
+            szerzo_ids, 
+            illusztrator_ids, 
+            fordito_ids, 
+            ...tisztaAdatok 
+        } = edited;
 
-            await httpCommon.put("/konyvek/konyvmodositas", payload, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-            });
-            alert("Sikeres módosítás!");
-            setShowInput(prev => ({ ...prev, [ISBN]: false }));
-            setOsszesKonyv([])
-            setPage(1);
-            setHasMore(true)
-            fetchData(1) 
-            
-        } catch (err) {
-            console.error("Hiba küldéskor:", err);
+        // SQL biztonsági javítás az illusztrációhoz (üres string helyett null, ha nincs kitöltve)
+        if (tisztaAdatok.illusztracio === "") {
+            tisztaAdatok.illusztracio = null;
         }
-    };
+
+        const payload = { 
+            REGIISBN: ISBN, 
+            ...tisztaAdatok, 
+            szerzo_ids: szerzo_ids || [], 
+            illusztrator_ids: illusztrator_ids || [], 
+            fordito_ids: fordito_ids || [] 
+        };
+
+        await httpCommon.put("/konyvek/konyvmodositas", payload, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        alert("Sikeres módosítás!");
+        setShowInput(prev => ({ ...prev, [ISBN]: false }));
+        setOsszesKonyv([]);
+        setPage(1);
+        setHasMore(true);
+        fetchData(1); 
+        
+    } catch (err) {
+        console.error("Hiba küldéskor:", err);
+        // Így több infót látsz a hibaüzenetben
+        alert("Hiba: " + (err.response?.data?.sqlMessage || "Szerver hiba történt."));
+    }
+};
 
     const Fetchmodositas = async (endpoint,setter) =>{
         try {
