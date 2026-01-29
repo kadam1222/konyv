@@ -5,11 +5,9 @@ import Button from 'react-bootstrap/Button';
 import "./kosar.css"
 
 
-export default function Kosar( {accestoken} ){
+export default function Kosar( {accesToken} ){
 
-    
-
-    const [mennyiseg,setMennyiseg] = useState(1)
+    const [mennyiseg,setMennyiseg] = useState()
     const navigate = useNavigate();
 
     const [termek, setTermek] = useState(
@@ -19,6 +17,12 @@ export default function Kosar( {accestoken} ){
     const [kosar, setKosar] = useState(
         JSON.parse(localStorage.getItem("kosar")) || []
     );
+
+    useEffect(()=>{
+        setMennyiseg(kosar.length)
+    }
+
+    ,[kosar]);
 
     const teljesAr = kosar.reduce(
         (sum, item) => sum + item.ar * item.mennyiseg,
@@ -38,7 +42,7 @@ export default function Kosar( {accestoken} ){
             <img src={`/kepek/${item.ISBN}.jpg`} />
 
             <div className="Termekinfo">
-                <h4>{item.cim}</h4>
+                <h4 id='konyvcim'>{item.cim}</h4>
                 <span>{item.szerzok}</span><br />
                 <span>{item.ar} Ft</span><br />
             </div>
@@ -56,6 +60,7 @@ export default function Kosar( {accestoken} ){
             />
 
             <FaTrashCan
+                id='torlesgomb'
                 onClick={() => {
                 const ujKosar = kosar.filter((_, i) => i !== index);
                 setKosar(ujKosar);
@@ -68,17 +73,17 @@ export default function Kosar( {accestoken} ){
             </div>
             ))
             ) : (
-                <p>Még nincs termék a kosárban!</p>
+                <p id='hibaüzenet'>Még nincs termék a kosárban!</p>
             )}
 
             
         </div>
         <div className='teljesar'> <h4 id='rendelescim'>Rendelésed:</h4> 
-            <div className='Termekinfo'> 
+            <div className='RendelesInfo'> 
                 <span className='rendeles'>{mennyiseg} db termék</span> 
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
-                <Button>Tovább a fizetéshez!</Button>
-                <Button onClick={()=>{navigate("/")}}>Vásárlás folytatása!</Button>
+                {kosar.length > 0 && accesToken ? <Button className='rendelesgombok' onClick={() => {navigate("/fizetes")}}>Tovább a fizetéshez!</Button> : <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>}
+                <Button style={{marginBottom:"5px"}} className='rendelesgombok' onClick={()=>{navigate("/")}}>Vásárlás folytatása!</Button>
                 </div> 
             </div>
         </div>

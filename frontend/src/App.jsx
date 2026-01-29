@@ -12,6 +12,16 @@ import Ászf from './components/ÁSZF'
 import Rolunk from './components/rolunk';
 import Elerhetosegek from './components/elerhetosegek';
 import Kosar from './components/kosar';
+import Profil from './components/profil';
+import Segitseg from './components/segitseg';
+import Fizetes from './components/fizetes';
+import Koszonjuk from './components/Koszonjuk';
+import Rendelesek from './components/Rendelesek';
+import AdminModositasok from './components/adminmodositas';
+import AdminUser from './components/adminusermodositas';
+import AdminBook from './components/adminosszeskonyv';
+import AdminInsertBook from './components/adminujadat';
+
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -24,50 +34,48 @@ function App() {
   const [accessToken, setAccessToken] = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
   const [allBooks, setAllBooks] = useState([]);
+  const [activeFilters, setActiveFilters] = useState({});
+  const [hasSearchOrCategory, setHasSearchOrCategory] = useState(false);
+  const [jogosultsag, setJogosultsag] = useState("")
 
 
-  
 
-  useEffect(() => {
-    const refreshToken = async () => {
-      try {
-        const res = await fetch("http://localhost:8080/auth/refresh", {
-          method: "POST",
-          credentials: "include",
-        });
-        if (!res.ok) return;
-          const data = await res.json();
-          setAccessToken(data.accessToken);
-      } 
-      catch(err){
 
-      }
-    };
-    refreshToken();
-  }, []);
-  const handleSearch = async (query, pageNum = 1, category = null) => {
-  try {
-    let url;
-    if (category) {
-      url = `/konyvek/search?kat=${category}&page=${pageNum}&limit=10`;
-      setActiveCategory(category);
-    } else {
-      url = `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`;
-      setActiveCategory(null)
+useEffect(() => {
+  const refreshToken = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/auth/refresh", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      console.log("Refresh token response:", data);
+      setAccessToken(data.accessToken);
+    } catch(err){
+      console.error(err);
     }
+  };
+  refreshToken();
+}, []);
 
-    const res = await fetch(url);
-    const data = await res.json();
+const handleSearch = async (query, pageNum = 1, category = null, filters = {}) => {
+  setSearchQuery(query);        
+  setActiveCategory(category);
+  setActiveFilters(filters);
+  setSearchPage(pageNum);
 
-    setTalalatok(prev => pageNum === 1 ? data : [...prev, ...data]);
-    setSearchQuery(query);
-    setSearchPage(pageNum);
-    setHasMoreSearch(data.length === 10);
-    setRawResults(data);
+  const params = new URLSearchParams({ page: pageNum, limit: 10 });
+  if (category) params.set("kat", category);
+  if (query) params.set("cim", query) ; params.set("szerzo", query);
+  Object.entries(filters).forEach(([key, val]) => { if(val) params.set(key, val); });
 
-  } catch (err) {
-    console.error(err);
-  }
+  const res = await fetch(`/konyvek/search?${params.toString()}`);
+  const data = await res.json();
+
+  setTalalatok(data);
+  setHasMoreSearch(data.length === 10);
+  setHasSearchOrCategory(true);
 };
 
 
@@ -82,31 +90,38 @@ function App() {
 
           <Route path="/" element={
               <>
-                {talalatok.length === 0 && <Main />}
+               {!searchQuery && !activeCategory && <Main />}
+
 
                 <div style={{ display: "flex" }}>
-                  {talalatok.length > 0 && (
-                    <Filters
-                      onSearch={setTalalatok}
-                      talalatok={talalatok}
-                    />
-                  )}
-
-                  <Fooldal
+                {hasSearchOrCategory && talalatok.length > 0 && (
+                  <Filters
+                    onSearch={handleSearch}
                     talalatok={talalatok}
-                    setTalalatok={setTalalatok}
+                    activeFilters={activeFilters}
+                    setActiveFilters={setActiveFilters}
                     searchQuery={searchQuery}
-                    searchPage={searchPage}
-                    setSearchPage={setSearchPage}
-                    hasMoreSearch={hasMoreSearch}
-                    setHasMoreSearch={setHasMoreSearch}
-                    page={page}
-                    setPage={setPage}
-                    hasMore={hasMore}
-                    setHasMore={setHasMore}
                     activeCategory={activeCategory}
                   />
-                </div>
+                )}
+
+                <Fooldal
+                  talalatok={talalatok}
+                  setTalalatok={setTalalatok}
+                  searchQuery={searchQuery}
+                  searchPage={searchPage}
+                  setSearchPage={setSearchPage}
+                  hasMoreSearch={hasMoreSearch}
+                  setHasMoreSearch={setHasMoreSearch}
+                  page={page}
+                  setPage={setPage}
+                  hasMore={hasMore}
+                  setHasMore={setHasMore}
+                  activeCategory={activeCategory}
+                  activeFilters={activeFilters}
+                  setActiveFilters={setActiveFilters}
+                />
+              </div>
               </>
             }
           />
@@ -115,7 +130,16 @@ function App() {
           <Route path="/ASZF" element={<Ászf />} />
           <Route path="/rolunk" element={<Rolunk />} />
           <Route path="/elerhetosegek" element={<Elerhetosegek />} />
-          <Route path="/cart" element={<Kosar/>} />
+          <Route path="/cart" element={<Kosar accesToken={accessToken}/>} />
+          <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
+          <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken} />} />
+          <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken} setAccessToken={setAccessToken} />}/>
+          <Route path="/adminmodosit" element={<AdminModositasok accessToken={accessToken}/>} />
+          <Route path="/adminuser" element={<AdminUser accessToken={accessToken}/>} />
+          <Route path="/adminbook" element={<AdminBook accessToken={accessToken}/>} />
+          <Route path="/admininsert" element={<AdminInsertBook accessToken={accessToken}/>} />
+          <Route path="/segitseg" element={<Segitseg/>} />
+          <Route path='/koszonjuk' element={<Koszonjuk/>}/>
 
 
         </Routes>

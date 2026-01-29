@@ -21,6 +21,9 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(true)
+  const [cartCount, setCartCount] = useState(0);
+
 
   const fetchData = async () => {
     try {
@@ -32,14 +35,25 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   };
 
   useEffect(() => {
-    fetchData();
+    const updateCartCount = () => {
+        const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
+        const count = kosar.reduce((sum, item) => sum + item.mennyiseg, 0);
+        setCartCount(count);
+      };
+      updateCartCount();
+      window.addEventListener("storage", updateCartCount);
+      fetchData();
+      return () => window.removeEventListener("storage", updateCartCount);
   }, []);
-  const handleSearch = () => {
-    if (!keresett.trim()) return;
-    setSearchParams({}, { replace: true });
+ const handleSearch = () => {
+  if (!keresett.trim()) return;
 
-    onSearch(keresett, 1, null);
-  };
+  navigate(`/?search=${keresett}`, { replace: true });
+
+  onSearch(keresett, 1, null, {});
+};
+
+
 
   const handleFilter = async (katNev) => {
     setSearchParams({ kat: katNev });
@@ -75,8 +89,13 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
 
   const Profildropdown = () => (
     <NavDropdown title="Profilom" id="asd">
-          <NavDropdown.Item >Rendeléseim</NavDropdown.Item>
-          <NavDropdown.Item >Segítség</NavDropdown.Item>
+          <NavDropdown.Item onClick={() => navigate("/profil")}>Személyes adatok</NavDropdown.Item>
+          <NavDropdown.Item onClick={() => navigate("/rendelesek")} >Rendeléseim</NavDropdown.Item>
+          <NavDropdown.Item onClick={() => navigate("/segitseg")}>Segítség</NavDropdown.Item>
+          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminmodosit")}>Rendelések módosítása</NavDropdown.Item> : ""}
+          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminuser")}>Felhasználók módosítása</NavDropdown.Item> : ""}
+          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminbook")}>Könyvek módosítása</NavDropdown.Item> : ""}
+          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/admininsert")}>Új adatok felvétele</NavDropdown.Item> : ""}
           <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );
@@ -86,9 +105,6 @@ const handleLogout = async () => {
       "/auth/logout",
       {},
       {
-        headers: {
-          Authorization: "Bearer " + accessToken
-        },
         withCredentials: true
       }
     );
@@ -96,10 +112,11 @@ const handleLogout = async () => {
     console.error("Logout hiba:", error);
   } finally {
     setAccessToken(null);
-    localStorage.removeItem("accessToken");
-    navigate("/")
+    localStorage.removeItem("accessToken"); 
+    navigate("/");
   }
 };
+
 
   return (
     <header style={{backgroundColor:"#ceb795ff"}}>
@@ -134,6 +151,7 @@ const handleLogout = async () => {
                     <FaMagnifyingGlass />
                   </button>
                 </div>
+                
                 {accessToken ?  <Profildropdown title="Profil" /> :
                     <Popup
                   trigger={
@@ -162,10 +180,17 @@ const handleLogout = async () => {
                         : "Belépés / Regisztráció"}
                     </div>
                   }
+                  className="auth-popup"
                   modal
                   nested
                   open={showAuthPopup}
                   onClose={() => setShowAuthPopup(false)}
+                  contentStyle={{
+                    width: "480px",
+                    maxWidth: "90%",
+                    padding: "25px",
+                    borderRadius: "12px",
+                  }}
                 >
                   {(close) => (
                     <div
@@ -176,7 +201,12 @@ const handleLogout = async () => {
                         width: "400px",
                         maxWidth: "90%",
                       }}
-                    >{showLoginForm ? (
+                    >
+                     <div className="popup-close-icon" onClick={close}>
+                        ×
+                      </div> 
+                      {showLoginForm ? (
+                        
                         <LoginForm
                           setAccessToken={setAccessToken}
                           onClose={() => {
@@ -195,16 +225,32 @@ const handleLogout = async () => {
                         />
                       )}
 
-                      <div style={{ textAlign: "right", marginTop: "10px" }}>
-                        <button onClick={close}>Bezárás</button>
-                      </div>
+                      
                     </div>
                   )}
                 </Popup>
                 }
-                <a href="/cart">
+                <a href="/cart" style={{ position: "relative" }}>
                   <TfiShoppingCartFull />
+                  {cartCount > 0 && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: "-8px",
+                        right: "-8px",
+                        background: "red",
+                        color: "white",
+                        borderRadius: "50%",
+                        padding: "2px 6px",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {cartCount}
+                    </span>
+                  )}
                 </a>
+
               </NavItem>
             </Navbar.Collapse>
           </div>
