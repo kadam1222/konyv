@@ -11,6 +11,7 @@ export default defineConfig({
   ],
   server: {
     proxy: {
+      "/kepek": "http://localhost:8080",
       '/konyvek': {
         target: 'http://localhost:8080', 
         changeOrigin: true,

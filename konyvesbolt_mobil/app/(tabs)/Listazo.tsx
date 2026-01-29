@@ -95,7 +95,7 @@ const ListazoInfinite = () => {
             </Text>
 
             <Image
-              source={{ uri: `${backendUrl}/images/${item.kepnev}` }}
+              source={{ uri: `${backendUrl}/kepek/${item.ISBN}.jpg` }}
               style={styles.image}
             />
 
