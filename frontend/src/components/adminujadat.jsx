@@ -95,13 +95,11 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
     };
 
     const handleFieldChange = (field, value) => {
-    // Listázzuk ki, mely mezőknek KELL számnak lenniük az adatbázisban
     const szamMezok = ["kiado_id", "nyelv_id", "ar", "oldalak_szama", "kategoria_id", "tipus_id", "borito_id", "illusztracio"];
 
     let veglegesErtek = value;
 
     if (szamMezok.includes(field)) {
-        // Ha üres, legyen null, egyébként alakítsuk számmá
         veglegesErtek = value === "" ? null : Number(value);
     }
 

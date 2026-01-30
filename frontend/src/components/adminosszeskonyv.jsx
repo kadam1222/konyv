@@ -18,6 +18,22 @@ export default function AdminBook( {accessToken}){
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
 
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const filteredKonyvek = osszesKonyv.filter((K) => {
+    const term = searchTerm.toLowerCase();
+    
+    const isbnString = K.ISBN ? K.ISBN.toString() : "";
+    const cimString = K.cim ? K.cim.toLowerCase() : "";
+    const szerzoString = K.szerzok ? K.szerzok.toLowerCase() : "";
+
+    return (
+        cimString.includes(term) ||
+        isbnString.includes(term) ||
+        szerzoString.includes(term)
+    );
+});
+
     useEffect(() => {
     if (accessToken) {
         setOsszesKonyv([]);
@@ -179,8 +195,6 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
     const edited = editedKonyvek[ISBN];
     if (!edited) return;
     try {
-        // Kiemeljük azokat a mezőket, amik CSAK a frontendnek vagy a kapcsolótábláknak kellenek.
-        // Hozzáadtam a 'fordítok' (ékezettel) mezőt is a listához, hogy NE kerüljön a tisztaAdatok-ba.
         const { 
             tipus_nev, 
             nyelv_nev, 
@@ -190,15 +204,13 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
             illusztracio_leiras, 
             szerzok, 
             forditok, 
-            fordítok, // <--- Ez volt a hiba forrása, ki kell venni a szórásból!
+            fordítok,
             illusztratorok, 
             szerzo_ids, 
             illusztrator_ids, 
             fordito_ids, 
             ...tisztaAdatok 
         } = edited;
-
-        // SQL biztonsági javítás az illusztrációhoz (üres string helyett null, ha nincs kitöltve)
         if (tisztaAdatok.illusztracio === "") {
             tisztaAdatok.illusztracio = null;
         }
@@ -224,7 +236,6 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
         
     } catch (err) {
         console.error("Hiba küldéskor:", err);
-        // Így több infót látsz a hibaüzenetben
         alert("Hiba: " + (err.response?.data?.sqlMessage || "Szerver hiba történt."));
     }
 };
@@ -256,7 +267,34 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
 
     return(
         <>
-        {osszesKonyv.map((K, index) =>(
+        <div style={{ 
+            position: "sticky", 
+            top: 0, 
+            backgroundColor: "#f4f4f4", 
+            padding: "15px", 
+            zIndex: 100, 
+            borderBottom: "2px solid #ddd",
+            marginBottom: "20px" 
+        }}>
+            <input
+                type="text"
+                placeholder="Keresés cím, ISBN vagy szerző alapján..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                    width: "100%",
+                    padding: "10px",
+                    fontSize: "16px",
+                    borderRadius: "5px",
+                    border: "1px solid #ccc"
+                }}
+            />
+            <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#666" }}>
+                Találatok száma: {filteredKonyvek.length} db
+            </p>
+        </div>
+
+        {filteredKonyvek.map((K, index) =>(
             <div key={K.ISBN} style={{ marginBottom: "20px" }}>
                 <span style={{marginBottom:"10px"}}>Cím: {K.cim}<br/> 
                     ISBN: {K.ISBN} <br/> 

@@ -10,9 +10,6 @@ export default function Kosar( {accesToken} ){
     const [mennyiseg,setMennyiseg] = useState()
     const navigate = useNavigate();
 
-    const [termek, setTermek] = useState(
-        JSON.parse(localStorage.getItem("termek"))
-    );
 
     const [kosar, setKosar] = useState(
         JSON.parse(localStorage.getItem("kosar")) || []

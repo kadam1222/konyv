@@ -117,7 +117,6 @@ const handleLogout = async () => {
   }
 };
 
-
   return (
     <header style={{backgroundColor:"#ceb795ff"}}>
       <Navbar expand="lg">

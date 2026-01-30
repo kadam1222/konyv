@@ -30,13 +30,12 @@ function App() {
   const [hasMoreSearch, setHasMoreSearch] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [rawResults, setRawResults] = useState([]);
+
   const [accessToken, setAccessToken] = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
-  const [allBooks, setAllBooks] = useState([]);
+
   const [activeFilters, setActiveFilters] = useState({});
   const [hasSearchOrCategory, setHasSearchOrCategory] = useState(false);
-  const [jogosultsag, setJogosultsag] = useState("")
 
 
 
