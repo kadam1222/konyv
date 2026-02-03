@@ -46,15 +46,6 @@ export default function Profil({ accessToken , setAccessToken}) {
           }
           
         );
-        {/*const { token, user  } = response.data;
-        if (token) setAccessToken(token);
-        if (user) {
-              setNev(user.vevo_nev);
-              setEmail(user.email);
-            } else {
-              setNev(ujnev.trim() !== "" ? ujnev : nev);
-              setEmail(ujemail.trim() !== "" ? ujemail : email);
-            }*/}
 
         await fetch("http://localhost:8080/auth/logout", {
           method: "POST",

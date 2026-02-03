@@ -102,8 +102,6 @@ return (
                   }
 
                   localStorage.setItem("kosar", JSON.stringify(kosar));
-
-                  // Trigger event to update Header
                   window.dispatchEvent(new Event("storage"));
                 }}>Kosárba</button>
         </div>

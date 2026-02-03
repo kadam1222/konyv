@@ -610,10 +610,10 @@ static async insertAdat(adatok ){
 
       await db.query(`INSERT INTO termek (${mezok.join(',')}) VALUES (${placeholders})`, ertekek);
 
-      // --- ITT HÍVJUK MEG A KAPCSOLÓTÁBLÁKAT ---
+    
       const ujISBN = t.ISBN;
 
-      // Szerzők (adatok.szerzoIds egy tömb kell legyen a JSON-ben, pl: [1, 5, 8])
+     
       if (adatok.szerzoIds) {
         await this.updateSzerzok(ujISBN, adatok.szerzoIds);
       }
