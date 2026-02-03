@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import httpCommon from "../http-common";
+import "./rendelesek.css"
+import Button from 'react-bootstrap/Button';
 
 export default function AdminBook( {accessToken}){
     const [osszesKonyv, setOsszesKonyv] = useState([])
@@ -88,7 +90,7 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div style={{ marginBottom: '15px', position: 'relative' }}>
+        <div className="order">
             <label><b>{label}</b></label>
             <div  onClick={() => setIsOpen(!isOpen)}  style={{ border: '1px solid #ccc', padding: '8px', cursor: 'pointer', backgroundColor: '#fff', minHeight: '35px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                 {selectedIds.length === 0 ? "Válassz..." : `Kiválasztva: ${selectedIds.length} db`}
@@ -295,7 +297,7 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
         </div>
 
         {filteredKonyvek.map((K, index) =>(
-            <div key={K.ISBN} style={{ marginBottom: "20px" }}>
+            <div className="order" key={K.ISBN} style={{ marginBottom: "20px" }}>
                 <span style={{marginBottom:"10px"}}>Cím: {K.cim}<br/> 
                     ISBN: {K.ISBN} <br/> 
                     nyelv_nev: {K.nyelv_nev} <br/> 
@@ -310,8 +312,8 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
                     {K.forditok ? `fordítok: ${K.forditok}`  : null}
                     {K.illusztratorok ? `illusztratorok:  ${K.illusztratorok}`  : null}
                 </span>
-            <button onClick={() => konyvTorles(K.ISBN)}>Könyv törlése</button>
-            <button onClick={() => handleToggleInput(K.ISBN, K)}>Könyv módosítása</button>
+            <Button className="clear-filters-btn" onClick={() => konyvTorles(K.ISBN)}>Könyv törlése</Button>
+            <Button onClick={() => handleToggleInput(K.ISBN, K)}>Könyv módosítása</Button>
 
             {showInput[K.ISBN] && editedKonyvek[K.ISBN] &&(
                 <div style={{ marginTop: "10px", border: "1px solid #ccc", padding: "10px" }}>

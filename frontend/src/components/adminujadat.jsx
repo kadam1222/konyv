@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import httpCommon from "../http-common";
+import Button from 'react-bootstrap/Button';
+import "./adminujadat.css"
 
 const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -171,7 +173,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
     }, []);
 
     return (
-        <>
+        <div id="fohozzadasdiv">
         <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
             <h2>Gyors adatfelvétel</h2>
 
@@ -182,7 +184,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                     value={borito}
                     onChange={(e) => setBorito(e.target.value)} 
                 />
-                <button onClick={() => mentés("borito", borito, setBorito)}>Hozzáad</button>
+                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("borito", borito, setBorito)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
@@ -192,7 +194,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                     value={kiado}
                     onChange={(e) => setKiado(e.target.value)} 
                 />
-                <button onClick={() => mentés("kiado", kiado, setKiado)}>Hozzáad</button>
+                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("kiado", kiado, setKiado)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
@@ -202,7 +204,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                     value={szerzo}
                     onChange={(e) => setSzerzo(e.target.value)} 
                 />
-                <button onClick={() => mentés("szerzo", szerzo, setSzerzo)}>Hozzáad</button>
+                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("szerzo", szerzo, setSzerzo)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
@@ -212,7 +214,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                     value={fordito}
                     onChange={(e) => setFordito(e.target.value)} 
                 />
-                <button onClick={() => mentés("fordito", fordito, setFordito)}>Hozzáad</button>
+                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("fordito", fordito, setFordito)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
@@ -222,7 +224,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                     value={illusztracio}
                     onChange={(e) => setIllusztracio(e.target.value)} 
                 />
-                <button onClick={() => mentés("illusztracio", illusztracio, setIllusztracio)}>Hozzáad</button>
+                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("illusztracio", illusztracio, setIllusztracio)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
@@ -232,7 +234,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                     value={illusztrator}
                     onChange={(e) => setIllusztrator(e.target.value)} 
                 />
-                <button onClick={() => mentés("illusztrator", illusztrator, setIllusztrator)}>Hozzáad</button>
+                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("illusztrator", illusztrator, setIllusztrator)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
@@ -242,10 +244,10 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                     value={nyelv}
                     onChange={(e) => setNyelv(e.target.value)} 
                 />
-                <button onClick={() => mentés("nyelv", nyelv, setNyelv)}>Hozzáad</button>
+                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("nyelv", nyelv, setNyelv)}>Hozzáad</Button>
             </div>
 
-            <div style={{ marginTop: "30px", padding: "15px", border: "1px solid #28a745", backgroundColor: "#f9fff9" }}>
+            <div className="kategoriafelvetel">
                 <h4>Új kategória felvétele</h4>
                 
                 <div style={{ marginBottom: "10px" }}>
@@ -259,7 +261,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
 
                 <div style={{ marginBottom: "10px" }}>
                     <label>Főkategória (ha alkategóriát hozol létre): </label>
-                    <select value={fokat} onChange={(e) => setFokat(e.target.value)}>
+                    <select style={{width:"240px"}} value={fokat} onChange={(e) => setFokat(e.target.value)}>
                         <option value="">Nincs (Ez egy főkategória lesz)</option>
                         {kategoriaLista.map(kat => (
                             <option key={kat.id} value={kat.id}>
@@ -269,24 +271,19 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                     </select>
                 </div>
 
-                <button 
-                    style={{ backgroundColor: "#28a745", color: "white", padding: "8px 15px", border: "none", cursor: "pointer" }}
-                    onClick={kategoriaMentes}
-                >
-                    Kategória mentése
-                </button>
+                <Button variant="success" onClick={kategoriaMentes}>Kategória mentése</Button>
             </div>
         </div>
 
-        <div style={{ padding: "20px", maxWidth: "600px", margin: "auto", border: "1px solid #ccc" }}>
+        <div id="ujkönyvdiv">
             <h2>Új könyv hozzáadása</h2>
 
-            <input style={s.input} placeholder="ISBN" value={ujKonyv.termekek.ISBN} onChange={e => handleFieldChange("ISBN", e.target.value)} />
-            <input style={s.input} placeholder="Cím" value={ujKonyv.termekek.cim} onChange={e => handleFieldChange("cim", e.target.value)} />
-            <input style={s.input} type="number" placeholder="Ár" value={ujKonyv.termekek.ar} onChange={e => handleFieldChange("ar", e.target.value)} />
-            <input style={s.input} type="number" placeholder="Oldalak száma" value={ujKonyv.termekek.oldalak_szama} onChange={e => handleFieldChange("oldalak_szama", e.target.value)} />
+            <input className="bemenőadat" placeholder="ISBN" value={ujKonyv.termekek.ISBN} onChange={e => handleFieldChange("ISBN", e.target.value)} />
+            <input className="bemenőadat" placeholder="Cím" value={ujKonyv.termekek.cim} onChange={e => handleFieldChange("cim", e.target.value)} />
+            <input className="bemenőadat" type="number" placeholder="Ár" value={ujKonyv.termekek.ar} onChange={e => handleFieldChange("ar", e.target.value)} />
+            <input className="bemenőadat" type="number" placeholder="Oldalak száma" value={ujKonyv.termekek.oldalak_szama} onChange={e => handleFieldChange("oldalak_szama", e.target.value)} />
 
-            <div style={s.row}>
+            <div className="sor" >
                 <label>Nyelv: </label>
                 <select value={ujKonyv.termekek.nyelv_id} onChange={e => handleFieldChange("nyelv_id", e.target.value)}>
                     <option value="">Válassz...</option>
@@ -294,7 +291,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                 </select>
             </div>
 
-            <div style={s.row}>
+            <div className="sor" >
                 <label>Kiadó: </label>
                 <select value={ujKonyv.termekek.kiado_id} onChange={e => handleFieldChange("kiado_id", e.target.value)}>
                     <option value="">Válassz...</option>
@@ -302,7 +299,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                 </select>
             </div>
 
-            <div style={s.row}>
+            <div className="sor" >
                 <label>Kategória: </label>
                 <select value={ujKonyv.termekek.kategoria_id} onChange={e => handleFieldChange("kategoria_id", e.target.value)}>
                     <option value="">Válassz...</option>
@@ -310,7 +307,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                 </select>
             </div>
 
-            <div style={s.row}>
+            <div className="sor" >
                 <label>Borító: </label>
                 <select value={ujKonyv.termekek.borito_id} onChange={e => handleFieldChange("borito_id", e.target.value)}>
                     <option value="">Válassz...</option>
@@ -318,7 +315,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                 </select>
             </div>
 
-            <div style={s.row}>
+            <div className="sor" >
                 <label>Típus: </label>
                 <select value={ujKonyv.termekek.tipus_id} onChange={e => handleFieldChange("tipus_id", e.target.value)}>
                     <option value="">Válassz...</option>
@@ -326,7 +323,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                 </select>
             </div>
             
-            <div style={s.row}>
+            <div className="sor" >
                 <label>Illusztráció típusa: </label>
                 <select 
                     value={ujKonyv.termekek.illusztracio || ""} 
@@ -347,14 +344,8 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
 
             <textarea style={{ width: "100%", height: "80px" }} placeholder="Leírás..." value={ujKonyv.termekek.leiras} onChange={e => handleFieldChange("leiras", e.target.value)} />
 
-            <button style={s.submitBtn} onClick={handleSubmit}>KÖNYV RÖGZÍTÉSE</button>
+            <Button variant="success" onClick={handleSubmit}>Könyv rögzítése</Button>
         </div>
-    </>
+    </div>
     );
 }
-
-const s = {
-    input: { display: "block", width: "100%", marginBottom: "10px", padding: "8px" },
-    row: { marginBottom: "10px", display: "flex", justifyContent: "space-between" },
-    submitBtn: { width: "100%", padding: "12px", backgroundColor: "#28a745", color: "#fff", border: "none", cursor: "pointer", fontWeight: "bold" }
-};
