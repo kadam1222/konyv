@@ -276,7 +276,6 @@ exports.logout = (req, res) => {
 
 exports.Profilleker = async (req, res) => {
   try {
-        console.log("REQ USER:", req.user);
     const { email } = req.user;
     const felhasznalo = await konyvek.profilleker(email);
 
