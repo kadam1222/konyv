@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import httpCommon from "../http-common";
+import Button from 'react-bootstrap/Button';
 
 export default function AdminModositasok( {accessToken}){
     const [osszesRendeles, setOsszesRendeles] = useState([])
@@ -148,9 +149,9 @@ osszesRendeles.forEach(row => {
                   </option>
                 ))}
                </select>
-               <button onClick={(()=>{statusz_modositas(order.szamlaszam); setModositas(null)})}>Mentés</button>
-               <button onClick={(() =>{setModositas(null)})}>Mégse</button></>) :(
-                <span><h4>Rendelés státusza: {order.rendeles_jelenlegi_statusza}</h4> <button onClick={() => {setModositas(order.szamlaszam); const current = statuszok.find(s => s.statusz === order.rendeles_jelenlegi_statusza);setUjstatusz(current?.id ?? "");}}>Módosítás</button></span>)}
+               <Button style={{marginLeft:"15px"}} className="apply-filters-btn" onClick={(()=>{statusz_modositas(order.szamlaszam); setModositas(null)})}>Mentés</Button>
+               <Button className="clear-filters-btn" onClick={(() =>{setModositas(null)})}>Mégse</Button></>) :(
+                <span><h4>Rendelés státusza: {order.rendeles_jelenlegi_statusza}</h4> <Button className="apply-filters-btn" onClick={() => {setModositas(order.szamlaszam); const current = statuszok.find(s => s.statusz === order.rendeles_jelenlegi_statusza);setUjstatusz(current?.id ?? "");}}>Módosítás</Button></span>)}
                 <strong><p>Számla létrejötte: {new Date(order.szamla_kelte).toLocaleDateString()}</p></strong>
                 <strong><p>Rendelő email címe: {order.email}</p></strong>
                 <strong><p>Megrendelt termékek:</p></strong>
