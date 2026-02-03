@@ -21,8 +21,9 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [cartCount, setCartCount] = useState(0);
+  const [user, setUser] = useState([])
 
 
   const fetchData = async () => {
@@ -33,6 +34,23 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
       console.error("Error fetching data: ", error);
     }
   };
+  useEffect (() =>{
+    const fetchUser = async () =>{
+      try{
+        const response = await http.get("/konyvek/profil",   {       
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }},)
+          const data =  response.data
+          setUser(data)
+          setIsAdmin(data.jogosultsag === 2)
+      }
+      catch(err){
+        console.error(err)
+      }
+    }
+    fetchUser()
+  }, [accessToken])
 
   useEffect(() => {
     const updateCartCount = () => {

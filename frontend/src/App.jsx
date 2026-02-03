@@ -85,67 +85,68 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
       <div className="app">
 
         <Header onSearch={handleSearch}  accessToken={accessToken} setAccessToken={setAccessToken} />
+        <main>
+          <Routes>
 
-        <Routes>
-
-          <Route path="/" element={
-              <>
-               {!searchQuery && !activeCategory && <Main />}
+            <Route path="/" element={
+                <>
+                {!searchQuery && !activeCategory && <Main />}
 
 
-                <div style={{ display: "flex" }}>
-                {hasSearchOrCategory && talalatok.length > 0 && (
-                  <Filters
-                    onSearch={handleSearch}
+                  <div style={{ display: "flex" }}>
+                  {hasSearchOrCategory && talalatok.length > 0 && (
+                    <Filters
+                      onSearch={handleSearch}
+                      talalatok={talalatok}
+                      activeFilters={activeFilters}
+                      setActiveFilters={setActiveFilters}
+                      searchQuery={searchQuery}
+                      activeCategory={activeCategory}
+                    />
+                  )}
+
+                  <Fooldal
                     talalatok={talalatok}
+                    setTalalatok={setTalalatok}
+                    searchQuery={searchQuery}
+                    searchPage={searchPage}
+                    setSearchPage={setSearchPage}
+                    hasMoreSearch={hasMoreSearch}
+                    setHasMoreSearch={setHasMoreSearch}
+                    page={page}
+                    setPage={setPage}
+                    hasMore={hasMore}
+                    setHasMore={setHasMore}
+                    activeCategory={activeCategory}
                     activeFilters={activeFilters}
                     setActiveFilters={setActiveFilters}
-                    searchQuery={searchQuery}
-                    activeCategory={activeCategory}
                   />
-                )}
+                </div>
+                </>
+              }
+            />
 
-                <Fooldal
-                  talalatok={talalatok}
-                  setTalalatok={setTalalatok}
-                  searchQuery={searchQuery}
-                  searchPage={searchPage}
-                  setSearchPage={setSearchPage}
-                  hasMoreSearch={hasMoreSearch}
-                  setHasMoreSearch={setHasMoreSearch}
-                  page={page}
-                  setPage={setPage}
-                  hasMore={hasMore}
-                  setHasMore={setHasMore}
-                  activeCategory={activeCategory}
-                  activeFilters={activeFilters}
-                  setActiveFilters={setActiveFilters}
-                />
-              </div>
-              </>
-            }
-          />
-
-          <Route path="/termek/:isbn" element={<Termek />} />
-          <Route path="/ASZF" element={<Ászf />} />
-          <Route path="/rolunk" element={<Rolunk />} />
-          <Route path="/elerhetosegek" element={<Elerhetosegek />} />
-          <Route path="/cart" element={<Kosar accesToken={accessToken}/>} />
-          <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
-          <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken} />} />
-          <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken} setAccessToken={setAccessToken} />}/>
-          <Route path="/adminmodosit" element={<AdminModositasok accessToken={accessToken}/>} />
-          <Route path="/adminuser" element={<AdminUser accessToken={accessToken}/>} />
-          <Route path="/adminbook" element={<AdminBook accessToken={accessToken}/>} />
-          <Route path="/admininsert" element={<AdminInsertBook accessToken={accessToken}/>} />
-          <Route path="/segitseg" element={<Segitseg/>} />
-          <Route path='/koszonjuk' element={<Koszonjuk/>}/>
+            <Route path="/termek/:isbn" element={<Termek />} />
+            <Route path="/ASZF" element={<Ászf />} />
+            <Route path="/rolunk" element={<Rolunk />} />
+            <Route path="/elerhetosegek" element={<Elerhetosegek />} />
+            <Route path="/cart" element={<Kosar accesToken={accessToken}/>} />
+            <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
+            <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken} />} />
+            <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken} setAccessToken={setAccessToken} />}/>
+            <Route path="/adminmodosit" element={<AdminModositasok accessToken={accessToken}/>} />
+            <Route path="/adminuser" element={<AdminUser accessToken={accessToken}/>} />
+            <Route path="/adminbook" element={<AdminBook accessToken={accessToken}/>} />
+            <Route path="/admininsert" element={<AdminInsertBook accessToken={accessToken}/>} />
+            <Route path="/segitseg" element={<Segitseg/>} />
+            <Route path='/koszonjuk' element={<Koszonjuk/>}/>
 
 
-        </Routes>
-
-        <Footer />
+          </Routes>
+        </main>
+        <Footer /> 
       </div>
+
     </Router>
   );
 }
