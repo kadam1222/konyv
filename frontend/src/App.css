@@ -5,11 +5,9 @@
 
 
 
-body {
+html, body {
+  height: 100%;
   margin: 0;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  background-color: #ddd1aa;
-  color: #222;
 }
 
 .app {
@@ -20,7 +18,9 @@ body {
 
 main {
   flex: 1;
+  display: block;
 }
+
 
 
 button:hover {
