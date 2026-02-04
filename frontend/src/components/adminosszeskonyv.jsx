@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import httpCommon from "../http-common";
-import "./rendelesek.css"
 import Button from 'react-bootstrap/Button';
-import "./adminosszeskonyv.css"
+import "./rendelesek.css";
+import "./adminosszeskonyv.css";
 
-export default function AdminBook( {accessToken}){
-    const [osszesKonyv, setOsszesKonyv] = useState([])
+export default function AdminBook({ accessToken }) {
+    const [osszesKonyv, setOsszesKonyv] = useState([]);
     const [showInput, setShowInput] = useState({});
     const [editedKonyvek, setEditedKonyvek] = useState({});
+    
+    // Metaadatok a választólistákhoz
     const [nyelvek, setNyelvek] = useState([]);
     const [kiado, setKiado] = useState([]);
     const [borito, setBorito] = useState([]);
@@ -17,92 +19,294 @@ export default function AdminBook( {accessToken}){
     const [forditok, setForditok] = useState([]);
     const [kategoria, setKategoria] = useState([]);
     const [tipus, setTipus] = useState([]);
+
+    // Görgetés és lapozás állapota
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-
     const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredKonyvek = osszesKonyv.filter((K) => {
-    const term = searchTerm.toLowerCase();
-    
-    const isbnString = K.ISBN ? K.ISBN.toString() : "";
-    const cimString = K.cim ? K.cim.toLowerCase() : "";
-    const szerzoString = K.szerzok ? K.szerzok.toLowerCase() : "";
+    const observerRef = useRef();
 
-    return (
-        cimString.includes(term) ||
-        isbnString.includes(term) ||
-        szerzoString.includes(term)
-    );
-});
-
+    // --- 1. ADATBETÖLTÉS (Lapozás alapú) ---
     useEffect(() => {
-    if (accessToken) {
-        setOsszesKonyv([]);
-        setPage(1);
-        setHasMore(true);
-        fetchData(1); 
-    }
-    }, [accessToken])
+        const fetchBooks = async () => {
+            if (!accessToken || !hasMore) return;
 
+            try {
+                setLoading(true);
+                const response = await httpCommon.get(`/konyvek/adminosszeskonyv?page=${page}&limit=10`, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                });
+
+                const ujAdatok = response.data;
+
+                if (ujAdatok.length === 0) {
+                    setHasMore(false);
+                } else {
+                    setOsszesKonyv(prev => {
+                        const tenylegesUj = ujAdatok.filter(
+                            n => !prev.some(p => p.ISBN === n.ISBN)
+                        );
+                        return [...prev, ...tenylegesUj];
+                    });
+                    if (ujAdatok.length < 10) setHasMore(false);
+                }
+            } catch (err) {
+                console.error("Hiba a könyvek betöltésekor:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBooks();
+    }, [page, accessToken]);
+
+    // --- 2. INTERSECTION OBSERVER (Görgetés figyelő) ---
+    const lastItemRef = useCallback(node => {
+        if (loading) return;
+        if (observerRef.current) observerRef.current.disconnect();
+
+        observerRef.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                setPage(prev => prev + 1);
+            }
+        });
+
+        if (node) observerRef.current.observe(node);
+    }, [loading, hasMore]);
+
+    // --- 3. METAADATOK BETÖLTÉSE ---
+    useEffect(() => {
+        if (accessToken) {
+            const Fetchmodositas = async (endpoint, setter) => {
+                try {
+                    const response = await httpCommon.get(`/konyvek/${endpoint}`);
+                    setter(response.data);
+                } catch (err) { console.error(`Error fetching ${endpoint}:`, err); }
+            };
+
+            Fetchmodositas('nyelv', setNyelvek);
+            Fetchmodositas('kiadok', setKiado);
+            Fetchmodositas('borito', setBorito);
+            Fetchmodositas('illusztracio', setIllusztráció);
+            Fetchmodositas('szerzok', setSzerzok);
+            Fetchmodositas('illusztratorok', setIllusztrátorok);
+            Fetchmodositas('forditok', setForditok);
+            Fetchmodositas('kategoria', setKategoria);
+            Fetchmodositas('tipus', setTipus);
+        }
+    }, [accessToken]);
+
+    // --- 4. MODOSÍTÁSI LOGIKA ---
     const handleToggleInput = (isbn, konyv) => {
         setShowInput(prev => ({ ...prev, [isbn]: !prev[isbn] }));
 
         if (!editedKonyvek[isbn]) {
-            const talaltNyelv = nyelvek.find(ny => ny.nyelv_nev === konyv.nyelv_nev);
-            const talaltKiado = kiado.find(k => k.kiado_nev === konyv.kiado_nev);
-            const talaltBorito = borito.find(b => b.borito_nev === konyv.borito_tipus);
-            const talaltKategoria = kategoria.find(k => k.kat_nev === konyv.kat_nev);
-            const talaltTipus = tipus.find(t => t.tipus_nev === konyv.tipus_nev);
-            const talaltIllusztracio = illusztráció.find(i => i.illusztracio === konyv.illusztracio_leiras);
-
             const getIdsFromNames = (nameString, allOptions, nameKey) => {
                 if (!nameString) return [];
-                return nameString
-                    .split(',') 
-                    .map(n => n.trim()) 
-                    .map(name => allOptions.find(opt => opt[nameKey] === name)?.id) 
-                    .filter(id => id !== undefined); 
+                return nameString.split(',').map(n => n.trim())
+                    .map(name => allOptions.find(opt => opt[nameKey] === name)?.id)
+                    .filter(id => id !== undefined);
             };
 
             setEditedKonyvek(prev => ({
                 ...prev,
                 [isbn]: { 
                     ...konyv,
-                    nyelv_id: talaltNyelv ? talaltNyelv.id : "",
-                    kiado_id: talaltKiado ? talaltKiado.id : "",
-                    borito_id: talaltBorito ? talaltBorito.id : "",
-                    kategoria_id: talaltKategoria ? talaltKategoria.id : "",
-                    tipus_id: talaltTipus ? talaltTipus.id : "",
-                    illusztracio: talaltIllusztracio ? talaltIllusztracio.id : "",
-                    
+                    nyelv_id: nyelvek.find(ny => ny.nyelv_nev === konyv.nyelv_nev)?.id || "",
+                    kiado_id: kiado.find(k => k.kiado_nev === konyv.kiado_nev)?.id || "",
+                    borito_id: borito.find(b => b.borito_nev === konyv.borito_tipus)?.id || "",
+                    kategoria_id: kategoria.find(k => k.kat_nev === konyv.kat_nev)?.id || "",
+                    tipus_id: tipus.find(t => t.tipus_nev === konyv.tipus_nev)?.id || "",
+                    illusztracio: illusztráció.find(i => i.illusztracio === konyv.illusztracio_leiras)?.id || "",
                     szerzo_ids: getIdsFromNames(konyv.szerzok, szerzok, "szerzo_nev"),
                     fordito_ids: getIdsFromNames(konyv.forditok, forditok, "fordito_nev"),
                     illusztrator_ids: getIdsFromNames(konyv.illusztratorok, illusztrátorok, "illusztrator"),
-                    
                     leiras: konyv.leiras || ""
-                } 
+                }
             }));
         }
     };
 
-const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const handleChange = (isbn, field, value) => {
+        setEditedKonyvek(prev => ({
+            ...prev,
+            [isbn]: { ...prev[isbn], [field]: value }
+        }));
+    };
+
+    const toggleSelection = (isbn, field, id) => {
+        setEditedKonyvek(prev => {
+            const currentList = prev[isbn][field] || [];
+            const newList = currentList.includes(id) ? currentList.filter(item => item !== id) : [...currentList, id];
+            return { ...prev, [isbn]: { ...prev[isbn], [field]: newList } };
+        });
+    };
+
+    const konyvTorles = async (ISBN) => {
+        if (!window.confirm("Biztosan törölni szeretnéd ezt a könyvet?")) return;
+        try {
+            await httpCommon.delete("/konyvek/konyvtorol", {
+                data: { ISBN },
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            setOsszesKonyv(prev => prev.filter(k => k.ISBN !== ISBN));
+        } catch (err) { console.error(err); }
+    };
+
+    const konyvmodositas = async (ISBN) => {
+        const edited = editedKonyvek[ISBN];
+        if (!edited) return;
+        try {
+            const { tipus_nev, nyelv_nev, kiado_nev, borito_tipus, kat_nev, illusztracio_leiras, szerzok, forditok, fordítok, illusztratorok, szerzo_ids, illusztrator_ids, fordito_ids, ...tisztaAdatok } = edited;
+            
+            const payload = { 
+                REGIISBN: ISBN, 
+                ...tisztaAdatok, 
+                illusztracio: tisztaAdatok.illusztracio === "" ? null : tisztaAdatok.illusztracio,
+                szerzo_ids: szerzo_ids || [], 
+                illusztrator_ids: illusztrator_ids || [], 
+                fordito_ids: fordito_ids || [] 
+            };
+
+            await httpCommon.put("/konyvek/konyvmodositas", payload, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
+            alert("Sikeres módosítás!");
+            setShowInput(prev => ({ ...prev, [ISBN]: false }));
+            // Frissítjük a lokális listát a módosított adatokkal (opcionális, de ajánlott)
+            window.location.reload(); 
+        } catch (err) {
+            console.error("Hiba:", err);
+            alert("Hiba történt a módosítás során.");
+        }
+    };
+
+    const filteredKonyvek = osszesKonyv.filter((K) => {
+        const term = searchTerm.toLowerCase();
+        return (
+            (K.cim?.toLowerCase() || "").includes(term) ||
+            (K.ISBN?.toString() || "").includes(term) ||
+            (K.szerzok?.toLowerCase() || "").includes(term)
+        );
+    });
 
     return (
-        <div className="order">
-            <label><b>{label}</b></label>
-            <div  onClick={() => setIsOpen(!isOpen)}  style={{ border: '1px solid #ccc', padding: '8px', cursor: 'pointer', backgroundColor: '#fff', minHeight: '35px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                {selectedIds.length === 0 ? "Válassz..." : `Kiválasztva: ${selectedIds.length} db`}
+        <>
+            <div style={{ position: "sticky", top: 70, backgroundColor: "#f4f4f4", padding: "15px", zIndex: 100, borderBottom: "2px solid #ddd", marginBottom: "20px" }}>
+                <input type="text" placeholder="Keresés cím, ISBN vagy szerző alapján..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ width: "100%", padding: "10px", fontSize: "16px", borderRadius: "5px", border: "1px solid #ccc" }} />
+                <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#666" }}>
+                    Találatok (betöltött): {filteredKonyvek.length} db
+                </p>
             </div>
 
+            {filteredKonyvek.map((K, index) => {
+                const isLastElement = filteredKonyvek.length === index + 1;
+                return (
+                    <div className="order" key={K.ISBN} ref={isLastElement ? lastItemRef : null} style={{ marginBottom: "20px" }}>
+                        <span style={{ marginBottom: "10px" }}>
+                            Cím: {K.cim}<br />
+                            ISBN: {K.ISBN} <br />
+                            Nyelv: {K.nyelv_nev} <br />
+                            Kiadó: {K.kiado_nev} <br />
+                            Borító: {K.borito_tipus} <br />
+                            Kategória: {K.kat_nev} <br />
+                            Ár: {K.ar} Ft<br />
+                            Illusztráció: {K.illusztracio_leiras} <br />
+                            Leírás: {K.leiras ? K.leiras.substring(0, 100) + '...' : 'Nincs leírás'} <br />
+                            Szerzők: {K.szerzok} <br />
+                            Típus: {K.tipus_nev} <br />
+                            {K.fordítok && `Fordítók: ${K.fordítok}`} <br />
+                            {K.illusztratorok && `Illusztrátorok: ${K.illusztratorok}`}
+                        </span>
+
+                        <div style={{ marginTop: "15px" }}>
+                            <Button variant="danger" style={{ marginRight: "15px" }} onClick={() => konyvTorles(K.ISBN)}>Könyv törlése</Button>
+                            <Button variant="primary" onClick={() => handleToggleInput(K.ISBN, K)}>Könyv módosítása</Button>
+                        </div>
+
+                        {showInput[K.ISBN] && editedKonyvek[K.ISBN] && (
+                            <div className="edit-form-container" style={{ marginTop: "20px", padding: "15px", borderTop: "1px dashed #ccc" }}>
+                                <div className="order">
+                                    <input className="adminosszesinputok" placeholder="ISBN" value={editedKonyvek[K.ISBN].ISBN} onChange={(e) => handleChange(K.ISBN, "ISBN", e.target.value)} />
+                                    <input className="adminosszesinputok" placeholder="Cím" value={editedKonyvek[K.ISBN].cim} onChange={(e) => handleChange(K.ISBN, "cim", e.target.value)} />
+                                    <input className="adminosszesinputok" placeholder="Ár" value={editedKonyvek[K.ISBN].ar} onChange={(e) => handleChange(K.ISBN, "ar", e.target.value)} /> Ft
+                                </div>
+
+                                <div className="order">
+                                    <label><strong>Nyelv:</strong></label>
+                                    <select value={editedKonyvek[K.ISBN].nyelv_id || ""} onChange={(e) => handleChange(K.ISBN, "nyelv_id", e.target.value)}>
+                                        {nyelvek.map(ny => <option key={ny.id} value={ny.id}>{ny.nyelv_nev}</option>)}
+                                    </select>
+                                </div>
+
+                                <div className="order">
+                                    <label><strong>Kiadó:</strong></label>
+                                    <select value={editedKonyvek[K.ISBN].kiado_id || ""} onChange={(e) => handleChange(K.ISBN, "kiado_id", e.target.value)}>
+                                        {kiado.map(k => <option key={k.id} value={k.id}>{k.kiado_nev}</option>)}
+                                    </select>
+                                </div>
+
+                                <div className="order">
+                                    <label><strong>Borító:</strong></label>
+                                    <select value={editedKonyvek[K.ISBN].borito_id || ""} onChange={(e) => handleChange(K.ISBN, "borito_id", e.target.value)}>
+                                        {borito.map(b => <option key={b.id} value={b.id}>{b.borito_nev}</option>)}
+                                    </select>
+                                </div>
+
+                                <div className="order">
+                                    <label><strong>Kategória:</strong></label>
+                                    <select value={editedKonyvek[K.ISBN].kategoria_id || ""} onChange={(e) => handleChange(K.ISBN, "kategoria_id", e.target.value)}>
+                                        {kategoria.map(k => <option key={k.id} value={k.id}>{k.kat_nev}</option>)}
+                                    </select>
+                                </div>
+
+                                <div className="order">
+                                    <label><strong>Típus:</strong></label>
+                                    <select value={editedKonyvek[K.ISBN].tipus_id || ""} onChange={(e) => handleChange(K.ISBN, "tipus_id", e.target.value)}>
+                                        {tipus.map(t => <option key={t.id} value={t.id}>{t.tipus_nev}</option>)}
+                                    </select>
+                                </div>
+
+                                <div className="order">
+                                    <label><strong>Leírás:</strong></label>
+                                    <textarea style={{ width: "100%", minHeight: "100px" }} value={editedKonyvek[K.ISBN].leiras || ""} onChange={(e) => handleChange(K.ISBN, "leiras", e.target.value)} />
+                                </div>
+
+                                <MultiSelectDropdown label="Szerzők:" options={szerzok} selectedIds={editedKonyvek[K.ISBN].szerzo_ids || []} nameKey="szerzo_nev" onToggle={(id) => toggleSelection(K.ISBN, "szerzo_ids", id)} />
+                                <MultiSelectDropdown label="Illusztrátorok:" options={illusztrátorok} selectedIds={editedKonyvek[K.ISBN].illusztrator_ids || []} nameKey="illusztrator" onToggle={(id) => toggleSelection(K.ISBN, "illusztrator_ids", id)} />
+                                <MultiSelectDropdown label="Fordítók:" options={forditok} selectedIds={editedKonyvek[K.ISBN].fordito_ids || []} nameKey="fordito_nev" onToggle={(id) => toggleSelection(K.ISBN, "fordito_ids", id)} />
+
+                                <Button variant="success" className="mt-3" onClick={() => konyvmodositas(K.ISBN)}>Módosítás mentése</Button>
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+
+            {loading && <p style={{ textAlign: "center", padding: "20px" }}><b>Könyvek betöltése...</b></p>}
+            {!hasMore && <p style={{ textAlign: "center", color: "gray", padding: "20px" }}>Nincs több megjeleníthető könyv.</p>}
+        </>
+    );
+}
+
+// MultiSelect segédkomponens
+const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+        <div className="order" style={{ position: 'relative', marginBottom: '10px' }}>
+            <label><b>{label}</b></label>
+            <div onClick={() => setIsOpen(!isOpen)} style={{ border: '1px solid #ccc', padding: '8px', cursor: 'pointer', backgroundColor: '#fff', minHeight: '35px' }}>
+                {selectedIds.length === 0 ? "Válassz..." : `Kiválasztva: ${selectedIds.length} db`}
+            </div>
             {isOpen && (
-                <div style={{ position: 'absolute', zIndex: 10, backgroundColor: '#fff', border: '1px solid #ccc', width: '100%', maxHeight: '200px', overflowY: 'auto', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}}>
+                <div style={{ position: 'absolute', zIndex: 1000, backgroundColor: '#fff', border: '1px solid #ccc', width: '100%', maxHeight: '200px', overflowY: 'auto', boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }}>
                     {options.map(opt => (
-                        <div key={opt.id} style={{ padding: '5px 10px', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-                            onClick={() => onToggle(opt.id)}>
-                            <input  type="checkbox"  checked={selectedIds.includes(opt.id)} readOnly style={{ marginRight: '10px' }} />
+                        <div key={opt.id} style={{ padding: '5px 10px', display: 'flex', alignItems: 'center', cursor: 'pointer', borderBottom: '1px solid #eee' }} onClick={() => onToggle(opt.id)}>
+                            <input type="checkbox" checked={selectedIds.includes(opt.id)} readOnly style={{ marginRight: '10px' }} />
                             {opt[nameKey]}
                         </div>
                     ))}
@@ -111,281 +315,3 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
         </div>
     );
 };
-
-    const handleChange = (isbn, field, value) => {
-        setEditedKonyvek(prev => {
-            const currentBook = prev[isbn] || {}; 
-            return {
-                ...prev,
-                [isbn]: { ...currentBook, [field]: value}
-            };
-        });
-    };
-
-    const toggleSelection = (isbn, field, id) => {
-        setEditedKonyvek(prev => {
-            const currentList = prev[isbn][field] || [];
-            const newList = currentList.includes(id) ? currentList.filter(item => item !== id) : [...currentList, id]; 
-            return {
-                ...prev, [isbn]: { ...prev[isbn], [field]: newList }
-            };
-        });
-    };
-
-    const fetchData = async (pageNum) => {
-        if(loading || !hasMore) return;
-        try {
-            const response = await httpCommon.get(`/konyvek/adminosszeskonyv?page=${pageNum}&limit=10`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            })
-            if (response.data.length === 0) {
-                setHasMore(false);
-                return;
-            }
-            setOsszesKonyv(prev => {
-            const ujKonyvek = response.data.filter(
-                newBook => !prev.some(oldBook => oldBook.ISBN === newBook.ISBN)
-            );
-            return [...prev, ...ujKonyvek];
-        });
-        } catch (err) {
-            console.error(err)
-        }
-        finally {
-        setLoading(false);
-    }
-    }
-
-
-    useEffect(() => {
-        if (!hasMore || loading || !accessToken) return;
-        const handleScroll = () => {
-            if ( window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
-            setPage(prev => {
-                const next = prev + 1;
-                fetchData(next);
-                return next;
-            });
-        }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-
-    }, [hasMore, loading, accessToken]);
-
-    const konyvTorles = async ( ISBN ) => {
-        try{
-            const response = await httpCommon.delete("/konyvek/konyvtorol", 
-                {
-                data: { ISBN },    
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            })
-            setOsszesKonyv(prev =>
-                prev.filter(k => k.ISBN !== ISBN)
-            )
-        }
-        catch(err){
-            console.error(err)
-        }
-    }
-
-   const konyvmodositas = async (ISBN) => {
-    const edited = editedKonyvek[ISBN];
-    if (!edited) return;
-    try {
-        const { 
-            tipus_nev, 
-            nyelv_nev, 
-            kiado_nev, 
-            borito_tipus, 
-            kat_nev, 
-            illusztracio_leiras, 
-            szerzok, 
-            forditok, 
-            fordítok,
-            illusztratorok, 
-            szerzo_ids, 
-            illusztrator_ids, 
-            fordito_ids, 
-            ...tisztaAdatok 
-        } = edited;
-        if (tisztaAdatok.illusztracio === "") {
-            tisztaAdatok.illusztracio = null;
-        }
-
-        const payload = { 
-            REGIISBN: ISBN, 
-            ...tisztaAdatok, 
-            szerzo_ids: szerzo_ids || [], 
-            illusztrator_ids: illusztrator_ids || [], 
-            fordito_ids: fordito_ids || [] 
-        };
-
-        await httpCommon.put("/konyvek/konyvmodositas", payload, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        });
-
-        alert("Sikeres módosítás!");
-        setShowInput(prev => ({ ...prev, [ISBN]: false }));
-        setOsszesKonyv([]);
-        setPage(1);
-        setHasMore(true);
-        fetchData(1); 
-        
-    } catch (err) {
-        console.error("Hiba küldéskor:", err);
-        alert("Hiba: " + (err.response?.data?.sqlMessage || "Szerver hiba történt."));
-    }
-};
-
-    const Fetchmodositas = async (endpoint,setter) =>{
-        try {
-              const response = await httpCommon.get(`/konyvek/${endpoint}`);
-              setter(response.data);
-            } 
-        catch (err) {
-              console.error(`Error fetching ${endpoint}:`, err);
-              setError(err.message);
-            }
-    }
-
-   useEffect(() => {
-    if (accessToken) {
-        Fetchmodositas('nyelv',setNyelvek);
-        Fetchmodositas('kiadok',setKiado);
-        Fetchmodositas('borito',setBorito);
-        Fetchmodositas('illusztracio',setIllusztráció);
-        Fetchmodositas('szerzok',setSzerzok);
-        Fetchmodositas('illusztratorok',setIllusztrátorok);
-        Fetchmodositas('forditok',setForditok);
-        Fetchmodositas('kategoria',setKategoria);
-        Fetchmodositas('tipus',setTipus);
-    }
-    }, [accessToken])
-
-    return(
-        <>
-        <div style={{ position: "sticky", top: 70, backgroundColor: "#f4f4f4", padding: "15px", zIndex: 100, borderBottom: "2px solid #ddd", marginBottom: "20px" }}>
-            <input type="text" placeholder="Keresés cím, ISBN vagy szerző alapján..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                style={{width: "100%", padding: "10px", fontSize: "16px", borderRadius: "5px", border: "1px solid #ccc" }}/>
-            <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#666" }}>
-                Találatok száma: {filteredKonyvek.length} db
-            </p>
-        </div>
-
-        {filteredKonyvek.map((K, index) =>(
-            <div className="order" key={K.ISBN} style={{ marginBottom: "20px" }}>
-                <span style={{marginBottom:"10px"}}>Cím: {K.cim}<br/> 
-                    ISBN: {K.ISBN} <br/> 
-                    nyelv_nev: {K.nyelv_nev} <br/> 
-                    kiado_nev: {K.kiado_nev} <br/> 
-                    borito_tipus:  {K.borito_tipus} <br/>
-                    kat_nev:  {K.kat_nev} <br/>
-                    ar:  {K.ar} <br/>
-                    illusztracio_leiras:  {K.illusztracio_leiras} <br/>
-                    Leírás: {K.leiras ? K.leiras.substring(0, 100) + '...' : 'Nincs leírás'} <br/>
-                    Szerzők:  {K.szerzok} <br/>
-                    Típus: {K.tipus_nev} <br/>
-                    {K.fordítok ? `Fordítok: ${K.fordítok}`  : null}
-                    {K.illusztratorok ? `Illusztratorok:  ${K.illusztratorok}`  : null}
-                </span>
-            <div style={{marginTop:"15px"}}>
-            <Button style={{marginRight:"15px"}} className="clear-filters-btn" onClick={() => konyvTorles(K.ISBN)}>Könyv törlése</Button>
-            <Button className="apply-filters-btn" onClick={() => handleToggleInput(K.ISBN, K)}>Könyv módosítása</Button>
-            </div>
-            
-
-            {showInput[K.ISBN] && editedKonyvek[K.ISBN] &&(
-                <div style={{ marginTop: "10px", padding: "10px" }}>
-                    <div className="order">
-                    
-                    <input className="adminosszesinputok" placeholder="ISBN" value={editedKonyvek[K.ISBN].ISBN} onChange={(e) => handleChange(K.ISBN, "ISBN", e.target.value)}/>
-                    <input className="adminosszesinputok" placeholder="Cím" value={editedKonyvek[K.ISBN].cim} onChange={(e) => handleChange(K.ISBN, "cim", e.target.value)}/>
-                    <input className="adminosszesinputok" placeholder="Ár" value={editedKonyvek[K.ISBN].ar} onChange={(e) => handleChange(K.ISBN, "ar", e.target.value)}/>Ft
-                    </div>
-                        <div className="order">
-                            <label><strong>Nyelv:</strong> </label>
-                                <select value={editedKonyvek[K.ISBN].nyelv_id || ""} onChange={(e) => handleChange(K.ISBN, "nyelv_id", e.target.value)} >
-                                    {nyelvek.map(ny =>(
-                                        <option key={ny.id} value={ny.id}>{ny.nyelv_nev}</option>
-                                    ))}
-                                </select>
-                        </div>
-                        <div className="order">
-                             <label><strong>Kiadó: </strong> </label>
-                                <select value={editedKonyvek[K.ISBN].kiado_id || ""} onChange={(e) => handleChange(K.ISBN, "kiado_id", e.target.value)} >
-                                    {kiado.map(k =>(
-                                        <option key={k.id} value={k.id}>{k.kiado_nev}</option>
-                                    ))}
-                                </select>
-                        </div>
-                        <div className="order">
-                            <label><strong>Borító típus:</strong> </label>
-                                <select value={editedKonyvek[K.ISBN].borito_id || ""} onChange={(e) => handleChange(K.ISBN, "borito_id", e.target.value)}>
-                                    {borito.map(b =>(
-                                        <option key={b.id} value={b.id}>{b.borito_nev}</option>
-                                    ))}
-                                </select>
-                        </div>
-                        <div className="order">
-                            <label><strong>Kategória:</strong> </label>
-                                <select value={editedKonyvek[K.ISBN].kategoria_id || ""} onChange={(e) => handleChange(K.ISBN, "kategoria_id", e.target.value)}>
-                                    {kategoria.map(k =>(
-                                        <option key={k.id} value={k.id}>{k.kat_nev}</option>
-                                    ))}
-                                </select>
-                        </div>
-                        <div className="order">
-                                <label><strong>Illusztráció:</strong> </label>
-                                <select value={editedKonyvek[K.ISBN].illusztracio || ""} onChange={(e) => handleChange(K.ISBN, "illusztracio", e.target.value)}>
-                                    {illusztráció.map(i =>(
-                                        <option key={i.id} value={i.id}>{i.illusztracio}</option>
-                                    ))}
-                                </select>
-                        </div>
-                        <div className="order">
-                            <label><strong>Típus: </strong> </label>
-                                <select value={editedKonyvek[K.ISBN].tipus_id || ""}  onChange={(e) => handleChange(K.ISBN, "tipus_id", e.target.value)}>
-                                    {tipus.map(t =>(
-                                        <option key={t.id} value={t.id}>{t.tipus_nev}</option>
-                                    ))}
-                                </select>
-                        </div>
-                        <div className="order">
-                            <label><strong>Leírás: </strong></label>
-                                <textarea  style={{ width: "100%", minHeight: "100px", display: "block" }} value={editedKonyvek[K.ISBN].leiras || ""} onChange={(e) => handleChange(K.ISBN, "leiras", e.target.value)}/>
-                        </div>
-                        <div>
-                            <MultiSelectDropdown label="Szerzők:" options={szerzok}
-                                    selectedIds={editedKonyvek[K.ISBN].szerzo_ids || []}
-                                    nameKey="szerzo_nev"
-                                    onToggle={(id) => toggleSelection(K.ISBN, "szerzo_ids", id)}
-                                />
-                        </div>
-                        <div>
-                            <MultiSelectDropdown label="Illusztrátorok:" options={illusztrátorok}
-                                    selectedIds={editedKonyvek[K.ISBN].illusztrator_ids || []}
-                                    nameKey="illusztrator"
-                                    onToggle={(id) => toggleSelection(K.ISBN, "illusztrator_ids", id)}
-                                />
-                        </div>
-                        <div>
-                            <MultiSelectDropdown label="Fordítók:" options={forditok}
-                                    selectedIds={editedKonyvek[K.ISBN].fordito_ids || []}
-                                    nameKey="fordito_nev"
-                                    onToggle={(id) => toggleSelection(K.ISBN, "fordito_ids", id)}
-                                />
-                        </div>  
-                        <Button className="apply-filters-btn" onClick={() => konyvmodositas(K.ISBN)}>Módosítás</Button>
-                </div>
-            )}
-            </div>
-        ))}
-        </>
-    )
-}
