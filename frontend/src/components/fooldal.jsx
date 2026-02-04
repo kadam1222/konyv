@@ -31,65 +31,7 @@ const lista = Array.from(
   ).values()
 );
 
-  
-
-  const safeFilters = activeFilters || {};
-
-  const fetchData = async (pagenum) => {
-    try {
-      setLoading(true);
-      const response = await httpCommon.get(`/konyvek?page=${pagenum}&limit=10`);
-      const uj = Array.isArray(response.data) ? response.data : [];
-
-      setHasMoreSearch(uj.length === 10);
-      setTalalatok(prev => {
-        const combined = [...prev, ...uj];
-        return Array.from(new Map(combined.map(item => [item.ISBN, item])).values());
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchSearchData = async (query, pagenum, category, filters) => {
-    if (!query && !category && !filters) return;
-
-    try {
-      setLoading(true);
-      const params = new URLSearchParams({ page: pagenum, limit: 10 });
-
-      if (category) params.set('kat', category);
-      if (query) {
-        params.set('cim', query);
-        params.set('szerzo', query);
-      }
-
-      if (filters) {
-        if (filters.kiado) params.set('kiado', filters.kiado);
-        if (filters.nyelv) params.set('nyelv', filters.nyelv);
-        if (filters.borito) params.set('borito', filters.borito);
-        if (filters.tipus) params.set('tipus', filters.tipus);
-        if (filters.armin) params.set('armin', filters.armin);
-        if (filters.armax) params.set('armax', filters.armax);
-      }
-
-      const response = await httpCommon.get(`/konyvek/search?${params.toString()}`);
-      const uj = Array.isArray(response.data) ? response.data : [];
-
-      setHasMoreSearch(uj.length === 10);
-
-      setTalalatok(prev => {
-        const combined = [...prev, ...uj];
-        return Array.from(new Map(combined.map(item => [item.ISBN, item])).values());
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const safeFilters = activeFilters || {};
 
 useEffect(() => {
   const fetchResults = async () => {

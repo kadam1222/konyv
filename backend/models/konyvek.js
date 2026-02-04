@@ -81,7 +81,7 @@ class Konyvek {
           feltetelek_sql.push("tipus_nev = ?");
           feltetelek_parameter.push(tipus);
         }
-        if (cim || szerzo) {
+      if (cim || szerzo) {
       const q = cim || szerzo; 
       feltetelek_sql.push("(cim LIKE ? OR szerzok LIKE ?)");
       feltetelek_parameter.push(`%${q}%`, `%${q}%`);
@@ -610,10 +610,10 @@ static async insertAdat(adatok ){
 
       await db.query(`INSERT INTO termek (${mezok.join(',')}) VALUES (${placeholders})`, ertekek);
 
-      // --- ITT HÍVJUK MEG A KAPCSOLÓTÁBLÁKAT ---
+    
       const ujISBN = t.ISBN;
 
-      // Szerzők (adatok.szerzoIds egy tömb kell legyen a JSON-ben, pl: [1, 5, 8])
+     
       if (adatok.szerzoIds) {
         await this.updateSzerzok(ujISBN, adatok.szerzoIds);
       }
@@ -634,6 +634,37 @@ static async insertAdat(adatok ){
     throw err;
   }
 }
+
+
+static async osszesRendelesSearchbar(page = 1, limit = 10, email = "", szamlaszam = "") {
+  try {
+    const offset = (page - 1) * limit;
+
+    let query = `SELECT * FROM rendelesek`;
+    let parameter = [];
+    let feltetel = []
+    if (email){
+      feltetel.push("email LIKE ?")
+      parameter.push(`%${email}%`)
+    }
+    if (szamlaszam){
+      feltetel.push("szamlaszam LIKE ?")
+      parameter.push(`%${szamlaszam}%`)
+    }
+    if (feltetel.length > 0){
+      query += " WHERE " + feltetel.join(" AND ")
+    }
+    query += " LIMIT ? OFFSET ?"
+    parameter.push(limit,offset)
+    const [rows] = await db.query(query, parameter);
+    return rows;
+
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
 }
 
 module.exports = Konyvek;

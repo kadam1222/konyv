@@ -499,4 +499,18 @@ exports.insertAdat = async (req,res) =>{
   }
 }
 
+exports.osszesRendelesSearch = async (req,res) =>{
+  try{
+    const page = parseInt(req.query.page) || 1;
+    const email = req.query.email || "";
+    const szamlaszam = req.query.szamlaszam || ""
+    const limit =  parseInt(req.query.limit) ||10;
+    const result = await Konyvek.osszesRendelesSearchbar(page,limit,email,szamlaszam)
+    res.json(result)
+  }
+  catch(err){
+    console.error(err)
+    res.status(500).json({message: "Szerver hiba!"})
+  }
+}
 

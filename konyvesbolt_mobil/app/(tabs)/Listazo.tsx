@@ -2,6 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import {View, Text, Image, Button, ActivityIndicator, FlatList, StyleSheet} from 'react-native';
 import axios from 'axios';
+import { Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
+const CARD_MARGIN = 8;
+const NUM_COLUMNS = 2;
+const CARD_WIDTH =
+  (width - CARD_MARGIN * (NUM_COLUMNS * 2)) / NUM_COLUMNS;
+
 
 type Termek = {
   id: number;
@@ -88,6 +96,9 @@ const ListazoInfinite = () => {
 
       <FlatList
         data={data}
+        numColumns={2}
+        key={2}
+        columnWrapperStyle={styles.row}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Text style={styles.title}>
@@ -99,7 +110,7 @@ const ListazoInfinite = () => {
               style={styles.image}
             />
 
-            <Text style={styles.price}>Ár: {item.ar} Ft</Text>
+            <Text numberOfLines={2} style={styles.price}>Ár: {item.ar} Ft</Text>
 
             <Button
               title="Kosárba"
@@ -142,10 +153,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   item: {
+    flex : 1,
     margin: 10,
     padding: 10,
     backgroundColor: 'white',
     borderRadius: 8,
+    alignItems: 'center'
   },
   title: {
     fontSize: 20,
@@ -156,9 +169,10 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   image: {
-    height: 200,
+    height: 120,
     resizeMode: 'contain',
     marginVertical: 5,
+    width: '100%'
   },
   errorText: {
     color: 'red',

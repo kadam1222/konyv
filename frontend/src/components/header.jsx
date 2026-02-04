@@ -35,6 +35,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
     }
   };
   useEffect (() =>{
+    if (!accessToken) return
     const fetchUser = async () =>{
       try{
         const response = await http.get("/konyvek/profil",   {       
@@ -135,9 +136,8 @@ const handleLogout = async () => {
   }
 };
 
-
   return (
-    <header style={{backgroundColor:"#ceb795ff"}}>
+    <header style={{backgroundColor:"#ceb795ff",zIndex: 1000}}>
       <Navbar expand="lg">
         <NavItem style={{ marginLeft: "14px" }}>
           <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
