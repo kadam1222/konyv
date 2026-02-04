@@ -136,7 +136,7 @@ const handleLogout = async () => {
 };
 
   return (
-    <header style={{backgroundColor:"#ceb795ff"}}>
+    <header style={{backgroundColor:"#ceb795ff",zIndex: 1000}}>
       <Navbar expand="lg">
         <NavItem style={{ marginLeft: "14px" }}>
           <a href="/" style={{ textDecoration: "none", color: "inherit" }}>

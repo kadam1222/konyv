@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import httpCommon from "../http-common";
 import "./rendelesek.css"
 import Button from 'react-bootstrap/Button';
+import "./adminosszeskonyv.css"
 
 export default function AdminBook( {accessToken}){
     const [osszesKonyv, setOsszesKonyv] = useState([])
@@ -269,28 +270,9 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
 
     return(
         <>
-        <div style={{ 
-            position: "sticky", 
-            top: 0, 
-            backgroundColor: "#f4f4f4", 
-            padding: "15px", 
-            zIndex: 100, 
-            borderBottom: "2px solid #ddd",
-            marginBottom: "20px" 
-        }}>
-            <input
-                type="text"
-                placeholder="Keresés cím, ISBN vagy szerző alapján..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                    width: "100%",
-                    padding: "10px",
-                    fontSize: "16px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc"
-                }}
-            />
+        <div style={{ position: "sticky", top: 70, backgroundColor: "#f4f4f4", padding: "15px", zIndex: 100, borderBottom: "2px solid #ddd", marginBottom: "20px" }}>
+            <input type="text" placeholder="Keresés cím, ISBN vagy szerző alapján..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                style={{width: "100%", padding: "10px", fontSize: "16px", borderRadius: "5px", border: "1px solid #ccc" }}/>
             <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#666" }}>
                 Találatok száma: {filteredKonyvek.length} db
             </p>
@@ -309,92 +291,97 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
                     Leírás: {K.leiras ? K.leiras.substring(0, 100) + '...' : 'Nincs leírás'} <br/>
                     Szerzők:  {K.szerzok} <br/>
                     Típus: {K.tipus_nev} <br/>
-                    {K.forditok ? `fordítok: ${K.forditok}`  : null}
-                    {K.illusztratorok ? `illusztratorok:  ${K.illusztratorok}`  : null}
+                    {K.fordítok ? `Fordítok: ${K.fordítok}`  : null}
+                    {K.illusztratorok ? `Illusztratorok:  ${K.illusztratorok}`  : null}
                 </span>
-            <Button className="clear-filters-btn" onClick={() => konyvTorles(K.ISBN)}>Könyv törlése</Button>
-            <Button onClick={() => handleToggleInput(K.ISBN, K)}>Könyv módosítása</Button>
+            <div style={{marginTop:"15px"}}>
+            <Button style={{marginRight:"15px"}} className="clear-filters-btn" onClick={() => konyvTorles(K.ISBN)}>Könyv törlése</Button>
+            <Button className="apply-filters-btn" onClick={() => handleToggleInput(K.ISBN, K)}>Könyv módosítása</Button>
+            </div>
+            
 
             {showInput[K.ISBN] && editedKonyvek[K.ISBN] &&(
-                <div style={{ marginTop: "10px", border: "1px solid #ccc", padding: "10px" }}>
-                    <input placeholder="ISBN" value={editedKonyvek[K.ISBN].ISBN} onChange={(e) => handleChange(K.ISBN, "ISBN", e.target.value)}/>
-                    <input placeholder="Cím" value={editedKonyvek[K.ISBN].cim} onChange={(e) => handleChange(K.ISBN, "cim", e.target.value)}/>
-                    <input placeholder="Ár" value={editedKonyvek[K.ISBN].ar} onChange={(e) => handleChange(K.ISBN, "ar", e.target.value)}/>
-
-                    <div>
-                            <label>Nyelv: </label>
+                <div style={{ marginTop: "10px", padding: "10px" }}>
+                    <div className="order">
+                    
+                    <input className="adminosszesinputok" placeholder="ISBN" value={editedKonyvek[K.ISBN].ISBN} onChange={(e) => handleChange(K.ISBN, "ISBN", e.target.value)}/>
+                    <input className="adminosszesinputok" placeholder="Cím" value={editedKonyvek[K.ISBN].cim} onChange={(e) => handleChange(K.ISBN, "cim", e.target.value)}/>
+                    <input className="adminosszesinputok" placeholder="Ár" value={editedKonyvek[K.ISBN].ar} onChange={(e) => handleChange(K.ISBN, "ar", e.target.value)}/>Ft
+                    </div>
+                        <div className="order">
+                            <label><strong>Nyelv:</strong> </label>
                                 <select value={editedKonyvek[K.ISBN].nyelv_id || ""} onChange={(e) => handleChange(K.ISBN, "nyelv_id", e.target.value)} >
                                     {nyelvek.map(ny =>(
                                         <option key={ny.id} value={ny.id}>{ny.nyelv_nev}</option>
                                     ))}
                                 </select>
-                            </div>
-                            <div>
-                                <label>Kiadó: </label>
+                        </div>
+                        <div className="order">
+                             <label><strong>Kiadó: </strong> </label>
                                 <select value={editedKonyvek[K.ISBN].kiado_id || ""} onChange={(e) => handleChange(K.ISBN, "kiado_id", e.target.value)} >
                                     {kiado.map(k =>(
                                         <option key={k.id} value={k.id}>{k.kiado_nev}</option>
                                     ))}
                                 </select>
-                            </div>
-                            <div>
-                                <label>Borító típus: </label>
+                        </div>
+                        <div className="order">
+                            <label><strong>Borító típus:</strong> </label>
                                 <select value={editedKonyvek[K.ISBN].borito_id || ""} onChange={(e) => handleChange(K.ISBN, "borito_id", e.target.value)}>
                                     {borito.map(b =>(
                                         <option key={b.id} value={b.id}>{b.borito_nev}</option>
                                     ))}
                                 </select>
-                            </div>
-                            <div>
-                                <label>Kategória: </label>
+                        </div>
+                        <div className="order">
+                            <label><strong>Kategória:</strong> </label>
                                 <select value={editedKonyvek[K.ISBN].kategoria_id || ""} onChange={(e) => handleChange(K.ISBN, "kategoria_id", e.target.value)}>
                                     {kategoria.map(k =>(
                                         <option key={k.id} value={k.id}>{k.kat_nev}</option>
                                     ))}
                                 </select>
-                            </div>
-                            <div>
-                                <label>Illusztráció: </label>
+                        </div>
+                        <div className="order">
+                                <label><strong>Illusztráció:</strong> </label>
                                 <select value={editedKonyvek[K.ISBN].illusztracio || ""} onChange={(e) => handleChange(K.ISBN, "illusztracio", e.target.value)}>
                                     {illusztráció.map(i =>(
                                         <option key={i.id} value={i.id}>{i.illusztracio}</option>
                                     ))}
                                 </select>
-                            </div>
-                            <div>
-                                <label>Típus: </label>
+                        </div>
+                        <div className="order">
+                            <label><strong>Típus: </strong> </label>
                                 <select value={editedKonyvek[K.ISBN].tipus_id || ""}  onChange={(e) => handleChange(K.ISBN, "tipus_id", e.target.value)}>
                                     {tipus.map(t =>(
                                         <option key={t.id} value={t.id}>{t.tipus_nev}</option>
                                     ))}
                                 </select>
-                            </div>
-                            <div>
-                                <label>Leírás: </label>
-                                <textarea   style={{ width: "100%", minHeight: "100px", display: "block" }} value={editedKonyvek[K.ISBN].leiras || ""} onChange={(e) => handleChange(K.ISBN, "leiras", e.target.value)}/>
-                            </div>
-                            <div>
-                                <MultiSelectDropdown label="Szerzők:" options={szerzok}
+                        </div>
+                        <div className="order">
+                            <label><strong>Leírás: </strong></label>
+                                <textarea  style={{ width: "100%", minHeight: "100px", display: "block" }} value={editedKonyvek[K.ISBN].leiras || ""} onChange={(e) => handleChange(K.ISBN, "leiras", e.target.value)}/>
+                        </div>
+                        <div>
+                            <MultiSelectDropdown label="Szerzők:" options={szerzok}
                                     selectedIds={editedKonyvek[K.ISBN].szerzo_ids || []}
                                     nameKey="szerzo_nev"
                                     onToggle={(id) => toggleSelection(K.ISBN, "szerzo_ids", id)}
                                 />
-                            </div>
-                            <div>
-                                <MultiSelectDropdown label="Illusztrátorok:" options={illusztrátorok}
+                        </div>
+                        <div>
+                            <MultiSelectDropdown label="Illusztrátorok:" options={illusztrátorok}
                                     selectedIds={editedKonyvek[K.ISBN].illusztrator_ids || []}
                                     nameKey="illusztrator"
                                     onToggle={(id) => toggleSelection(K.ISBN, "illusztrator_ids", id)}
                                 />
-                            </div>
-                            <div>
-                                <MultiSelectDropdown label="Fordítók:" options={forditok}
+                        </div>
+                        <div>
+                            <MultiSelectDropdown label="Fordítók:" options={forditok}
                                     selectedIds={editedKonyvek[K.ISBN].fordito_ids || []}
                                     nameKey="fordito_nev"
                                     onToggle={(id) => toggleSelection(K.ISBN, "fordito_ids", id)}
                                 />
-                            </div>  
-                        <button onClick={() => konyvmodositas(K.ISBN)}>Módosítás</button>
+                        </div>  
+                        <Button className="apply-filters-btn" onClick={() => konyvmodositas(K.ISBN)}>Módosítás</Button>
                 </div>
             )}
             </div>
