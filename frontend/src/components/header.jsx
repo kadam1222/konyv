@@ -35,6 +35,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
     }
   };
   useEffect (() =>{
+    if (!accessToken) return
     const fetchUser = async () =>{
       try{
         const response = await http.get("/konyvek/profil",   {       
