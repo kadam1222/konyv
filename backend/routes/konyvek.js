@@ -2,11 +2,14 @@ const express = require('express');
 const router = express.Router();
 const konyvekcontrollers = require('../controllers/konyvekcontrollers');
 const auth = require('../middleware/auth');
-const requireAdmin = require('../middleware/adminOnly')
+const requireAdmin = require('../middleware/adminOnly');
+
 
 router.get('/search', konyvekcontrollers.filter);
 
 router.get('/kategoria', konyvekcontrollers.kategoria);
+
+router.get('/searchRendelesek',auth,requireAdmin, konyvekcontrollers.osszesRendelesSearch)
 
 router.get('/nyelv', konyvekcontrollers.nyelv);
 
