@@ -9,7 +9,6 @@ export default function AdminModositasok({ accessToken }) {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     
-    // Keresési feltételek
     const [searchEmail, setSearchEmail] = useState("");
     const [searchSzamlaszam, setSearchSzamlaszam] = useState("");
     
@@ -19,13 +18,13 @@ export default function AdminModositasok({ accessToken }) {
 
     const observerRef = useRef();
 
-    // --- 1. ADATOK LEKÉRÉSE A SZERVERRŐL ---
+
     const fetchOrders = useCallback(async (pageNum, isNewSearch = false) => {
         if (loading) return;
         
         try {
             setLoading(true);
-            // Az új /searchRendelesek végpontot használjuk
+
             const response = await httpCommon.get(
                 `/konyvek/searchRendelesek?page=${pageNum}&limit=10&email=${searchEmail}&szamlaszam=${searchSzamlaszam}`,
                 {
@@ -49,7 +48,7 @@ export default function AdminModositasok({ accessToken }) {
         }
     }, [accessToken, searchEmail, searchSzamlaszam]);
 
-    // --- 2. KERESÉS ÉS KEZDETI BETÖLTÉS ---
+
     useEffect(() => {
         if (accessToken) {
             setPage(1);
@@ -58,7 +57,7 @@ export default function AdminModositasok({ accessToken }) {
         }
     }, [accessToken, searchEmail, searchSzamlaszam, fetchOrders]);
 
-    // --- 3. INTERSECTION OBSERVER ---
+
     const lastOrderRef = useCallback(node => {
         if (loading) return;
         if (observerRef.current) observerRef.current.disconnect();
@@ -76,7 +75,7 @@ export default function AdminModositasok({ accessToken }) {
         if (node) observerRef.current.observe(node);
     }, [loading, hasMore, fetchOrders]);
 
-    // --- 4. CSOPORTOSÍTÁS (Változatlan logika) ---
+
     const groupedOrdersMap = new Map();
     osszesRendeles.forEach(row => {
         const { szamlaszam, szamla_id, cim, darab, szamla_kelte, email, rendeles_jelenlegi_statusza, vegosszeg } = row;
@@ -99,7 +98,6 @@ export default function AdminModositasok({ accessToken }) {
     });
     const groupedOrders = Array.from(groupedOrdersMap.values());
 
-    // --- 5. STÁTUSZOK ÉS MÓDOSÍTÁS ---
     useEffect(() => {
         const fetchStatus = async () => {
             try {

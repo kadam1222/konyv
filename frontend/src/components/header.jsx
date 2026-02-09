@@ -13,6 +13,7 @@ import "reactjs-popup/dist/index.css";
 import LoginForm from "./loginform";
 import RegisterForm from "./registerform";
 import { useNavigate } from "react-router-dom";
+import "./header.css"
 
 export default function Header({ onSearch, accessToken, setAccessToken }) {
    const navigate = useNavigate();
@@ -80,11 +81,13 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   };
 
   const CategoryDropdown = ({ title }) => (
-    <NavDropdown title={title} id={`nav-${title}`}>
-      {fokat
-        .filter((f) => !f.katazon)
-        .map((f) => (
-          <NavDropdown key={f.id} title={f.kat_nev} id={`nav-sub-${f.id}`}>
+  <NavDropdown title={title} id={`nav-${title}`}>
+    {fokat
+      .filter((f) => !f.katazon)
+      .map((f) => (
+        // Itt adunk hozzá egy burkolót vagy osztályt
+        <div className="dropdown-submenu" key={f.id}>
+          <NavDropdown title={f.kat_nev} id={`nav-sub-${f.id}`} drop="end">
             {fokat.filter((k) => k.katazon === f.id).length > 0 ? (
               fokat
                 .filter((k) => k.katazon === f.id)
@@ -102,9 +105,10 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
               </NavDropdown.Item>
             )}
           </NavDropdown>
-        ))}
-    </NavDropdown>
-  );
+        </div>
+      ))}
+  </NavDropdown>
+);
 
   const Profildropdown = () => (
     <NavDropdown title="Profilom" id="asd">

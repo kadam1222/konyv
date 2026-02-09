@@ -65,7 +65,7 @@ export default function RegisterForm( { onClose, switchToLogin } ){
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <Button variant="primary" type="submit" id="regisztraciogomb">
-        Regisztracio
+        Regisztráció
       </Button>
       <p style={{ marginTop: "10px", textAlign: "center" }}>
         Már van fiókod?{" "}

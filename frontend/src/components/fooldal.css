@@ -35,9 +35,11 @@ body{
 
 .termek_kep {
     width: 100%;
-    height: auto;
-    max-height: 430px;
-    border-radius: 5px;
+    height: 350px; 
+    object-fit: contain; 
+    background-color: #f8f1e5;
+    padding: 10px;
+    cursor: pointer;
 }
 
 .uzenet{
