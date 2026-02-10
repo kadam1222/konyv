@@ -145,7 +145,7 @@ const handleLogout = async () => {
       <Navbar expand="lg">
         <NavItem style={{ marginLeft: "14px" }}>
           <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
-            <h2>Bolt</h2>
+            <h2>BookBar</h2>
           </a>
         </NavItem>
 

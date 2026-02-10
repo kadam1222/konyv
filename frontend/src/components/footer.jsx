@@ -10,7 +10,7 @@ export default function Footer() {
         <div className="leftBlock">
           <h2 className="brand">
             <span className="logo"></span>
-            Bolt
+            BookBar
           </h2>
 
           <p className="description">
@@ -28,7 +28,7 @@ export default function Footer() {
       <hr className="line" />
 
       <div className="bottomSection">
-        <p className="copy">© 2025 Bolt. All rights reserved.</p>
+        <p className="copy">© 2025 BookBar. All rights reserved.</p>
 
         <div className="iconRow">
           <a

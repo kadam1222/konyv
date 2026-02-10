@@ -63,6 +63,7 @@ export default function Kosar( {accesToken} ){
                 const ujKosar = kosar.filter((_, i) => i !== index);
                 setKosar(ujKosar);
                 localStorage.setItem("kosar", JSON.stringify(ujKosar));
+                window.dispatchEvent(new Event("storage"));
                 }}
             />
 

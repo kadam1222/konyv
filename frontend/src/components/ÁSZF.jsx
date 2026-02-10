@@ -9,7 +9,7 @@ export default function Ászf(){
                 <Card.Text style={{ color: "#3a3a3a" }}>
                     <h4>1. Bevezetés</h4>
 
-                    <span style={{ color: "#6e604bff" }}> Jelen Általános Szerződési Feltételek (továbbiakban: ÁSZF) a Bolt (továbbiakban: Szolgáltató) és a vásárló (továbbiakban: Vásárló) között létrejövő adásvételi szerződés feltételeit tartalmazza.</span>
+                    <span style={{ color: "#6e604bff" }}> Jelen Általános Szerződési Feltételek (továbbiakban: ÁSZF) a BookBar (továbbiakban: Szolgáltató) és a vásárló (továbbiakban: Vásárló) között létrejövő adásvételi szerződés feltételeit tartalmazza.</span>
                 </Card.Text>
                 <Card.Text style={{ color: "#3a3a3a" }}>
                 <h4>2. A szerződés tárgya</h4>
