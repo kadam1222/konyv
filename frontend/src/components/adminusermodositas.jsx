@@ -8,7 +8,7 @@ export default function AdminUser( {accessToken}){
 
     const fetchData = async () => {
         try {
-            const response = await httpCommon.get("/konyvek/adminuser", {
+            const response = await httpCommon.get("/admin/adminuser", {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
@@ -29,7 +29,7 @@ export default function AdminUser( {accessToken}){
 
 const usertorles = async (email) =>{
         try{
-            const response = await httpCommon.put("/konyvek/adminuserdelete", 
+            const response = await httpCommon.put("/admin/adminuserdelete", 
                 { email },
                 {
                 headers: {
@@ -46,7 +46,7 @@ const usertorles = async (email) =>{
 
 const jogosultsagupdate = async (email,jogosultsag) =>{
         try{
-            const response = await httpCommon.put("/konyvek/updatejogosultsag", 
+            const response = await httpCommon.put("/admin/updatejogosultsag", 
                 { email, jogosultsag },
                 {
                 headers: {

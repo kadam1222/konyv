@@ -45,8 +45,18 @@ select{
   margin-bottom: 5px;
 }
 
+.kat.active {
+    background-color: #ceb795; 
+    color: #3a2f1f;          
+    font-weight: bold;
+    padding-left: 10px;       
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
 .kat:hover{
   transform: translateY(-3px);
+  cursor: pointer;
 }
 
 

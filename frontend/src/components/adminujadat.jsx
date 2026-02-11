@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import httpCommon from "../http-common";
 import Button from 'react-bootstrap/Button';
 import "./adminujadat.css"
+import { Form, InputGroup } from "react-bootstrap";
 
 const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +28,38 @@ const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey })
 };
 
 export default function AdminAdatFelvetel({ accessToken, onSiker }) {
+    const uploadImage = async (isbnValue) => {
+    if (!selectedFile) return;
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+        await httpCommon.post(`/upload/${isbnValue}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        console.log("Kép sikeresen feltöltve.");
+    } catch (err) {
+        console.error("Képfeltöltési hiba:", err);
+        throw new Error("A könyv mentve, de a kép feltöltése sikertelen volt.");
+    }
+};
+const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        if (file.type === "image/jpeg" || file.type === "image/jpg") {
+            setSelectedFile(file);
+            setMessage("Kép kiválasztva.");
+        } else {
+            setMessage("Hiba: Csak .jpg formátum engedélyezett!");
+            e.target.value = null;
+            setSelectedFile(null);
+        }
+    }
+};
+
     const initialSate = {
         termekek: {
             cim: "", ISBN: "", kiado_id: "", nyelv_id: "", ar: "", 
@@ -39,6 +72,9 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
     };
     
     const [ujKonyv, setUjKonyv] = useState(initialSate);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("");
 
     const [options, setOptions] = useState({
         nyelvek: [], kiadok: [], boritok: [], illusztraciok: [],
@@ -73,6 +109,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
     };
 
     const handleSubmit = async () => {
+        if (!ujKonyv.termekek.ISBN) return alert("Az ISBN megadása kötelező!");
         const tisztaAdatok = { ...ujKonyv };
         const szamMezok = ["kiado_id", "nyelv_id", "ar", "oldalak_szama", "kategoria_id", "tipus_id", "borito_id", "illusztracio"];
         
@@ -85,9 +122,12 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
         });
 
         try {
-            await httpCommon.post("/konyvek/adatHozzaad", tisztaAdatok, {
+            await httpCommon.post("/admin/adatHozzaad", tisztaAdatok, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
+            if (selectedFile) {
+            await uploadImage(ujKonyv.termekek.ISBN);
+        }
             alert("Könyv sikeresen felvéve!");
             setUjKonyv(initialSate);
         } catch (err) {
@@ -126,7 +166,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
     const mentés = async (kulcs, ertek, setter) => {
         if (!ertek) return alert("Üres mező!");
         try {
-            await httpCommon.post("/konyvek/adatHozzaad", { [kulcs]: ertek }, {
+            await httpCommon.post("/admin/adatHozzaad", { [kulcs]: ertek }, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
             alert("Sikeres mentés!");
@@ -145,7 +185,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
                 katazon: fokat === "" ? null : Number(fokat) 
             };
 
-            await httpCommon.post("/konyvek/adatHozzaad", payload, {
+            await httpCommon.post("/admin/adatHozzaad", payload, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
             
@@ -343,7 +383,23 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
             <MultiSelectDropdown label="Illusztrátorok:" options={options.illusztratorok} selectedIds={ujKonyv.illusztrator_ids} nameKey="illusztrator" onToggle={id => handleMultiToggle("illusztrator_ids", id)} />
 
             <textarea style={{ width: "100%", height: "80px" }} placeholder="Leírás..." value={ujKonyv.termekek.leiras} onChange={e => handleFieldChange("leiras", e.target.value)} />
-
+                <div className="mt-3 p-3 border rounded bg-light">
+      <Form.Group>
+        <Form.Label><b>Borítókép feltöltése (csak .jpg)</b></Form.Label>
+        <InputGroup>
+          <Form.Control
+            type="file"
+            accept=".jpg,.jpeg"
+            onChange={handleFileChange}
+            disabled={loading}/>
+        </InputGroup>
+        {message && (
+          <Form.Text className={message.includes("Hiba") ? "text-danger" : "text-success"}>
+            {message}
+          </Form.Text>
+        )}
+      </Form.Group>
+    </div>
             <Button variant="success" onClick={handleSubmit}>Könyv rögzítése</Button>
         </div>
     </div>

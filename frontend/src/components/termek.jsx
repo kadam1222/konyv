@@ -87,7 +87,7 @@ return (
           <span><strong>Nyelv:</strong> {adatok.nyelv_nev}</span>
           <span><strong>Kiadás éve:</strong> {adatok.kiadas_eve}</span>
           {adatok.illusztratorok ? <span><strong>Illusztrátor(ok):</strong> {adatok.illusztratorok}</span> : ""}
-          {adatok.forditok ? <span><strong>Fordító(k):</strong> {adatok.forditok}</span> : ""}
+          {adatok.fordítok ? <span><strong>Fordító(k):</strong> {adatok.fordítok}</span> : ""}
         </div>
 
         <div className="termek-footer">

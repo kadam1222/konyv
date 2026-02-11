@@ -9,25 +9,25 @@ export default function AdminModositasok({ accessToken }) {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     
-    // Keresési feltételek
     const [searchEmail, setSearchEmail] = useState("");
     const [searchSzamlaszam, setSearchSzamlaszam] = useState("");
     
     const [modositas, setModositas] = useState(null);
     const [statuszok, setStatuszok] = useState([]);
     const [ujstatusz, setUjstatusz] = useState("");
-
+    const [teljesites_kelte, setTeljesites_kelte] = useState(null)
+    const [fizetesi_mod, setFizetesi_mod] = useState("")
     const observerRef = useRef();
 
-    // --- 1. ADATOK LEKÉRÉSE A SZERVERRŐL ---
+
     const fetchOrders = useCallback(async (pageNum, isNewSearch = false) => {
         if (loading) return;
         
         try {
             setLoading(true);
-            // Az új /searchRendelesek végpontot használjuk
+
             const response = await httpCommon.get(
-                `/konyvek/searchRendelesek?page=${pageNum}&limit=10&email=${searchEmail}&szamlaszam=${searchSzamlaszam}`,
+                `/admin/searchRendelesek?page=${pageNum}&limit=10&email=${searchEmail}&szamlaszam=${searchSzamlaszam}`,
                 {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 }
@@ -49,7 +49,7 @@ export default function AdminModositasok({ accessToken }) {
         }
     }, [accessToken, searchEmail, searchSzamlaszam]);
 
-    // --- 2. KERESÉS ÉS KEZDETI BETÖLTÉS ---
+
     useEffect(() => {
         if (accessToken) {
             setPage(1);
@@ -58,7 +58,7 @@ export default function AdminModositasok({ accessToken }) {
         }
     }, [accessToken, searchEmail, searchSzamlaszam, fetchOrders]);
 
-    // --- 3. INTERSECTION OBSERVER ---
+
     const lastOrderRef = useCallback(node => {
         if (loading) return;
         if (observerRef.current) observerRef.current.disconnect();
@@ -76,10 +76,10 @@ export default function AdminModositasok({ accessToken }) {
         if (node) observerRef.current.observe(node);
     }, [loading, hasMore, fetchOrders]);
 
-    // --- 4. CSOPORTOSÍTÁS (Változatlan logika) ---
+
     const groupedOrdersMap = new Map();
     osszesRendeles.forEach(row => {
-        const { szamlaszam, szamla_id, cim, darab, szamla_kelte, email, rendeles_jelenlegi_statusza, vegosszeg } = row;
+        const { szamlaszam, szamla_id, cim, darab, szamla_kelte, email, rendeles_jelenlegi_statusza, vegosszeg, fizetesi_mod } = row;
 
         if (!groupedOrdersMap.has(szamlaszam)) {
             groupedOrdersMap.set(szamlaszam, {
@@ -89,6 +89,7 @@ export default function AdminModositasok({ accessToken }) {
                 email,
                 rendeles_jelenlegi_statusza,
                 vegosszeg,
+                fizetesi_mod,
                 books: []
             });
         }
@@ -99,7 +100,6 @@ export default function AdminModositasok({ accessToken }) {
     });
     const groupedOrders = Array.from(groupedOrdersMap.values());
 
-    // --- 5. STÁTUSZOK ÉS MÓDOSÍTÁS ---
     useEffect(() => {
         const fetchStatus = async () => {
             try {
@@ -112,8 +112,11 @@ export default function AdminModositasok({ accessToken }) {
 
     const statusz_modositas = async (szamlaszam) => {
         try {
-            await httpCommon.put("/konyvek/rendeles_statusz_modositas", 
-                { szamlaszam, r_statusz: ujstatusz },
+        const kuldendoDatum = (Number(ujstatusz) === 4 && fizetesi_mod === "Utánvét") 
+            ? new Date().toISOString().split('T')[0] 
+            : null;
+            await httpCommon.put("/admin/rendeles_statusz_modositas", 
+                { szamlaszam, r_statusz: ujstatusz, teljesites_kelte: kuldendoDatum },
                 { headers: { Authorization: `Bearer ${accessToken}` } }
             );
             
@@ -171,6 +174,7 @@ export default function AdminModositasok({ accessToken }) {
                                     setModositas(order.szamlaszam);
                                     const current = statuszok.find(s => s.statusz === order.rendeles_jelenlegi_statusza);
                                     setUjstatusz(current?.id ?? "");
+                                    setFizetesi_mod(String(order.fizetesi_mod));
                                 }}>Módosítás</Button>
                             </div>
                         )}

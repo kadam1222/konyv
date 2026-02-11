@@ -35,31 +35,39 @@ const safeFilters = activeFilters || {};
 
 useEffect(() => {
   const fetchResults = async () => {
-    if (!searchQuery && !activeCategory && !Object.values(safeFilters).some(f => f)) {
-      try {
-        setLoading(true);
-        const res = await httpCommon.get(`/konyvek?page=${page}&limit=10`);
-        const uj = Array.isArray(res.data) ? res.data : [];
-        setTalalatok(prev => [...prev, ...uj]);
-        setHasMore(uj.length === 10);
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
-
+    setLoading(true);
     try {
-      setLoading(true);
-      const params = new URLSearchParams({ page: searchPage, limit: 10 });
-      if (searchQuery) params.set("cim", searchQuery) && params.set("szerzo", searchQuery);
-      if (activeCategory) params.set("kat", activeCategory);
-      Object.entries(safeFilters).forEach(([k,v]) => v && params.set(k,v));
+      const params = new URLSearchParams({ 
+        page: (searchQuery || activeCategory || Object.values(safeFilters).some(f => f)) ? searchPage : page, 
+        limit: 10 
+      });
 
-      const res = await httpCommon.get(`/konyvek/search?${params.toString()}`);
+      if (searchQuery) params.set("cim", searchQuery); 
+      if (activeCategory) params.set("kat", activeCategory);
+
+      Object.entries(safeFilters).forEach(([k, v]) => {
+        if (v) params.set(k, v);
+      });
+
+      const endpoint = (searchQuery || activeCategory || Object.values(safeFilters).some(f => f)) 
+        ? `/konyvek/search?${params.toString()}` 
+        : `/konyvek?${params.toString()}`;
+
+      const res = await httpCommon.get(endpoint);
       const uj = Array.isArray(res.data) ? res.data : [];
 
-      setTalalatok(prev => searchPage === 1 ? uj : [...prev, ...uj]);
-      setHasMoreSearch(uj.length === 10);
+
+      const currentPage = (searchQuery || activeCategory || Object.values(safeFilters).some(f => f)) ? searchPage : page;
+      
+      setTalalatok(prev => currentPage === 1 ? uj : [...prev, ...uj]);
+      
+      if (searchQuery || activeCategory || Object.values(safeFilters).some(f => f)) {
+        setHasMoreSearch(uj.length === 10);
+      } else {
+        setHasMore(uj.length === 10);
+      }
+    } catch (err) {
+      console.error("Hiba a lekérésnél:", err);
     } finally {
       setLoading(false);
     }

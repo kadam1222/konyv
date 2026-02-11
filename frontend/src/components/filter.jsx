@@ -50,8 +50,11 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
   }, [searchParams]);
 
   const handleSelectFilter = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
+  setFilters(prev => ({
+    ...prev,
+    [key]: prev[key] === value ? '' : value 
+  }));
+};
 
   const handleApplyFilters = () => {
     const newParams = new URLSearchParams();
