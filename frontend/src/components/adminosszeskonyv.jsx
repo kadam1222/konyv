@@ -218,8 +218,10 @@ export default function AdminBook({ accessToken }) {
                             Leírás: {K.leiras ? K.leiras.substring(0, 100) + '...' : 'Nincs leírás'} <br />
                             Szerzők: {K.szerzok} <br />
                             Típus: {K.tipus_nev} <br />
+                            Raktáron: {K.raktar}
                             {K.fordítok && `Fordítók: ${K.fordítok}`} <br />
                             {K.illusztratorok && `Illusztrátorok: ${K.illusztratorok}`}
+
                         </span>
 
                         <div style={{ marginTop: "15px" }}>
@@ -240,11 +242,6 @@ export default function AdminBook({ accessToken }) {
                                     <select value={editedKonyvek[K.ISBN].nyelv_id || ""} onChange={(e) => handleChange(K.ISBN, "nyelv_id", e.target.value)}>
                                         {nyelvek.map(ny => <option key={ny.id} value={ny.id}>{ny.nyelv_nev}</option>)}
                                     </select>
-                                </div>
-
-                                <div className="order">
-                                    <label><strong>Raktáron:</strong></label>
-                                    <input value={editedKonyvek[K.ISBN].raktar || ""} onChange={(e) => handleChange(K.ISBN, "raktar", e.target.value)}> </input>
                                 </div>
 
                                 <div className="order">
@@ -273,6 +270,11 @@ export default function AdminBook({ accessToken }) {
                                     <select value={editedKonyvek[K.ISBN].tipus_id || ""} onChange={(e) => handleChange(K.ISBN, "tipus_id", e.target.value)}>
                                         {tipus.map(t => <option key={t.id} value={t.id}>{t.tipus_nev}</option>)}
                                     </select>
+                                </div>
+
+                                <div className="order">
+                                    <label><strong>Raktáron:</strong></label>
+                                    <input type="number" value={editedKonyvek[K.ISBN].raktar} min={0} onChange={(e)=> handleChange(K.ISBN, "raktar", e.target.value)}></input>
                                 </div>
 
                                 <div className="order">
