@@ -499,6 +499,18 @@ exports.insertAdat = async (req,res) =>{
   }
 }
 
+exports.deleteAdat = async (req,res) =>{
+  try{
+    const {...adatok} = req.body;
+    await konyvek.deleteAdat(adatok)
+    res.status(204).json()
+
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Szerver hiba a DELETE során" });
+  }
+}
+
 exports.osszesRendelesSearch = async (req,res) =>{
   try{
     const page = parseInt(req.query.page) || 1;

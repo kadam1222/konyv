@@ -639,6 +639,34 @@ static async insertAdat(adatok ){
   }
 }
 
+static async deleteAdat(adatok){
+  try{
+      const segedTablak = {
+      borito: ['borito', 'id'],
+      kiado: ['kiado', 'id'],
+      illusztracio: ['illusztracio', 'id'],
+      nyelv: ['nyelv', 'id'],
+      illusztrator: ['illusztrator', 'id'],
+      fordito: ['fordito', 'id'],
+      szerzo: ['szerző', 'id'],
+      kategoriak: ['kategoria', 'id']
+    };
+
+    for (const [kulcs, [tabla, oszlop]] of Object.entries(segedTablak)) {
+      if (adatok[kulcs]) {
+        await db.query(
+          `DELETE from ${tabla} WHERE ${oszlop} = ? `, 
+          [adatok[kulcs]]
+        );
+      }
+    }
+  }
+  catch(err){
+    console.error(err)
+    throw err
+  }
+}
+
 
 static async osszesRendelesSearchbar(page = 1, limit = 10, email = "", szamlaszam = "") {
   try {

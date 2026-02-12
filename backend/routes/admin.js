@@ -23,4 +23,7 @@ router.put("/rendeles_statusz_modositas",auth,requireAdmin,konyvekcontrollers.re
 router.delete('/konyvtorol',auth,requireAdmin, konyvekcontrollers.delete);
 
 router.get('/searchRendelesek',auth,requireAdmin, konyvekcontrollers.osszesRendelesSearch)
+
+router.delete('/deleteAdat', auth, requireAdmin, konyvekcontrollers.deleteAdat)
+
 module.exports = router;
