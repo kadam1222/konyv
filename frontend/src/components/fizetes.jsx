@@ -147,8 +147,8 @@ useEffect(() => {
         </Form.Group>
 
 
-<Button variant="primary" type="submit" disabled={loading}>
-    {loading ? "Feldolgozás..." : "Vásárlás!"}
+<Button id="fizetesleadasagomb" className='rendelesgombok' type="submit" disabled={loading}>
+    {loading ? "Feldolgozás..." : <strong>Vásárlás!</strong>} 
 </Button>
 
     </Form>
@@ -160,7 +160,6 @@ useEffect(() => {
                     <p key={item.ISBN}>{item.mennyiseg} x {item.cim}</p>
                 ))}
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
-                {kosar.length > 0 ? <Button className='rendelesgombok' onClick={() => {navigate("/fizetes")}}>Tovább a fizetéshez!</Button> : <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>}
                 <Button style={{marginBottom:"5px"}} className='rendelesgombok' onClick={()=>{navigate("/")}}>Vásárlás folytatása!</Button>
             </div> 
     </div>

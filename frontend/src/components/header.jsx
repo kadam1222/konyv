@@ -235,9 +235,18 @@ const handleLogout = async () => {
                     maxWidth: "90%",
                     padding: "25px",
                     borderRadius: "12px",
+                    backgroundColor: "#ceb795ff",
+                    padding: "40px 25px",   
+                    display: "flex",
+                    justifyContent: "center",
+                    position: "relative"
                   }}
                 >
                   {(close) => (
+                    <>
+                    <div className="popup-close-icon" onClick={close}>
+                        ×
+                      </div> 
                     <div
                       style={{
                         background: "#fff",
@@ -245,11 +254,11 @@ const handleLogout = async () => {
                         borderRadius: "8px",
                         width: "400px",
                         maxWidth: "90%",
+                        position: "relative",
+                        margin: "0 auto"
                       }}
                     >
-                     <div className="popup-close-icon" onClick={close}>
-                        ×
-                      </div> 
+                     
                       {showLoginForm ? (
                         
                         <LoginForm
@@ -272,7 +281,9 @@ const handleLogout = async () => {
 
                       
                     </div>
+                    </>
                   )}
+                  
                 </Popup>
                 }
                 <div style={{ position: "relative", display: "inline-block" }}>

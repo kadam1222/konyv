@@ -57,3 +57,12 @@
     z-index: 9999;
     width: 220px 
 }
+
+.popup-close-icon {
+  position: absolute;
+  top: -5px;      /* állítsd 4px-re ha még feljebb akarod */
+  right: 12px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+}
