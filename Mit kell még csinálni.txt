@@ -1,0 +1,16 @@
+Bevezető fél - egy oldal. 
+Times new roman 12-es méret sorkizárt 
+
+Beszűrás => oldaltörés hogy át csússzon a másik oldalra
+
+elrendezés töréspont szakaszos következő előző oldal töréspont utána elfordít és azt követően még egy töréspont hogy csak egy legyen elfordítva oda adatbázis kép 
+
+
+Szegélyek le az adatbázis táblákról
+
+Projekt indítása 
+clone függőségek töltése szerver indítás npm run dev 
+build készítés 
+
+lezárás mit lehet tovább fejleszteni + munkamegosztás 
+Ne minden varchar(255) legyen adatbázisban.
