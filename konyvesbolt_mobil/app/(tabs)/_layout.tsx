@@ -23,7 +23,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="book.fill" color={color} />,
         }}
       />
-      {/* Itt NINCS LoginLogout fül! */}
+
     </Tabs>
   );
 }

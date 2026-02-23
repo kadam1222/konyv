@@ -7,15 +7,15 @@ export default function AuthScreen() {
   const { login, register } = useAuth();
 
   // Form állapotok
-  const [name, setName] = useState('');
+  const [nev, setNev] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [jelszo, setJelszo] = useState('');
 
   const handleSubmit = async () => {
     if (isLogin) {
-      await login(email, password);
+      await login(email, jelszo);
     } else {
-      const success = await register(name, email, password);
+      const success = await register(nev, email, jelszo);
       if (success) setIsLogin(true); // Regisztráció után dobjuk át a loginra
     }
   };
@@ -48,8 +48,8 @@ export default function AuthScreen() {
             <TextInput
               style={styles.input}
               placeholder="Teljes név"
-              value={name}
-              onChangeText={setName}
+              value={nev}
+              onChangeText={setNev}
             />
           )}
           <TextInput
@@ -64,8 +64,8 @@ export default function AuthScreen() {
             style={styles.input}
             placeholder="Jelszó"
             secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+            value={jelszo}
+            onChangeText={setJelszo}
           />
 
           <TouchableOpacity style={styles.button} onPress={handleSubmit}>
