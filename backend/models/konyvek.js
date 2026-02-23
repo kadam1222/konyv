@@ -639,31 +639,56 @@ static async insertAdat(adatok ){
   }
 }
 
-static async deleteAdat(adatok){
-  try{
-      const segedTablak = {
-      borito: ['borito', 'id'],
-      kiado: ['kiado', 'id'],
-      illusztracio: ['illusztracio', 'id'],
-      nyelv: ['nyelv', 'id'],
-      illusztrator: ['illusztrator', 'id'],
-      fordito: ['fordito', 'id'],
-      szerzo: ['szerző', 'id'],
-      kategoriak: ['kategoria', 'id']
+static async deleteAdat(adatok) {
+  try {
+    const alapMezok = {
+      borito: { tabla: 'borito', termekOszlop: 'borito_id' },
+      kiado: { tabla: 'kiado', termekOszlop: 'kiado_id' },
+      nyelv: { tabla: 'nyelv', termekOszlop: 'nyelv_id' },
+      kategoriak: { tabla: 'kategoria', termekOszlop: 'kategoria_id' },
+      illusztracio: { tabla: 'illusztracio', termekOszlop: 'illusztracio' }
     };
 
-    for (const [kulcs, [tabla, oszlop]] of Object.entries(segedTablak)) {
+    const kapcsololtMezok = {
+      szerzo: { tabla: 'szerző', kapcsolotabla: 'termek_szerzo', fk: 'szerzo_id' },
+      fordito: { tabla: 'fordito', kapcsolotabla: 'termek_forditok', fk: 'fordito_id' },
+      illusztrator: { tabla: 'illusztrator', kapcsolotabla: 'termek_illusztratorok', fk: 'illusztrator_id' }
+    };
+
+    for (const [kulcs, config] of Object.entries(alapMezok)) {
       if (adatok[kulcs]) {
-        await db.query(
-          `DELETE from ${tabla} WHERE ${oszlop} = ? `, 
-          [adatok[kulcs]]
+        const id = adatok[kulcs];
+        const [hasTermek] = await db.query(
+          `SELECT COUNT(*) as count FROM termek WHERE ${config.termekOszlop} = ?`,
+          [id]
         );
+
+        if (hasTermek[0].count > 0) {
+          throw new Error("Az adat használatban van egy terméknél!");
+        }
+        await db.query(`DELETE FROM ${config.tabla} WHERE id = ?`, [id]);
+        return;
       }
     }
-  }
-  catch(err){
-    console.error(err)
-    throw err
+    for (const [kulcs, config] of Object.entries(kapcsololtMezok)) {
+      if (adatok[kulcs]) {
+        const id = adatok[kulcs];
+        const [hasRelation] = await db.query(
+          `SELECT COUNT(*) as count FROM ${config.kapcsolotabla} WHERE ${config.fk} = ?`,
+          [id]
+        );
+
+        if (hasRelation[0].count > 0) {
+          throw new Error("Ez a személy még hozzá van rendelve egy könyvhöz!");
+        }
+        await db.query(`DELETE FROM ${config.tabla} WHERE id = ?`, [id]);
+        return;
+      }
+    }
+
+  } catch (err) {
+    console.error("Törlési hiba a szerveren:", err.message);
+    throw err;
   }
 }
 

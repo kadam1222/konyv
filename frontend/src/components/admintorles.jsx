@@ -52,13 +52,13 @@ export default function AdminSegedAdatTorles({ accessToken, onSiker }) {
             if (onSiker) onSiker();
         } catch (err) {
             console.error("Törlési hiba:", err);
-            alert("Hiba! Valószínűleg kényszerfeltétel hiba (az adat használatban van).");
+            alert("Hiba! Az adat használatban van.");
         }
     }
 };
 
     return (
-        <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "10px", backgroundColor: "#dfcdb4" }}>
+        <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
             <h4>Kis adatok törlése</h4>
             
             <Form.Group className="mb-3">
