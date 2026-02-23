@@ -70,7 +70,9 @@ useEffect(() => {
                     szallitas_mod: shippingMethod,
                     termekek: kosar.map(item => ({
                         ISBN: item.ISBN,
-                        darab: item.mennyiseg
+                        darab: item.mennyiseg,
+                        ar:item.ar,
+                        cim: item.cim
                     })),
                     nev,
                     email,
