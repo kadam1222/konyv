@@ -1,27 +1,29 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-import { AuthProvider } from '@/auth/AuthProvider';
+function RootLayoutNav() {
+  const { user } = useAuth(); 
+  const segments = useSegments();
+  const router = useRouter();
+  const [isReady, setIsReady] = useState(false);
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+  useEffect(() => {
+    setIsReady(true);
+  }, []);
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+  useEffect(() => {
+    if (!isReady) return;
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+    const inTabsGroup = segments[0] === '(tabs)';
+    if (!user && inTabsGroup) {
+      router.replace('/LoginLogout');
+    } 
+    else if (user && segments[0] === 'LoginLogout') {
+      router.replace('/(tabs)');
+    }
+  }, [user, segments, isReady]);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AuthProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }}/>
-        </Stack>
-      </AuthProvider>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Stack>
+      <Stack.Screen name="LoginLogout" options={{ headerShown: false, title: 'Belépés' }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    </Stack>
   );
 }
