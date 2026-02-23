@@ -291,6 +291,7 @@ exports.Profilleker = async (req, res) => {
 };
 
 exports.szamlakeszites = async (req, res) => {
+  console.log("Beérkező adatok:", req.body)
   try {
     const { email } = req.user; 
     const { fizetesi_mod, szallitas_mod, termekek, lakcim, teljesites_kelte } = req.body; 
@@ -300,6 +301,17 @@ exports.szamlakeszites = async (req, res) => {
         message: "Hiányzó fizetési mód, szállítási mód vagy termékek"
       });
     }
+  for (const item of termekek) {
+      const valosAdat = await Konyvek.getbyISBN(item.ISBN);
+      if (!valosAdat) {
+        return res.status(404).json({ message: "Sajnos az egyik termék nem található!" });
+    }
+      if (Number(valosAdat.ar) !== Number(item.ar) || valosAdat.cim !== item.cim) {
+          return res.status(400).json({ 
+              message: "A kosár tartalma időközben megváltozott. Kérjük rakja újra a kosarát!" 
+          });
+      }
+  }
     const vegosszeg = await Konyvek.vegosszegSzamitas(termekek, szallitas_mod)
     for (const item of termekek) {
       await Konyvek.darabszam_modositas(item.darab, item.ISBN);

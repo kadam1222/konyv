@@ -30,10 +30,8 @@ function App() {
   const [hasMoreSearch, setHasMoreSearch] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-
   const [accessToken, setAccessToken] = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
-
   const [activeFilters, setActiveFilters] = useState({});
   const [hasSearchOrCategory, setHasSearchOrCategory] = useState(false);
 
