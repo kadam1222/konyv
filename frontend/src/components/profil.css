@@ -1,46 +1,149 @@
-.fodivprofil{
-        display: flex;
-    border: 3px solid #7641345b ;
-    width: 450px;
+.profil-container {
+    padding: 5px 10px;
+    display: flex;
     flex-direction: column;
-    justify-content: space-evenly;  
-    margin: 15px auto 15px auto;
-    
+    align-items: center;
+    min-height: 100vh;
 }
 
-.fodivprofil > h2{
+
+.back-link {
+    text-decoration: none;
+    color: #8c6b2f;
+    font-weight: 600;
+    margin-bottom: 25px;
+    transition: 0.3s;
+}
+
+.back-link:hover {
+    color: #3a2f1f;
+}
+
+
+.profil-card {
+    background: white;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(181, 155, 120, 0.2); 
+    border: 1px solid #dcc4a4; 
+    overflow: hidden;
+}
+
+
+.profil-header {
+    background: linear-gradient(to bottom, #dcc4a4, #c9ad86); 
+    padding: 40px 30px;
     text-align: center;
-    margin-top: 5px;
+    color: #3a2f1f;
 }
 
-.fodivprofil > p {
-    margin-left: 10px;
-    font-weight: bold;
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    background: #fcf9f3;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.profil-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.profil-body {
+    padding: 30px;
+}
+
+.info-group {
+    margin-bottom: 5px;
+}
+
+.info-group label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #a68b6d;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.display-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-height: 50px;
 }
 
-.fodivprofil button {
-    margin-right: 10px;
+.display-row span {
+    font-size: 17px;
+    color: #3a2f1f;
+    font-weight: 500;
 }
 
-.profilgomb{
-    padding: 12px 28px;
-  border-radius: 10px;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  background-color: #dbc38c;
-  color: #3a2f1f;
-  transition: all 0.2s ease;
+.input-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 10px;
 }
 
-.profilgomb:hover{
-    background-color: #8c6b2f;
+.input-row input {
+    padding: 12px;
+    border: 2px solid #dcc4a4;
+    border-radius: 8px;
+    background-color: #fdfaf6;
+    color: #3a2f1f;
+    outline: none;
+    font-size: 16px;
+}
+
+.input-row input:focus {
     border-color: #8c6b2f;
-    color: #fff;
-    box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
+}
+
+.action-btns {
+    display: flex;
+    gap: 10px;
+}
+
+.profilgomb {
+    padding: 8px 20px  ;
+    border-radius: 8px  ;
+    border: none  ;
+    font-size: 14px  ;
+    font-weight: 600  ;
+    cursor: pointer  ;
+    background-color: #dbc38c  ; 
+    color: #3a2f1f  ;
+    transition: all 0.2s ease  ;
+}
+
+.profilgomb:hover {
+    background-color: #8c6b2f  ;
+    color: #fff  ;
     transform: translateY(-2px);
+}
+
+.profilgomb.mentés {
+    background-color: #8c6b2f  ;
+    color: white  ;
+}
+
+.profilgomb.mégse {
+    background-color: #e2d1b9  ;
+    color: #3a2f1f  ;
+}
+
+
+hr {
+    border: 0;
+    border-top: 1px solid #eee5d8;
+    margin: 20px 0;
 }

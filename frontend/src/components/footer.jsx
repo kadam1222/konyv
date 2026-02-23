@@ -28,7 +28,7 @@ export default function Footer() {
       <hr className="line" />
 
       <div className="bottomSection">
-        <p className="copy">© 2025 BookBar. All rights reserved.</p>
+        <p className="copy">© 2026 BookBar. All rights reserved.</p>
 
         <div className="iconRow">
           <a

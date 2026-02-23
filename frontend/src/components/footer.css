@@ -37,13 +37,13 @@
   flex-wrap: wrap;
 }
 .linksRow a {
-  color: #ffffff;
+  color: black;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .linksRow a:hover {
-  color: #dbc38c;
+  color: rgba(0, 0, 0, 0.705);
 }
 
 
@@ -63,7 +63,7 @@
 }
 
 .copy {
-  color: #f2e5bb;
+  color: black;
 }
 
 
@@ -75,10 +75,10 @@
 
 .icon {
   font-size: 20px;
-  color: #ffffff;
+  color: black;
   transition: color 0.2s ease;
 }
 
 .icon:hover {
-  color: #dbc38c;
+  color: rgba(0, 0, 0, 0.705);
 }
