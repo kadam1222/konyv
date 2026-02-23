@@ -9,7 +9,7 @@ export default function AdminBook({ accessToken }) {
     const [showInput, setShowInput] = useState({});
     const [editedKonyvek, setEditedKonyvek] = useState({});
     
-    // Metaadatok a választólistákhoz
+
     const [nyelvek, setNyelvek] = useState([]);
     const [kiado, setKiado] = useState([]);
     const [borito, setBorito] = useState([]);
@@ -19,8 +19,8 @@ export default function AdminBook({ accessToken }) {
     const [forditok, setForditok] = useState([]);
     const [kategoria, setKategoria] = useState([]);
     const [tipus, setTipus] = useState([]);
+    const [raktar, setRaktar] = useState(1);
 
-    // Görgetés és lapozás állapota
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
@@ -28,14 +28,13 @@ export default function AdminBook({ accessToken }) {
 
     const observerRef = useRef();
 
-    // --- 1. ADATBETÖLTÉS (Lapozás alapú) ---
     useEffect(() => {
         const fetchBooks = async () => {
             if (!accessToken || !hasMore) return;
 
             try {
                 setLoading(true);
-                const response = await httpCommon.get(`/konyvek/adminosszeskonyv?page=${page}&limit=10`, {
+                const response = await httpCommon.get(`/admin/adminosszeskonyv?page=${page}&limit=10`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
 
@@ -62,7 +61,7 @@ export default function AdminBook({ accessToken }) {
         fetchBooks();
     }, [page, accessToken]);
 
-    // --- 2. INTERSECTION OBSERVER (Görgetés figyelő) ---
+
     const lastItemRef = useCallback(node => {
         if (loading) return;
         if (observerRef.current) observerRef.current.disconnect();
@@ -76,7 +75,7 @@ export default function AdminBook({ accessToken }) {
         if (node) observerRef.current.observe(node);
     }, [loading, hasMore]);
 
-    // --- 3. METAADATOK BETÖLTÉSE ---
+
     useEffect(() => {
         if (accessToken) {
             const Fetchmodositas = async (endpoint, setter) => {
@@ -98,7 +97,7 @@ export default function AdminBook({ accessToken }) {
         }
     }, [accessToken]);
 
-    // --- 4. MODOSÍTÁSI LOGIKA ---
+
     const handleToggleInput = (isbn, konyv) => {
         setShowInput(prev => ({ ...prev, [isbn]: !prev[isbn] }));
 
@@ -147,7 +146,7 @@ export default function AdminBook({ accessToken }) {
     const konyvTorles = async (ISBN) => {
         if (!window.confirm("Biztosan törölni szeretnéd ezt a könyvet?")) return;
         try {
-            await httpCommon.delete("/konyvek/konyvtorol", {
+            await httpCommon.delete("/admin/konyvtorol", {
                 data: { ISBN },
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
@@ -170,13 +169,13 @@ export default function AdminBook({ accessToken }) {
                 fordito_ids: fordito_ids || [] 
             };
 
-            await httpCommon.put("/konyvek/konyvmodositas", payload, {
+            await httpCommon.put("/admin/konyvmodositas", payload, {
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
 
             alert("Sikeres módosítás!");
             setShowInput(prev => ({ ...prev, [ISBN]: false }));
-            // Frissítjük a lokális listát a módosított adatokkal (opcionális, de ajánlott)
+
             window.location.reload(); 
         } catch (err) {
             console.error("Hiba:", err);
@@ -219,8 +218,10 @@ export default function AdminBook({ accessToken }) {
                             Leírás: {K.leiras ? K.leiras.substring(0, 100) + '...' : 'Nincs leírás'} <br />
                             Szerzők: {K.szerzok} <br />
                             Típus: {K.tipus_nev} <br />
+                            Raktáron: {K.raktar}
                             {K.fordítok && `Fordítók: ${K.fordítok}`} <br />
                             {K.illusztratorok && `Illusztrátorok: ${K.illusztratorok}`}
+
                         </span>
 
                         <div style={{ marginTop: "15px" }}>
@@ -272,6 +273,11 @@ export default function AdminBook({ accessToken }) {
                                 </div>
 
                                 <div className="order">
+                                    <label><strong>Raktáron:</strong></label>
+                                    <input type="number" value={editedKonyvek[K.ISBN].raktar} min={0} onChange={(e)=> handleChange(K.ISBN, "raktar", e.target.value)}></input>
+                                </div>
+
+                                <div className="order">
                                     <label><strong>Leírás:</strong></label>
                                     <textarea style={{ width: "100%", minHeight: "100px" }} value={editedKonyvek[K.ISBN].leiras || ""} onChange={(e) => handleChange(K.ISBN, "leiras", e.target.value)} />
                                 </div>
@@ -293,7 +299,6 @@ export default function AdminBook({ accessToken }) {
     );
 }
 
-// MultiSelect segédkomponens
 const MultiSelectDropdown = ({ label, options, selectedIds, onToggle, nameKey }) => {
     const [isOpen, setIsOpen] = useState(false);
     return (

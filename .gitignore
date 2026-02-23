@@ -11,6 +11,7 @@
 /mobilapp
 # testing
 /frontend/coverage
+/Mit kell még csinálni.txt
 
 # production
 /frontend/build

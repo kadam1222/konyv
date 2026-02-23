@@ -5,10 +5,11 @@ import Button from 'react-bootstrap/Button';
 
 export default function AdminUser( {accessToken}){
     const [osszesUser, setOsszesUser] = useState([])
+    const [jelenlegi_admin_email, setJelenlegi_admin_email] = useState("")
 
     const fetchData = async () => {
         try {
-            const response = await httpCommon.get("/konyvek/adminuser", {
+            const response = await httpCommon.get("/admin/adminuser", {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
@@ -29,7 +30,7 @@ export default function AdminUser( {accessToken}){
 
 const usertorles = async (email) =>{
         try{
-            const response = await httpCommon.put("/konyvek/adminuserdelete", 
+            const response = await httpCommon.put("/admin/adminuserdelete", 
                 { email },
                 {
                 headers: {
@@ -46,7 +47,7 @@ const usertorles = async (email) =>{
 
 const jogosultsagupdate = async (email,jogosultsag) =>{
         try{
-            const response = await httpCommon.put("/konyvek/updatejogosultsag", 
+            const response = await httpCommon.put("/admin/updatejogosultsag", 
                 { email, jogosultsag },
                 {
                 headers: {
@@ -60,11 +61,32 @@ const jogosultsagupdate = async (email,jogosultsag) =>{
             console.error(err)
         }
 }
+  useEffect(() => {
+    const fetchEmail = async () => {
+      try {
+        const response = await httpCommon.get("/konyvek/profil", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        setJelenlegi_admin_email(response.data.email);
+        console.log(jelenlegi_admin_email)
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    if (accessToken) fetchEmail();
+  }, [accessToken]);
 
     return(
         <>
         {osszesUser.map((U, index) =>(
-            <div className="order">
+            
+            jelenlegi_admin_email !== U.email &&(
+            <div className="order" key={index}>
             <span style={{marginBottom:"10px"}}>Username: {U.vevo_nev}<br/> 
             Lakcím: {U.lakcim ? U.lakcim : "Nincs felvett adat"} <br/> 
             Email: {U.email} <br/> 
@@ -78,6 +100,7 @@ const jogosultsagupdate = async (email,jogosultsag) =>{
             </span>
 
             </div>
+            )
         ))}
         </>
     )

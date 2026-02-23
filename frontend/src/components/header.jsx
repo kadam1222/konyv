@@ -4,6 +4,8 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import Toast from 'react-bootstrap/Toast';
+import ToastContainer from 'react-bootstrap/ToastContainer';
 import { useEffect, useState } from "react";
 import { NavItem } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
@@ -13,6 +15,7 @@ import "reactjs-popup/dist/index.css";
 import LoginForm from "./loginform";
 import RegisterForm from "./registerform";
 import { useNavigate } from "react-router-dom";
+import "./header.css"
 
 export default function Header({ onSearch, accessToken, setAccessToken }) {
    const navigate = useNavigate();
@@ -24,6 +27,9 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   const [isAdmin, setIsAdmin] = useState(false)
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState([])
+  const [showToast, setShowToast] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState(null);
+  
 
 
   const fetchData = async () => {
@@ -72,6 +78,23 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   onSearch(keresett, 1, null, {});
 };
 
+useEffect(() => {
+    const updateCartCount = () => {
+      const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
+      const count = kosar.reduce((sum, item) => sum + item.mennyiseg, 0);
+      setCartCount(count);
+
+
+      if (kosar.length > 0) {
+        const lastItem = kosar[kosar.length - 1];
+        setLastAddedItem(lastItem.cim);
+        setShowToast(true);
+      }
+    };
+
+    window.addEventListener("storage", updateCartCount);
+    return () => window.removeEventListener("storage", updateCartCount);
+  }, []);
 
 
   const handleFilter = async (katNev) => {
@@ -80,11 +103,13 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   };
 
   const CategoryDropdown = ({ title }) => (
-    <NavDropdown title={title} id={`nav-${title}`}>
-      {fokat
-        .filter((f) => !f.katazon)
-        .map((f) => (
-          <NavDropdown key={f.id} title={f.kat_nev} id={`nav-sub-${f.id}`}>
+  <NavDropdown title={title} id={`nav-${title}`}>
+    {fokat
+      .filter((f) => !f.katazon)
+      .map((f) => (
+
+        <div className="dropdown-submenu" key={f.id}>
+          <NavDropdown title={f.kat_nev} id={`nav-sub-${f.id}`} drop="end">
             {fokat.filter((k) => k.katazon === f.id).length > 0 ? (
               fokat
                 .filter((k) => k.katazon === f.id)
@@ -102,9 +127,10 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
               </NavDropdown.Item>
             )}
           </NavDropdown>
-        ))}
-    </NavDropdown>
-  );
+        </div>
+      ))}
+  </NavDropdown>
+);
 
   const Profildropdown = () => (
     <NavDropdown title="Profilom" id="asd">
@@ -115,6 +141,7 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
           {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminuser")}>Felhasználók módosítása</NavDropdown.Item> : ""}
           {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminbook")}>Könyvek módosítása</NavDropdown.Item> : ""}
           {isAdmin ? <NavDropdown.Item onClick={() => navigate("/admininsert")}>Új adatok felvétele</NavDropdown.Item> : ""}
+          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/admintorles")}>Adatok törlése</NavDropdown.Item> : ""}
           <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );
@@ -141,7 +168,7 @@ const handleLogout = async () => {
       <Navbar expand="lg">
         <NavItem style={{ marginLeft: "14px" }}>
           <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
-            <h2>Bolt</h2>
+            <h2>BookBar</h2>
           </a>
         </NavItem>
 
@@ -208,9 +235,18 @@ const handleLogout = async () => {
                     maxWidth: "90%",
                     padding: "25px",
                     borderRadius: "12px",
+                    backgroundColor: "#ceb795ff",
+                    padding: "40px 25px",   
+                    display: "flex",
+                    justifyContent: "center",
+                    position: "relative"
                   }}
                 >
                   {(close) => (
+                    <>
+                    <div className="popup-close-icon" onClick={close}>
+                        ×
+                      </div> 
                     <div
                       style={{
                         background: "#fff",
@@ -218,11 +254,11 @@ const handleLogout = async () => {
                         borderRadius: "8px",
                         width: "400px",
                         maxWidth: "90%",
+                        position: "relative",
+                        margin: "0 auto"
                       }}
                     >
-                     <div className="popup-close-icon" onClick={close}>
-                        ×
-                      </div> 
+                     
                       {showLoginForm ? (
                         
                         <LoginForm
@@ -245,29 +281,36 @@ const handleLogout = async () => {
 
                       
                     </div>
+                    </>
                   )}
+                  
                 </Popup>
                 }
-                <a href="/cart" style={{ position: "relative" }}>
-                  <TfiShoppingCartFull />
-                  {cartCount > 0 && (
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: "-8px",
-                        right: "-8px",
-                        background: "red",
-                        color: "white",
-                        borderRadius: "50%",
-                        padding: "2px 6px",
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {cartCount}
-                    </span>
-                  )}
-                </a>
+                <div style={{ position: "relative", display: "inline-block" }}>
+              <a href="/cart" style={{ color: "#3a3a3a", fontSize: "20px" }}>
+                <TfiShoppingCartFull />
+                {cartCount > 0 && (
+                  <span style={{ position: "absolute",top: "-8px",right: "-8px",background: "red",color: "white",borderRadius: "50%",padding: "2px 6px",fontSize: "12px",fontWeight: "bold", }}>
+                    {cartCount}
+                  </span>
+                )}
+              </a>
+
+
+              <div className="toast_div">
+               <Toast onClose={() => setShowToast(false)} show={showToast} delay={2500} autohide style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.15)", border: "1px solid #ceb795" }} >
+                  <Toast.Body style={{ fontSize: "13px", backgroundColor: "#fff", borderRadius: "8px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span style={{ color: "green", fontWeight: "bold" }}>✓</span>
+                      <div>
+                        <strong>Hozzáadva:</strong><br/>
+                        <span style={{ color: "#555" }}>{lastAddedItem}</span>
+                      </div>
+                    </div>
+                  </Toast.Body>
+                </Toast>
+              </div>
+            </div>
 
               </NavItem>
             </Navbar.Collapse>

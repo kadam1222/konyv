@@ -1,8 +1,8 @@
 .teljesar{
     border: 3px solid #7641345b ;
-    width: 300px;
+    width: 310px;
     margin-left: 100px;
-    max-height: 300px;
+    max-height: 350px;
     margin-top: 20px;
     margin-bottom: 1%;
     background-color: #ebdaaf;
@@ -27,24 +27,29 @@
 .termekek{
     display: flex;
     border-bottom: 3px solid #7641345b ;
-
+    justify-content: flex-start; 
+    align-items: center;
 }
 
 .termekek > img{
     width: 100px;
     height: 150px;
-    margin-top: 5%;
-    margin-bottom: 5%;
-    margin-left: 5%;
+    margin: 15px;
+    object-fit: contain;
 }
 
 .termekek > input{
-    width: 10%;
-    height: 15%;
+    width: 60px;
+    height: 35px;
     margin-top: auto;
     margin-bottom: auto;
-    margin-right: 30px;
+    margin-left: 20px;
+    margin-right: 5px;
 
+}
+
+.termekek:last-child {
+    border-bottom: none;
 }
 
 .Termekinfo{
@@ -54,8 +59,8 @@
     margin-top: 5%;
     margin-bottom: 1%;
     padding: 0%;
-    min-width: 450px;
-    max-width: 450px;
+    min-width: 350px;
+    flex-grow: 1;
 }
 
 .RendelesInfo{
@@ -108,7 +113,7 @@
     margin-top: auto;
     margin-bottom: auto;
     margin-left: 5px;
-    margin-right: 0;
+    margin-right: 30px;
 }
 
 .rendelesgombok:hover {

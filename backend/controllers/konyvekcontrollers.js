@@ -293,9 +293,9 @@ exports.Profilleker = async (req, res) => {
 exports.szamlakeszites = async (req, res) => {
   try {
     const { email } = req.user; 
-    const { fizetesi_mod, szallitas_mod, termekek } = req.body; 
+    const { fizetesi_mod, szallitas_mod, termekek, lakcim, teljesites_kelte } = req.body; 
 
-    if (!fizetesi_mod || !szallitas_mod || !termekek || termekek.length === 0) {
+    if (!fizetesi_mod || !szallitas_mod || !termekek || termekek.length === 0 || !lakcim) {
       return res.status(400).json({
         message: "Hiányzó fizetési mód, szállítási mód vagy termékek"
       });
@@ -304,7 +304,7 @@ exports.szamlakeszites = async (req, res) => {
     for (const item of termekek) {
       await Konyvek.darabszam_modositas(item.darab, item.ISBN);
     }
-    const { szamla_id } = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg); 
+    const { szamla_id } = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg, lakcim, teljesites_kelte); 
     await Konyvek.rendelesSnapshotFeltoltese(szamla_id, termekek);
 
     res.status(201).json({
@@ -364,8 +364,8 @@ exports.OsszesRendeles = async (req, res) =>{
 exports.rendeles_statusza_modositasa = async (req, res) =>{
   try{
     const {r_statusz} = req.body
-    const {szamlaszam }= req.body
-    const result = await Konyvek.rendeles_statusza_modositas(r_statusz, szamlaszam)
+    const {szamlaszam, teljesites_kelte }= req.body
+    const result = await Konyvek.rendeles_statusza_modositas(r_statusz, teljesites_kelte ,szamlaszam)
     if (result) res.json({message: "Rendelés státusza sikeresen megváltoztatva"})
   }
   catch(err){
@@ -496,6 +496,18 @@ exports.insertAdat = async (req,res) =>{
   }catch (err) {
     console.error(err);
     res.status(500).json({ message: "Szerver hiba az INSERT során" });
+  }
+}
+
+exports.deleteAdat = async (req,res) =>{
+  try{
+    const {...adatok} = req.body;
+    await konyvek.deleteAdat(adatok)
+    res.status(204).json()
+
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Szerver hiba a DELETE során" });
   }
 }
 
