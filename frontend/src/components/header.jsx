@@ -6,7 +6,7 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { NavItem } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
 import http from "../http-common";
@@ -29,7 +29,8 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   const [user, setUser] = useState([])
   const [showToast, setShowToast] = useState(false);
   const [lastAddedItem, setLastAddedItem] = useState(null);
-  
+  const prevCartCount = useRef(0);
+  const prevKosarRef = useRef([]);
 
 
   const fetchData = async () => {
@@ -59,17 +60,47 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
     fetchUser()
   }, [accessToken])
 
-  useEffect(() => {
-    const updateCartCount = () => {
-        const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
-        const count = kosar.reduce((sum, item) => sum + item.mennyiseg, 0);
-        setCartCount(count);
-      };
-      updateCartCount();
-      window.addEventListener("storage", updateCartCount);
-      fetchData();
-      return () => window.removeEventListener("storage", updateCartCount);
-  }, []);
+useEffect(() => {
+  const updateCart = () => {
+    const ujKosar = JSON.parse(localStorage.getItem("kosar")) || [];
+    const regiKosar = prevKosarRef.current;
+
+    const ujOsszDarab = ujKosar.reduce((sum, item) => sum + item.mennyiseg, 0);
+    const regiOsszDarab = regiKosar.reduce((sum, item) => sum + item.mennyiseg, 0);
+
+    if (ujOsszDarab > regiOsszDarab) {
+      let hozzaadottTermek = null;
+
+      ujKosar.forEach((ujItem) => {
+        const regiMegfelelo = regiKosar.find((r) => r.ISBN === ujItem.ISBN);
+        
+
+        if (!regiMegfelelo || ujItem.mennyiseg > regiMegfelelo.mennyiseg) {
+          hozzaadottTermek = ujItem;
+        }
+      });
+
+      if (hozzaadottTermek) {
+        setLastAddedItem(hozzaadottTermek.cim);
+        setShowToast(false); 
+        setTimeout(() => setShowToast(true), 10); 
+      }
+    }
+
+    setCartCount(ujOsszDarab);
+    prevKosarRef.current = ujKosar; 
+  };
+
+  window.addEventListener("storage", updateCart);
+  
+  const alapKosar = JSON.parse(localStorage.getItem("kosar")) || [];
+  setCartCount(alapKosar.reduce((sum, item) => sum + item.mennyiseg, 0));
+  prevKosarRef.current = alapKosar;
+
+  return () => window.removeEventListener("storage", updateCart);
+}, []);
+
+
  const handleSearch = () => {
   if (!keresett.trim()) return;
 
@@ -77,24 +108,6 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
 
   onSearch(keresett, 1, null, {});
 };
-
-useEffect(() => {
-    const updateCartCount = () => {
-      const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
-      const count = kosar.reduce((sum, item) => sum + item.mennyiseg, 0);
-      setCartCount(count);
-
-
-      if (kosar.length > 0) {
-        const lastItem = kosar[kosar.length - 1];
-        setLastAddedItem(lastItem.cim);
-        setShowToast(true);
-      }
-    };
-
-    window.addEventListener("storage", updateCartCount);
-    return () => window.removeEventListener("storage", updateCartCount);
-  }, []);
 
 
   const handleFilter = async (katNev) => {
