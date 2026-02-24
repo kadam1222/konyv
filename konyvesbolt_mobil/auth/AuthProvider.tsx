@@ -1,12 +1,12 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { api, setAccessToken } from "../api/api"; // itt legyen a jwt/axios logika
 import { Alert } from 'react-native';
 
 interface AuthContextType {
   user: { email: string, name: string } | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, jelszo: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<boolean>
+  register: (nev: string, email: string, jelszo: string) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -27,10 +27,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   };
-
-  const login = async (email: string, password: string) => {
+  
+  const login = async (email: string, jelszo: string) => {
     try {
-      const res = await api.post("/auth/login", { email, password }, { withCredentials: true });
+      const res = await api.post("/auth/login", { email, jelszo }, { withCredentials: true });
       const token = res.data.accessToken;
       setAccessToken(token);
        const userProfile = await fetchUserProfile(token);
@@ -49,9 +49,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (nev: string, email: string, jelszo: string) => {
   try {
-    await api.post("/auth/register", { name, email, password });
+    await api.post("/auth/register", { nev, email, jelszo });
     Alert.alert("Sikeres regisztráció!");
     return true;
   } catch (error: any) {
