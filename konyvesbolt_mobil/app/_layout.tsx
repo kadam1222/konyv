@@ -11,7 +11,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
@@ -19,7 +19,7 @@ function RootLayoutNav() {
   useEffect(() => { setIsReady(true); }, []);
 
   useEffect(() => {
-    if (!isReady) return;
+    if (!isReady || isLoading) return;
 
     const inTabsGroup = segments[0] === '(tabs)';
 
@@ -31,8 +31,8 @@ function RootLayoutNav() {
     else if (user && segments[0] === 'LoginLogout') {
       router.replace('/(tabs)');
     }
-  }, [user, segments, isReady]);
-
+  }, [user, segments, isReady, isLoading]);
+  if (isLoading) return null;
   return (
     <Stack>
       <Stack.Screen name="LoginLogout" options={{ headerShown: false }} />

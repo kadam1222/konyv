@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import * as SecureStore from "expo-secure-store"
 import { api, setAccessToken } from "../api/api"; // itt legyen a jwt/axios logika
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 
 interface AuthContextType {
   user: { email: string, name: string } | null;
@@ -13,6 +14,43 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<{ email: string,name:string } | null>(null);  
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() =>{
+    const initializeAuth = async () =>{
+try {
+      let token = null;
+
+      if (Platform.OS !== 'web') {
+        // MOBILON: Először megnézzük a tárolót
+        token = await SecureStore.getItemAsync('userToken');
+      }
+
+      // Ha van token (mobilon) vagy próbálkozunk sütivel (weben)
+      const res = await api.post("/auth/refresh", 
+        { token: token }, // Mobilon body-ban küldjük a refresh tokent
+        { withCredentials: true }
+      );
+
+      const newAccessToken = res.data.accessToken;
+      setAccessToken(newAccessToken);
+      
+      const userProfile = await fetchUserProfile(newAccessToken);
+      setUser(userProfile);
+      
+      // Mobilon frissítjük az elmentett access tokent is
+      if (Platform.OS !== 'web') {
+        await SecureStore.setItemAsync('userToken', newAccessToken);
+      }
+    }
+      catch (err){
+        console.log(err)
+      }
+      finally {
+        setIsLoading(false)
+      }
+    }
+    initializeAuth()
+  },[])
   const fetchUserProfile = async (token: string) => {
     try {
       const res = await api.get("/konyvek/profil", {
@@ -31,10 +69,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, jelszo: string) => {
     try {
       const res = await api.post("/auth/login", { email, jelszo }, { withCredentials: true });
-      const token = res.data.accessToken;
-      setAccessToken(token);
-       const userProfile = await fetchUserProfile(token);
-       setUser(userProfile); // Beállítjuk a teljes felhasználói profilt
+      const {accessToken, refreshToken} = res.data;
+      setAccessToken(accessToken);
+       const userProfile = await fetchUserProfile(accessToken);
+       setUser(userProfile); 
+      if (Platform.OS !== 'web') {
+      await SecureStore.setItemAsync('userToken', accessToken);
+      await SecureStore.setItemAsync('refreshToken', refreshToken);
+    }
     } catch (error: any) {
       Alert.alert('Hibás belépés');
       // Alert.alert('Hibás belépés', error.message);
@@ -44,9 +86,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await api.post("/auth/logout", {}, { withCredentials: true });
-    setAccessToken(null);
-    setUser(null);
+    try{
+      await api.post("/auth/logout", {}, { withCredentials: true });
+    }
+    finally{
+      setAccessToken(null);
+      setUser(null);
+    }
   };
 
   const register = async (nev: string, email: string, jelszo: string) => {
@@ -60,7 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 };
   return (
-    <AuthContext.Provider value={{ user, login, logout, register }}>
+    <AuthContext.Provider value={{ user, login, logout, register, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
