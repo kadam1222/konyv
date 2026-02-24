@@ -44,28 +44,13 @@ export default function Kosar( {accesToken} ){
                 <span>{item.ar} Ft</span><br />
             </div>
 
-            <input
-                type="number"
-                min={1}
-                value={item.mennyiseg}
-                onChange={(e) => {
-                const ujKosar = [...kosar];
-                ujKosar[index].mennyiseg = Number(e.target.value);
-                setKosar(ujKosar);
-                localStorage.setItem("kosar", JSON.stringify(ujKosar));
-                }}
-                
-            />
-            <span style={{margin:"auto",marginLeft:"0px",marginRight:"15px"}}>db</span>
-            <FaTrashCan
-                id='torlesgomb'
-                onClick={() => {
-                const ujKosar = kosar.filter((_, i) => i !== index);
-                setKosar(ujKosar);
-                localStorage.setItem("kosar", JSON.stringify(ujKosar));
+            <input type="number" min={1} value={item.mennyiseg} onChange={(e) => 
+            { 
+                const ujMennyiseg = Number(e.target.value); const ujKosar = [...kosar]; ujKosar[index].mennyiseg = ujMennyiseg; setKosar(ujKosar); localStorage.setItem("kosar", JSON.stringify(ujKosar));
                 window.dispatchEvent(new Event("storage"));
-                }}
-            />
+            }} />
+            <span style={{margin:"auto",marginLeft:"0px",marginRight:"15px"}}>db</span>
+            <FaTrashCan id='torlesgomb' onClick={() => { const ujKosar = kosar.filter((_, i) => i !== index); setKosar(ujKosar); localStorage.setItem("kosar", JSON.stringify(ujKosar)); window.dispatchEvent(new Event("storage")); }}/>
 
             
 
@@ -81,7 +66,7 @@ export default function Kosar( {accesToken} ){
             <div className='RendelesInfo'> 
                 <span className='rendeles'>{mennyiseg} db termék</span> 
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
-                {kosar.length > 0 && accesToken ? <Button className='rendelesgombok' onClick={() => {navigate("/fizetes")}}>Tovább a fizetéshez!</Button> : <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>}
+                {kosar.length > 0 && accesToken ? <Button className='rendelesgombok' onClick={() => {navigate("/fizetes")}}>Tovább a fizetéshez!</Button> : <><span style={{color:"red"}}><strong>A vásárlás folytatásához kötelező a regisztráció!</strong></span><Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button></>}
                 <Button style={{marginBottom:"5px"}} className='rendelesgombok' onClick={()=>{navigate("/")}}>Vásárlás folytatása!</Button>
                 </div> 
             </div>

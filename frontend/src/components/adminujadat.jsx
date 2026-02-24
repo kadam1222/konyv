@@ -46,6 +46,7 @@ export default function AdminAdatFelvetel({ accessToken, onSiker }) {
         throw new Error("A könyv mentve, de a kép feltöltése sikertelen volt.");
     }
 };
+
 const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -219,71 +220,45 @@ const handleFileChange = (e) => {
 
             <div style={{ marginBottom: "15px" }}>
                 <label>Új borító felvétele: </label>
-                <input 
-                    placeholder="pl. keménytáblás" 
-                    value={borito}
-                    onChange={(e) => setBorito(e.target.value)} 
-                />
+                <input placeholder="pl. keménytáblás" value={borito}onChange={(e) => setBorito(e.target.value)} />
                 <Button className="hozzaadgombok" variant="success" onClick={() => mentés("borito", borito, setBorito)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
                 <label>Új kiadó felvétele: </label>
-                <input 
-                    placeholder="pl. Európa Kiadó" 
-                    value={kiado}
-                    onChange={(e) => setKiado(e.target.value)} 
-                />
+                <input placeholder="pl. Európa Kiadó" value={kiado} onChange={(e) => setKiado(e.target.value)} />
                 <Button className="hozzaadgombok" variant="success" onClick={() => mentés("kiado", kiado, setKiado)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
                 <label>Új szerző felvétele: </label>
-                <input 
-                    placeholder="pl. J.K. Rowling" 
-                    value={szerzo}
-                    onChange={(e) => setSzerzo(e.target.value)} 
-                />
+                <input  placeholder="pl. J.K. Rowling"  value={szerzo} onChange={(e) => setSzerzo(e.target.value)} />
                 <Button className="hozzaadgombok" variant="success" onClick={() => mentés("szerzo", szerzo, setSzerzo)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
                 <label>Új fordító felvétele: </label>
-                <input 
-                    placeholder="pl. Acsai Roland" 
-                    value={fordito}
-                    onChange={(e) => setFordito(e.target.value)} 
-                />
+                <input placeholder="pl. Acsai Roland" value={fordito} onChange={(e) => setFordito(e.target.value)} />
                 <Button className="hozzaadgombok" variant="success" onClick={() => mentés("fordito", fordito, setFordito)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
                 <label>Új illusztráció felvétele: </label>
-                <input 
-                    placeholder="pl. Színes Képekkel, Fotókkal" 
-                    value={illusztracio}
-                    onChange={(e) => setIllusztracio(e.target.value)} 
+                <input placeholder="pl. Színes Képekkel, Fotókkal" value={illusztracio} onChange={(e) => setIllusztracio(e.target.value)} 
                 />
                 <Button className="hozzaadgombok" variant="success" onClick={() => mentés("illusztracio", illusztracio, setIllusztracio)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
                 <label>Új Illusztrátor felvétele: </label>
-                <input 
-                    placeholder="pl. Alice Oseman" 
-                    value={illusztrator}
-                    onChange={(e) => setIllusztrator(e.target.value)} 
+                <input placeholder="pl. Alice Oseman" value={illusztrator} onChange={(e) => setIllusztrator(e.target.value)} 
                 />
                 <Button className="hozzaadgombok" variant="success" onClick={() => mentés("illusztrator", illusztrator, setIllusztrator)}>Hozzáad</Button>
             </div>
 
             <div style={{ marginBottom: "15px" }}>
                 <label>Új nyelv felvétele: </label>
-                <input 
-                    placeholder="pl. Magyar" 
-                    value={nyelv}
-                    onChange={(e) => setNyelv(e.target.value)} 
-                />
+                <input placeholder="pl. Magyar" value={nyelv} onChange={(e) => setNyelv(e.target.value)} />
                 <Button className="hozzaadgombok" variant="success" onClick={() => mentés("nyelv", nyelv, setNyelv)}>Hozzáad</Button>
             </div>
 
@@ -365,10 +340,7 @@ const handleFileChange = (e) => {
             
             <div className="sor" >
                 <label>Illusztráció típusa: </label>
-                <select 
-                    value={ujKonyv.termekek.illusztracio || ""} 
-                    onChange={e => handleFieldChange("illusztracio", e.target.value)}
-                >
+                <select value={ujKonyv.termekek.illusztracio || ""} onChange={e => handleFieldChange("illusztracio", e.target.value)}>
                     <option value="">Nincs / Nem ismert</option>
                     {options.illusztraciok.map(i => (
                         <option key={i.id} value={i.id}>
