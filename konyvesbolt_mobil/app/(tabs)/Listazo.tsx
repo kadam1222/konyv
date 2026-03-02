@@ -1,8 +1,9 @@
-//React Native-ben NINCS IntersectionObserver → FlatList.onEndReached-et kell használni.
+
 import React, { useEffect, useState } from 'react';
-import {View, Text, Image, Button, ActivityIndicator, FlatList, StyleSheet} from 'react-native';
+import {View, Text, Image, Button, ActivityIndicator, FlatList, StyleSheet, Alert, TextInput, TouchableOpacity} from 'react-native';
 import axios from 'axios';
 import { Dimensions } from 'react-native';
+import { useCart } from './CartContext';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN = 8;
@@ -22,28 +23,40 @@ const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
 const PAGE_SIZE = 10;
 
 const ListazoInfinite = () => {
+  const { addToCart } = useCart();
   const [data, setData] = useState<Termek[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery , setSearchQuery] = useState("");
+  const [activeSearch, setActiveSearch] = useState("");
 
   useEffect(() => {
     loadPage(1);
   }, []);
 
-  const loadPage = async (pageNum: number, refresh = false) => {
+  const startSearch = () =>{
+    setData([])
+    setActiveSearch(searchQuery)
+    setPage(1)
+    setHasMore(true)
+    loadPage(1, true, searchQuery)
+  }
+  const loadPage = async (pageNum: number, refresh = false, query = activeSearch) => {
     if (loading) return;
 
     setLoading(true);
     setError(null);
 
     try {
+      const endpoint = query ? '/konyvek/search' : '/konyvek';
       const response = await axios.get<Termek[]>(
-        `${backendUrl}/konyvek`,
+        `${backendUrl}${endpoint}`,
         {
           params: {
             page: pageNum,
+            cim: query
             //limit: PAGE_SIZE,
           },
           timeout: 5000,
@@ -51,15 +64,13 @@ const ListazoInfinite = () => {
       );
 
       const newData = response.data;
-
+      setData((prev) =>{
+        if (refresh || pageNum === 1) return newData;
+        return [...prev, ...newData]
+      })
       if (newData.length < PAGE_SIZE) {
         setHasMore(false);
       }
-
-      setData((prev) =>
-        refresh ? newData : [...prev, ...newData]
-      );
-
       setPage(pageNum);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -90,48 +101,65 @@ const ListazoInfinite = () => {
     );
   }
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.htext}>Terméklista</Text>
+ return (
+  <View style={styles.container}>
+    <Text style={styles.htext}>Terméklista</Text>
 
-      <FlatList
-        data={data}
-        numColumns={2}
-        key={2}
-        columnWrapperStyle={styles.row}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.title}>
-              {item.ISBN}. {item.cim}
-            </Text>
-
-            <Image
-              source={{ uri: `${backendUrl}/kepek/${item.ISBN}.jpg` }}
-              style={styles.image}
-            />
-
-            <Text numberOfLines={2} style={styles.price}>Ár: {item.ar} Ft</Text>
-
-            <Button
-              title="Kosárba"
-              onPress={() => console.log('Kosárba:', item.ISBN)}
-            />
-          </View>
-        )}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.5}
-        refreshing={loading && page === 1}
-        onRefresh={refreshList}
-        ListFooterComponent={
-          loading && page > 1 ? (
-            <ActivityIndicator style={{ marginVertical: 20 }} />
-          ) : !hasMore ? (
-            <Text style={styles.endText}>Nincs több termék</Text>
-          ) : null
-        }
+    <View style={styles.searchContainer}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Keresés..."
+        placeholderTextColor="#888"
+        value={searchQuery}
+        onChangeText={(text) => setSearchQuery(text)} 
+        clearButtonMode="while-editing"
       />
+      <TouchableOpacity style={styles.searchButton} onPress={startSearch}>
+        <Text style={styles.searchButtonText}>Keresés</Text>
+      </TouchableOpacity>
     </View>
-  );
+
+    <FlatList
+      data={data}
+      numColumns={2}
+      key={2} 
+      columnWrapperStyle={styles.row}
+      renderItem={({ item }) => (
+        <View style={styles.item}>
+          <Text style={styles.title}>
+            {item.ISBN}. {item.cim}
+          </Text>
+
+          <Image
+            source={{ uri: `${backendUrl}/kepek/${item.ISBN}.jpg` }}
+            style={styles.image}
+          />
+
+          <Text numberOfLines={2} style={styles.price}>Ár: {item.ar} Ft</Text>
+
+          <Button
+            title="Kosárba"
+            onPress={() => {
+              addToCart(item);
+              Alert.alert("Sikeres kosárba rakás", "A terméket sikeresen elhelyezte a kosárba");
+            }}
+          />
+        </View>
+      )}
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.5}
+      refreshing={loading && page === 1}
+      onRefresh={refreshList}
+      ListFooterComponent={
+        loading && page > 1 ? (
+          <ActivityIndicator style={{ marginVertical: 20 }} />
+        ) : !hasMore ? (
+          <Text style={styles.endText}>Nincs több termék</Text>
+        ) : null
+      }
+    />
+  </View>
+);
 };
 
 export default ListazoInfinite;
@@ -184,5 +212,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'gray',
     marginVertical: 20,
+  },
+  searchContainer: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#25292e',
+    gap: 10, 
+  },
+  searchInput: {
+    flex: 1, 
+    backgroundColor: 'white',
+    color: 'black',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  searchButton: {
+    backgroundColor: 'yellow',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchButtonText: {
+    color: 'black',
+    fontWeight: 'bold',
   },
 });

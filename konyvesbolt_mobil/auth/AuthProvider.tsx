@@ -4,16 +4,16 @@ import { api, setAccessToken } from "../api/api"; // itt legyen a jwt/axios logi
 import { Alert, Platform } from 'react-native';
 
 interface AuthContextType {
-  user: { email: string, name: string } | null;
+  user: { email: string, nev: string } | null;
   login: (email: string, jelszo: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (nev: string, email: string, jelszo: string) => Promise<boolean>
+  register: (vevo_nev: string, email: string, jelszo: string) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<{ email: string,name:string } | null>(null);  
+  const [user, setUser] = useState<{ email: string,nev:string } | null>(null);  
   const [isLoading, setIsLoading] = useState(true)
   useEffect(() =>{
     const initializeAuth = async () =>{
@@ -95,9 +95,9 @@ try {
     }
   };
 
-  const register = async (nev: string, email: string, jelszo: string) => {
+  const register = async (vevo_nev: string, email: string, jelszo: string) => {
   try {
-    await api.post("/auth/register", { nev, email, jelszo });
+    await api.post("/auth/register", { vevo_nev, email, jelszo });
     Alert.alert("Sikeres regisztráció!");
     return true;
   } catch (error: any) {

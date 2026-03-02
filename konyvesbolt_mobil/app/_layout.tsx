@@ -1,11 +1,14 @@
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from '@/auth/AuthProvider';
+import { CartProvider } from './(tabs)/CartContext';
 
 export default function RootLayout() {
   return (
     <AuthProvider>
+      <CartProvider>
       <RootLayoutNav />
+      </CartProvider>
     </AuthProvider>
   );
 }
@@ -37,6 +40,7 @@ function RootLayoutNav() {
     <Stack>
       <Stack.Screen name="LoginLogout" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="FizetesScreen" options={{ headerShown: true, title: 'Pénztár', headerBackTitle: 'Vissza' }} />
     </Stack>
   );
 }
