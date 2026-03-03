@@ -6,7 +6,7 @@
  Logout törli az access tokent és a cookie-t a szerver oldalon.
 */
 // npm install @react-native-cookies/cookies axios
-
+import { Platform } from "react-native";
 import axios from "axios";
 // csak az install kell !! az import nem
 //import { Cookies } from "@react-native-cookies/cookies";
@@ -40,6 +40,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    
     const originalRequest = error.config;
 
     const isAuthEndpoint =
@@ -59,17 +60,26 @@ api.interceptors.response.use(
 
     return Promise.reject(error);
   }
+  
 );
 
 // ------------------- Refresh token -------------------
 async function refreshToken() {
   try {
-    // fetch vagy axios POST /refresh, a cookie automatikusan elküldődik
-    const response = await api.post("/auth/refresh", {}, { withCredentials: true });
+    let rToken = null;
+    // Csak ha nem weben vagyunk, próbáljuk a SecureStore-t
+    if (typeof window === 'undefined') { 
+       const SecureStore = require("expo-secure-store");
+       rToken = await SecureStore.getItemAsync('refreshToken');
+    }
 
-    // új access token memóriába
+    const response = await api.post("/auth/refresh", 
+      { token: rToken }, // Body-ban küldjük el a biztonság kedvéért
+      { withCredentials: true }
+    );
+
     accessToken = response.data.accessToken;
-    console.log("Access token frissítve:", accessToken);
+    setAccessToken(accessToken);
     return accessToken;
   } catch (err) {
     console.error("Refresh token hiba:", err.response?.data || err.message);

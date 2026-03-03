@@ -1,18 +1,56 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import * as SecureStore from "expo-secure-store"
 import { api, setAccessToken } from "../api/api"; // itt legyen a jwt/axios logika
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 
 interface AuthContextType {
-  user: { email: string, name: string } | null;
-  login: (email: string, password: string) => Promise<void>;
+  user: { email: string, nev: string } | null;
+  login: (email: string, jelszo: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<boolean>
+  register: (vevo_nev: string, email: string, jelszo: string) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<{ email: string,name:string } | null>(null);  
+  const [user, setUser] = useState<{ email: string,nev:string } | null>(null);  
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() =>{
+    const initializeAuth = async () =>{
+try {
+      let token = null;
+
+      if (Platform.OS !== 'web') {
+        // MOBILON: Először megnézzük a tárolót
+        token = await SecureStore.getItemAsync('userToken');
+      }
+
+      // Ha van token (mobilon) vagy próbálkozunk sütivel (weben)
+      const res = await api.post("/auth/refresh", 
+        { token: token }, // Mobilon body-ban küldjük a refresh tokent
+        { withCredentials: true }
+      );
+
+      const newAccessToken = res.data.accessToken;
+      setAccessToken(newAccessToken);
+      
+      const userProfile = await fetchUserProfile(newAccessToken);
+      setUser(userProfile);
+      
+      // Mobilon frissítjük az elmentett access tokent is
+      if (Platform.OS !== 'web') {
+        await SecureStore.setItemAsync('userToken', newAccessToken);
+      }
+    }
+      catch (err){
+        console.log(err)
+      }
+      finally {
+        setIsLoading(false)
+      }
+    }
+    initializeAuth()
+  },[])
   const fetchUserProfile = async (token: string) => {
     try {
       const res = await api.get("/konyvek/profil", {
@@ -27,14 +65,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw error;
     }
   };
-
-  const login = async (email: string, password: string) => {
+  
+  const login = async (email: string, jelszo: string) => {
     try {
-      const res = await api.post("/auth/login", { email, password }, { withCredentials: true });
-      const token = res.data.accessToken;
-      setAccessToken(token);
-       const userProfile = await fetchUserProfile(token);
-       setUser(userProfile); // Beállítjuk a teljes felhasználói profilt
+      const res = await api.post("/auth/login", { email, jelszo }, { withCredentials: true });
+      const {accessToken, refreshToken} = res.data;
+      setAccessToken(accessToken);
+       const userProfile = await fetchUserProfile(accessToken);
+       setUser(userProfile); 
+      if (Platform.OS !== 'web') {
+      await SecureStore.setItemAsync('userToken', accessToken);
+      await SecureStore.setItemAsync('refreshToken', refreshToken);
+    }
     } catch (error: any) {
       Alert.alert('Hibás belépés');
       // Alert.alert('Hibás belépés', error.message);
@@ -44,14 +86,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await api.post("/auth/logout", {}, { withCredentials: true });
-    setAccessToken(null);
-    setUser(null);
+    try{
+      await api.post("/auth/logout", {}, { withCredentials: true });
+    }
+    finally{
+      setAccessToken(null);
+      setUser(null);
+    }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (vevo_nev: string, email: string, jelszo: string) => {
   try {
-    await api.post("/auth/register", { name, email, password });
+    await api.post("/auth/register", { vevo_nev, email, jelszo });
     Alert.alert("Sikeres regisztráció!");
     return true;
   } catch (error: any) {
@@ -60,7 +106,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 };
   return (
-    <AuthContext.Provider value={{ user, login, logout, register }}>
+    <AuthContext.Provider value={{ user, login, logout, register, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,7 +6,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Szia, {user?.name || 'Felhasználó'}!</Text>
+      <Text style={styles.title}>Szia, {user?.vevo_nev || 'Felhasználó'}!</Text>
       <Text style={styles.email}>{user?.email}</Text>
       
       <TouchableOpacity style={styles.logoutButton} onPress={logout}>

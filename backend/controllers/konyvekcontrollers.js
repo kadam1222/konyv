@@ -231,14 +231,14 @@ exports.bejelentkezes = async (req, res, next) =>{
       sameSite: "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000 
     });
-    res.status(200).json({ message: "Sikeres bejelentkezés 🎉", accessToken})
+    res.status(200).json({ message: "Sikeres bejelentkezés 🎉", accessToken, refreshToken})
   }
   catch(error){
     next(error)
   }
 }
 exports.refreshToken = async (req, res) => {
-  const token = req.cookies.refreshToken;
+  const token = req.cookies.refreshToken || req.body.token;
   if (!token) {
     return res.status(401).json({ message: "Nincs refresh token" });
   }
