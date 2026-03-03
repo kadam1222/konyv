@@ -68,7 +68,6 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
 
     setSearchParams(newParams);
     setActiveFilters(filters);
-    onSearch(searchQuery, 1, activeCategory, filters);
   };
 
   const handleClearFilters = () => {
