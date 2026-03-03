@@ -1,0 +1,32 @@
+.kezdolap-container {
+    overflow-x: hidden;
+}
+
+
+.termek_kep2 {
+    height: 350px; 
+    object-fit: contain; 
+    padding-bottom: 20px;
+    cursor: pointer;
+    transition: transform 0.5s ease;
+}
+
+.category-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.info-bar {
+    background-color: #ffffff;
+    border-top: 1px solid #dee2e6;
+}
+
+.uzenet {
+    font-style: italic;
+    color: #6c757d;
+}

@@ -6,7 +6,7 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from 'react-bootstrap/ToastContainer';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { NavItem } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
 import http from "../http-common";
@@ -29,17 +29,23 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
   const [user, setUser] = useState([])
   const [showToast, setShowToast] = useState(false);
   const [lastAddedItem, setLastAddedItem] = useState(null);
-  
+  const prevCartCount = useRef(0);
+  const prevKosarRef = useRef([]);
 
 
   const fetchData = async () => {
     try {
       const response = await http.get("/konyvek/kategoria");
-      setFokat(response.data);
+      setFokat(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error("Error fetching data: ", error);
+      console.error("Hiba a kategóriák lekérésekor:", error);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   useEffect (() =>{
     if (!accessToken) return
     const fetchUser = async () =>{
@@ -59,76 +65,102 @@ export default function Header({ onSearch, accessToken, setAccessToken }) {
     fetchUser()
   }, [accessToken])
 
-  useEffect(() => {
-    const updateCartCount = () => {
-        const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
-        const count = kosar.reduce((sum, item) => sum + item.mennyiseg, 0);
-        setCartCount(count);
-      };
-      updateCartCount();
-      window.addEventListener("storage", updateCartCount);
-      fetchData();
-      return () => window.removeEventListener("storage", updateCartCount);
-  }, []);
+useEffect(() => {
+  const updateCart = () => {
+    const ujKosar = JSON.parse(localStorage.getItem("kosar")) || [];
+    const regiKosar = prevKosarRef.current;
+
+    const ujOsszDarab = ujKosar.reduce((sum, item) => sum + item.mennyiseg, 0);
+    const regiOsszDarab = regiKosar.reduce((sum, item) => sum + item.mennyiseg, 0);
+
+    if (ujOsszDarab > regiOsszDarab) {
+      let hozzaadottTermek = null;
+
+      ujKosar.forEach((ujItem) => {
+        const regiMegfelelo = regiKosar.find((r) => r.ISBN === ujItem.ISBN);
+        
+
+        if (!regiMegfelelo || ujItem.mennyiseg > regiMegfelelo.mennyiseg) {
+          hozzaadottTermek = ujItem;
+        }
+      });
+
+      if (hozzaadottTermek) {
+        setLastAddedItem(hozzaadottTermek.cim);
+        setShowToast(false); 
+        setTimeout(() => setShowToast(true), 10); 
+      }
+    }
+
+    setCartCount(ujOsszDarab);
+    prevKosarRef.current = ujKosar; 
+  };
+
+  window.addEventListener("storage", updateCart);
+  
+  const alapKosar = JSON.parse(localStorage.getItem("kosar")) || [];
+  setCartCount(alapKosar.reduce((sum, item) => sum + item.mennyiseg, 0));
+  prevKosarRef.current = alapKosar;
+
+  return () => window.removeEventListener("storage", updateCart);
+}, []);
+
+
  const handleSearch = () => {
   if (!keresett.trim()) return;
 
-  navigate(`/?search=${keresett}`, { replace: true });
+  navigate(`/konyvlista?search=${keresett}`, { replace: true });
 
   onSearch(keresett, 1, null, {});
 };
 
-useEffect(() => {
-    const updateCartCount = () => {
-      const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
-      const count = kosar.reduce((sum, item) => sum + item.mennyiseg, 0);
-      setCartCount(count);
-
-
-      if (kosar.length > 0) {
-        const lastItem = kosar[kosar.length - 1];
-        setLastAddedItem(lastItem.cim);
-        setShowToast(true);
-      }
-    };
-
-    window.addEventListener("storage", updateCartCount);
-    return () => window.removeEventListener("storage", updateCartCount);
-  }, []);
-
 
   const handleFilter = async (katNev) => {
-    setSearchParams({ kat: katNev });
+    navigate(`/konyvlista?kat=${(katNev)}`);
+    if (onSearch) {
     onSearch("", 1, katNev);
+    }
   };
 
   const CategoryDropdown = ({ title }) => (
-  <NavDropdown title={title} id={`nav-${title}`}>
-    {fokat
-      .filter((f) => !f.katazon)
-      .map((f) => (
-
-        <div className="dropdown-submenu" key={f.id}>
-          <NavDropdown title={f.kat_nev} id={`nav-sub-${f.id}`} drop="end">
-            {fokat.filter((k) => k.katazon === f.id).length > 0 ? (
-              fokat
-                .filter((k) => k.katazon === f.id)
-                .map((sub) => (
+  <NavDropdown title={title} id="nav-kategoriak">
+    {fokat && fokat.length > 0 ? (
+      fokat
+        .filter((f) => !f.katazon) 
+        .map((f) => {
+          const alkategoriak = fokat.filter((k) => k.katazon === f.id);
+          if (alkategoriak.length > 0) {
+            return (
+              <NavDropdown
+                key={f.id}
+                title={f.kat_nev}
+                id={`sub-${f.id}`}
+                drop="end"
+                className="dropdown-submenu"
+              >
+                {alkategoriak.map((sub) => (
                   <NavDropdown.Item
                     key={sub.id}
                     onClick={() => handleFilter(sub.kat_nev)}
                   >
                     {sub.kat_nev}
                   </NavDropdown.Item>
-                ))
-            ) : (
-              <NavDropdown.Item disabled>
-                Nincs alkategória
-              </NavDropdown.Item>
-            )}
-          </NavDropdown>
-        </div>
-      ))}
+                ))}
+              </NavDropdown>
+            );
+          }
+          return (
+            <NavDropdown.Item
+              key={f.id}
+              onClick={() => handleFilter(f.kat_nev)}
+            >
+              {f.kat_nev}
+            </NavDropdown.Item>
+          );
+        })
+    ) : (
+      <NavDropdown.Item disabled>Betöltés...</NavDropdown.Item>
+    )}
   </NavDropdown>
 );
 

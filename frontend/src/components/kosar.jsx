@@ -57,7 +57,7 @@ export default function Kosar( {accesToken} ){
             </div>
             ))
             ) : (
-                <p id='hibaüzenet'>Még nincs termék a kosárban!</p>
+                <p id='hibaüzenet' style={{color:"red", fontWeight:"bold"}}>Még nincs termék a kosárban!</p>
             )}
 
             

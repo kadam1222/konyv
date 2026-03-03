@@ -130,9 +130,9 @@ const lastItemRef = useCallback(
               <ListGroup className='list-group-flush'>
                 <ListGroup.Item>{t.kiado_nev}</ListGroup.Item>
                 <ListGroup.Item>{t.kiadas_eve}</ListGroup.Item>
-                <ListGroup.Item>{t.ar} Ft</ListGroup.Item>
+                <ListGroup.Item style={{ fontWeight: 'bold',}} >{t.ar} Ft</ListGroup.Item>
               </ListGroup>
-              <Card.Footer>
+              <Card.Footer className="d-flex justify-content-center bg-transparent border-0 pb-4">
                 <Button
                   className='Kosargomb'
                   onClick={() => {
