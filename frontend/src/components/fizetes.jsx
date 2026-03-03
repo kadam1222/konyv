@@ -10,12 +10,14 @@ export default function Fizetes( {accessToken}){
     const [nev, setNev] = useState("");
     const [email, setEmail] = useState("");
     const [mennyiseg,setMennyiseg] = useState("")
+    const [lakcim,setLakcim] = useState("")
     const [paymentMethod, setPaymentMethod] = useState("");
     const [shippingMethod, setShippingMethod] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const navigate = useNavigate();
+    const [teljesites_kelte, setTeljesites_kelte] =useState(null)
     const [kosar, setKosar] = useState(
         JSON.parse(localStorage.getItem("kosar")) || []
     );
@@ -42,6 +44,7 @@ useEffect(() => {
          console.log("Profil adatok:", res.data); 
       setNev(res.data.vevo_nev || "");
       setEmail(res.data.email || "");
+      
     })
     .catch(err => {
       console.error("Felhasználó adat lekérése sikertelen:", err);
@@ -54,7 +57,7 @@ useEffect(() => {
             setError("Kérlek válassz fizetési és szállítási módot, és legyenek termékek a kosárban!");
             return;
         }
-
+        const kuldendoDatum = (paymentMethod === "1") ? null : new Date().toISOString().split('T')[0];
         setLoading(true);
         setError("");
         setSuccess("");
@@ -67,10 +70,14 @@ useEffect(() => {
                     szallitas_mod: shippingMethod,
                     termekek: kosar.map(item => ({
                         ISBN: item.ISBN,
-                        darab: item.mennyiseg
+                        darab: item.mennyiseg,
+                        ar:item.ar,
+                        cim: item.cim
                     })),
                     nev,
-                    email
+                    email,
+                    lakcim: lakcim,
+                    teljesites_kelte: kuldendoDatum
                 },
                 {
                     headers: {
@@ -83,6 +90,7 @@ useEffect(() => {
             setSuccess(`Sikeres rendelés! Számla ID: ${response.data.szamla_id}`);
             localStorage.removeItem("kosar");
             setKosar([]);
+            window.dispatchEvent(new Event("storage"));
            navigate("/koszonjuk");
 
         }catch(err){
@@ -90,12 +98,13 @@ useEffect(() => {
             setError(err.response?.data?.message || "Hiba a rendelés leadásakor");
         }finally{
             setLoading(false);
+            
         }
     };
     return(
 
     <div style={{display:"flex", gap:"40px" , alignItems:"flex-start"}}>
-        {error && <p style={{color:"red"}}>{error}</p>}
+        
         {success && <p style={{color:"green"}}>{success}</p>}
     <div className="fizetesfodiv">
         <Form onSubmit={handleSubmit}>
@@ -114,7 +123,7 @@ useEffect(() => {
 
         <Form.Group className="mb-3" controlId="formBasiclakcím">
             <Form.Label>Lakcím</Form.Label>
-            <Form.Control type="text"  placeholder="pl. : 1011 Budapest Fő utca 2..." />
+            <Form.Control type="text" value={lakcim || ""}  onChange={(e) => setLakcim(e.target.value)} placeholder="pl. : 1011 Budapest Fő utca 2..." />
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="formBasicadoszam">
@@ -139,9 +148,9 @@ useEffect(() => {
             <Form.Check type="radio" label="Személyes átvétel (INGYENES)" value="2" checked={shippingMethod === "2"} onChange={(e) => setShippingMethod(e.target.value)}/>
         </Form.Group>
 
-
-<Button variant="primary" type="submit" disabled={loading}>
-    {loading ? "Feldolgozás..." : "Vásárlás!"}
+{error && <p style={{color:"red"}}>{error}</p>}
+<Button id="fizetesleadasagomb" className='rendelesgombok' type="submit" disabled={loading}>
+    {loading ? "Feldolgozás..." : <strong>Vásárlás!</strong>} 
 </Button>
 
     </Form>
@@ -153,7 +162,6 @@ useEffect(() => {
                     <p key={item.ISBN}>{item.mennyiseg} x {item.cim}</p>
                 ))}
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
-                {kosar.length > 0 ? <Button className='rendelesgombok' onClick={() => {navigate("/fizetes")}}>Tovább a fizetéshez!</Button> : <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>}
                 <Button style={{marginBottom:"5px"}} className='rendelesgombok' onClick={()=>{navigate("/")}}>Vásárlás folytatása!</Button>
             </div> 
     </div>

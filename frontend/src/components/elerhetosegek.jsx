@@ -10,7 +10,7 @@ export default function Elerhetosegek(){
       <Card.Body>
         <Card.Text style={{ color: "#3a3a3a" }}>
           <strong>E-mail cím:</strong>
-          <span style={{ color: "#6e604bff" }}> bolt@Gmail.com</span>
+          <span style={{ color: "#6e604bff" }}> BookBar@Gmail.com</span>
         </Card.Text>
         <Card.Text>
             <strong>Telefonszám:</strong> 

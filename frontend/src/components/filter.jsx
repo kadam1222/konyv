@@ -50,8 +50,11 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
   }, [searchParams]);
 
   const handleSelectFilter = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
+  setFilters(prev => ({
+    ...prev,
+    [key]: prev[key] === value ? '' : value 
+  }));
+};
 
   const handleApplyFilters = () => {
     const newParams = new URLSearchParams();
@@ -65,7 +68,6 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
 
     setSearchParams(newParams);
     setActiveFilters(filters);
-    onSearch(searchQuery, 1, activeCategory, filters);
   };
 
   const handleClearFilters = () => {
@@ -89,8 +91,8 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
             <Button className="apply-filters-btn" onClick={handleApplyFilters}>
                 Szűrés
             </Button>
-            <Button  className="clear-filters-btn" onClick={handleClearFilters}>
-                TÖRLÉS
+            <Button className="clear-filters-btn" onClick={handleClearFilters}>
+                Szűrők törlése
             </Button>
       </div>
       <div className="selected_filters">
@@ -158,7 +160,7 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
           </span>
         ))}
       </div>
-
+      {/*
       <h3>Ár:</h3>
       <div className="arak_range">
         <input
@@ -176,7 +178,7 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
         />
         <span>Ft</span>
       </div>
-
+    */}
      
     </div>
   );

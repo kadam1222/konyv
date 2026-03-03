@@ -231,14 +231,14 @@ exports.bejelentkezes = async (req, res, next) =>{
       sameSite: "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000 
     });
-    res.status(200).json({ message: "Sikeres bejelentkezés 🎉", accessToken})
+    res.status(200).json({ message: "Sikeres bejelentkezés 🎉", accessToken, refreshToken})
   }
   catch(error){
     next(error)
   }
 }
 exports.refreshToken = async (req, res) => {
-  const token = req.cookies.refreshToken;
+  const token = req.cookies.refreshToken || req.body.token;
   if (!token) {
     return res.status(401).json({ message: "Nincs refresh token" });
   }
@@ -291,20 +291,32 @@ exports.Profilleker = async (req, res) => {
 };
 
 exports.szamlakeszites = async (req, res) => {
+  console.log("Beérkező adatok:", req.body)
   try {
     const { email } = req.user; 
-    const { fizetesi_mod, szallitas_mod, termekek } = req.body; 
+    const { fizetesi_mod, szallitas_mod, termekek, lakcim, teljesites_kelte } = req.body; 
 
-    if (!fizetesi_mod || !szallitas_mod || !termekek || termekek.length === 0) {
+    if (!fizetesi_mod || !szallitas_mod || !termekek || termekek.length === 0 || !lakcim) {
       return res.status(400).json({
         message: "Hiányzó fizetési mód, szállítási mód vagy termékek"
       });
     }
+  for (const item of termekek) {
+      const valosAdat = await Konyvek.getbyISBN(item.ISBN);
+      if (!valosAdat) {
+        return res.status(404).json({ message: "Sajnos az egyik termék nem található!" });
+    }
+      if (Number(valosAdat.ar) !== Number(item.ar) || valosAdat.cim !== item.cim) {
+          return res.status(400).json({ 
+              message: "A kosár tartalma időközben megváltozott. Kérjük rakja újra a kosarát!" 
+          });
+      }
+  }
     const vegosszeg = await Konyvek.vegosszegSzamitas(termekek, szallitas_mod)
     for (const item of termekek) {
       await Konyvek.darabszam_modositas(item.darab, item.ISBN);
     }
-    const { szamla_id } = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg); 
+    const { szamla_id } = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg, lakcim, teljesites_kelte); 
     await Konyvek.rendelesSnapshotFeltoltese(szamla_id, termekek);
 
     res.status(201).json({
@@ -364,8 +376,8 @@ exports.OsszesRendeles = async (req, res) =>{
 exports.rendeles_statusza_modositasa = async (req, res) =>{
   try{
     const {r_statusz} = req.body
-    const {szamlaszam }= req.body
-    const result = await Konyvek.rendeles_statusza_modositas(r_statusz, szamlaszam)
+    const {szamlaszam, teljesites_kelte }= req.body
+    const result = await Konyvek.rendeles_statusza_modositas(r_statusz, teljesites_kelte ,szamlaszam)
     if (result) res.json({message: "Rendelés státusza sikeresen megváltoztatva"})
   }
   catch(err){
@@ -496,6 +508,18 @@ exports.insertAdat = async (req,res) =>{
   }catch (err) {
     console.error(err);
     res.status(500).json({ message: "Szerver hiba az INSERT során" });
+  }
+}
+
+exports.deleteAdat = async (req,res) =>{
+  try{
+    const {...adatok} = req.body;
+    await konyvek.deleteAdat(adatok)
+    res.status(204).json()
+
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Szerver hiba a DELETE során" });
   }
 }
 

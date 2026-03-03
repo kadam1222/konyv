@@ -256,7 +256,7 @@ class Konyvek {
   
 }
 
-static async szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg) {
+static async szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg, lakcim, teljesites_kelte) {
   try {
     const [vevoRows] = await db.query(
       "SELECT id FROM vevo WHERE email = ?",
@@ -277,7 +277,9 @@ static async szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg) {
         fizetesi_hatarido,
         vevo_id,
         vegosszeg,
-        szamlaszam
+        szamlaszam,
+        lakcim,
+        teljesites_kelte
       )
       SELECT
         ?,           
@@ -294,9 +296,11 @@ static async szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg) {
             WHERE vevo_id = ?
               AND YEAR(szamla_kelte) = YEAR(CURDATE())
           )
-        )
+        ),
+        ?,
+        ?
       `,
-      [fizetesi_mod, szallitas_mod, vevo_id,vegosszeg, vevo_id, vevo_id]
+      [fizetesi_mod, szallitas_mod, vevo_id,vegosszeg, vevo_id, vevo_id,lakcim, teljesites_kelte]
     );
 
     return {
@@ -340,9 +344,9 @@ static async modositas (email, nev, regiemail){
       throw err
     }
   }
-  static async rendeles_statusza_modositas(r_statusz, szamlaszam){
+  static async rendeles_statusza_modositas(r_statusz,teljesites_kelte, szamlaszam){
     try{
-      const [rows] = await db.query('UPDATE szamla SET r_statusz = ? WHERE szamlaszam= ?', [r_statusz, szamlaszam])
+      const [rows] = await db.query('UPDATE szamla SET r_statusz = ?, teljesites_kelte = ? WHERE szamlaszam= ?', [r_statusz, teljesites_kelte,szamlaszam])
       return rows.affectedRows > 0
     }
     catch(err){
@@ -572,7 +576,7 @@ static async insertAdat(adatok ){
       nyelv: ['nyelv', 'nyelv_nev'],
       illusztrator: ['illusztrator', 'illusztrator'],
       fordito: ['fordito', 'fordito_nev'],
-      szerzo: ['szerző', 'szerzo_nev']
+      szerzo: ['szerző', 'szerzo_nev'],
     };
 
     for (const [kulcs, [tabla, oszlop]] of Object.entries(segedTablak)) {
@@ -631,6 +635,59 @@ static async insertAdat(adatok ){
   }
   catch (err) {
     console.error(err);
+    throw err;
+  }
+}
+
+static async deleteAdat(adatok) {
+  try {
+    const alapMezok = {
+      borito: { tabla: 'borito', termekOszlop: 'borito_id' },
+      kiado: { tabla: 'kiado', termekOszlop: 'kiado_id' },
+      nyelv: { tabla: 'nyelv', termekOszlop: 'nyelv_id' },
+      kategoriak: { tabla: 'kategoria', termekOszlop: 'kategoria_id' },
+      illusztracio: { tabla: 'illusztracio', termekOszlop: 'illusztracio' }
+    };
+
+    const kapcsololtMezok = {
+      szerzo: { tabla: 'szerző', kapcsolotabla: 'termek_szerzo', fk: 'szerzo_id' },
+      fordito: { tabla: 'fordito', kapcsolotabla: 'termek_forditok', fk: 'fordito_id' },
+      illusztrator: { tabla: 'illusztrator', kapcsolotabla: 'termek_illusztratorok', fk: 'illusztrator_id' }
+    };
+
+    for (const [kulcs, config] of Object.entries(alapMezok)) {
+      if (adatok[kulcs]) {
+        const id = adatok[kulcs];
+        const [hasTermek] = await db.query(
+          `SELECT COUNT(*) as count FROM termek WHERE ${config.termekOszlop} = ?`,
+          [id]
+        );
+
+        if (hasTermek[0].count > 0) {
+          throw new Error("Az adat használatban van egy terméknél!");
+        }
+        await db.query(`DELETE FROM ${config.tabla} WHERE id = ?`, [id]);
+        return;
+      }
+    }
+    for (const [kulcs, config] of Object.entries(kapcsololtMezok)) {
+      if (adatok[kulcs]) {
+        const id = adatok[kulcs];
+        const [hasRelation] = await db.query(
+          `SELECT COUNT(*) as count FROM ${config.kapcsolotabla} WHERE ${config.fk} = ?`,
+          [id]
+        );
+
+        if (hasRelation[0].count > 0) {
+          throw new Error("Ez a személy még hozzá van rendelve egy könyvhöz!");
+        }
+        await db.query(`DELETE FROM ${config.tabla} WHERE id = ?`, [id]);
+        return;
+      }
+    }
+
+  } catch (err) {
+    console.error("Törlési hiba a szerveren:", err.message);
     throw err;
   }
 }
