@@ -104,7 +104,7 @@ useEffect(() => {
     return(
 
     <div style={{display:"flex", gap:"40px" , alignItems:"flex-start"}}>
-        {error && <p style={{color:"red"}}>{error}</p>}
+        
         {success && <p style={{color:"green"}}>{success}</p>}
     <div className="fizetesfodiv">
         <Form onSubmit={handleSubmit}>
@@ -148,7 +148,7 @@ useEffect(() => {
             <Form.Check type="radio" label="Személyes átvétel (INGYENES)" value="2" checked={shippingMethod === "2"} onChange={(e) => setShippingMethod(e.target.value)}/>
         </Form.Group>
 
-
+{error && <p style={{color:"red"}}>{error}</p>}
 <Button id="fizetesleadasagomb" className='rendelesgombok' type="submit" disabled={loading}>
     {loading ? "Feldolgozás..." : <strong>Vásárlás!</strong>} 
 </Button>

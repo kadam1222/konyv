@@ -3,7 +3,7 @@
   flex-direction: column;   
   font-family: serif;
   padding: 15px;
-  width: 250px;            
+  width: 300px;            
   box-sizing: border-box;
   background-color: #c6ab8077; 
   margin-top: 0;
@@ -88,4 +88,22 @@ select{
   color: black;
   box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
   transform: translateY(-2px);
+}
+
+.filter_buttons {
+  display: flex;
+  justify-content: space-between; 
+  gap: 10px;                      
+  margin-bottom: 20px;           
+  width: 100%;
+}
+
+.apply-filters-btn, .clear-filters-btn {
+  flex: 1;                
+  margin-right: 0;        
+  margin-bottom: 0;      
+  white-space: nowrap;    
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -18,28 +18,61 @@ body{
     height: auto;
     max-height: 860px;
     background-color:#F5F5DC;
-
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.kartya:hover,
-.kartya:hover .card-body,
-.kartya:hover .list-group-item {
-    transform: translateY(-2px);
-    background-color: #e5e5cf;
-    box-shadow: 0 8px 20px rgba(159, 141, 115, 0.4);
+.kartya:hover {
+    transform: translateY(-8px); 
+    background-color: #F5F5DC; 
+    box-shadow: 0 15px 30px rgba(101, 87, 66, 0.2); 
+    border-color: #d6cfb4;
 }
+
 
 .kartya:hover .list-group-item {
   border: 1px solid #d6cfb4; 
 }
 
+.kartya .list-group-item {
+    border-color: rgba(0, 0, 0, 0.05) !important;
+    padding: 8px 20px;
+    font-size: 0.95rem;
+}
+
+.kartya .list-group-item:last-child {
+    border-bottom: none !important;
+}
+
+
 .termek_kep {
     width: 100%;
     height: 350px; 
     object-fit: contain; 
-    background-color: #f8f1e5;
-    padding: 10px;
+    background-color: #F5F5DC;
+    padding: 15px;
     cursor: pointer;
+    transition: transform 0.5s ease;
+}
+
+.kartya:hover .termek_kep {
+    transform: scale(1.03); 
+    background-color: #F5F5DC;
+}
+
+.kartya .card-title {
+    transition: color 0.3s ease;
+}
+
+.kartya .card-footer {
+    background-color: #F5F5DC !important;
+    border-top: none !important;
+    padding: 15px 20px 20px 20px; 
+    display: flex;
+    justify-content: center;
 }
 
 .uzenet{
@@ -68,11 +101,35 @@ body{
 .Kosargomb:hover{
     background-color: #8c6b2f;
     border-color: #8c6b2f;
-    color: #fff;
     box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
     transform: translateY(-2px);
 }
 
 .list-group-item{
-    background-color: #F5F5DC
+    background-color: #F5F5DC;
+    transition: background-color 0.4s ease;
+}
+
+.Kosargomb:active, 
+.Kosargomb:focus, 
+.btn-primary.Kosargomb:active, 
+.btn-primary.Kosargomb:focus {
+    background-color: #8c6b2f !important;
+    color: #fff !important;
+    border-color: #8c6b2f !important;
+    box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4) !important;
+    outline: none !important;
+}
+
+.Kosargomb:active {
+    background-color: #725626 !important; 
+    transform: translateY(0); 
+    color: #fff !important;
+}
+
+.Kosargomb:focus:not(:hover) {
+    background-color: #dbc38c !important;
+    color: #3a2f1f !important;
+    transform: translateY(0);
+    box-shadow: none !important;
 }
