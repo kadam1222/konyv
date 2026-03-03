@@ -20,7 +20,8 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'book.fill': 'auto-stories',
   "arrow.right.square" : "login",
-  "person.fill" : "person"
+  "person.fill" : "person",
+  "cart.fill" : "shopping-cart"
 } as IconMapping;
 
 /**
