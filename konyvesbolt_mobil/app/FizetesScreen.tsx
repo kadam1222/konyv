@@ -26,7 +26,7 @@ const FizetesScreen = () => {
     }
 
     setLoading(true);
-    const kuldendoDatum = new Date().toISOString().split('T')[0];
+    const kuldendoDatum = paymentMethod == 1 ? null : new Date().toISOString().split('T')[0];
 
     try {
 

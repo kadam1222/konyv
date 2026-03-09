@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useAuth } from '@/auth/AuthProvider';
 
 export default function AuthScreen() {
@@ -15,8 +15,10 @@ export default function AuthScreen() {
     if (isLogin) {
       await login(email, jelszo);
     } else {
-      const success = await register(nev, email, jelszo);
-      if (success) setIsLogin(true); // Regisztráció után dobjuk át a loginra
+      const success = await register({nev: nev, email: email, jelszo : jelszo});
+      if (success){
+         setIsLogin(true);
+      } 
     }
   };
 
