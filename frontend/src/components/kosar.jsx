@@ -74,9 +74,9 @@ export default function Kosar( {accessToken, setShowAuthPopup, setShowLoginForm}
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
                 {!accessToken ? (
                 <>
-                    <span style={{ color: "red", fontWeight: "bold" }}>
+                    <span  style={{ color: "red", fontWeight: "bold" }}>
                         A vásárlás folytatásához bejelentkezés szükséges!<br/>
-                        <a  style={{cursor: 'pointer' , textDecoration:"none", color:"black"}} onClick={handleLoginClick}>Kattints ide a bejelentkezéshez </a>
+                        <a className="auth-login-link" onClick={handleLoginClick}>Kattints ide a bejelentkezéshez </a>
                     </span>
                     
                     <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>
