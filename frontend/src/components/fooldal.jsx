@@ -133,7 +133,16 @@ const lastItemRef = useCallback(
                 <ListGroup.Item style={{ fontWeight: 'bold',}} >{t.ar} Ft</ListGroup.Item>
               </ListGroup>
               <Card.Footer className="d-flex justify-content-center bg-transparent border-0 pb-4">
-                <Button
+                {t.raktar == 0 ?  
+                  <Button
+                  className='Kosargomb'
+                  disabled
+                  variant='primary'
+                >
+                  Kosárba rakom
+                </Button>
+                :
+                 <Button
                   className='Kosargomb'
                   onClick={() => {
                     const kosar = JSON.parse(localStorage.getItem('kosar')) || [];
@@ -150,6 +159,9 @@ const lastItemRef = useCallback(
                 >
                   Kosárba rakom
                 </Button>
+                }
+                
+               
               </Card.Footer>
             </Card>
           );

@@ -72,9 +72,10 @@ function Kezdolap() {
             </Col>
             <Col md={6} className="d-none d-md-block">
               <img 
-                src="/kepek/hero_books.png" 
+                src="/kepek/stockimage5.png" 
                 alt="Könyvek" 
                 className="img-fluid floating-img"
+                id='stockkep'
               />
             </Col>
           </Row>
@@ -91,7 +92,7 @@ function Kezdolap() {
               style={{ cursor: 'pointer' }}
               onClick={() => navigate(`/konyvlista?kat=${(kat.kat_nev)}`)}
             >
-              <Card.Body className="rounded text-center" style={{ backgroundColor: '#f3e5f5' }}>
+              <Card.Body className="rounded text-center" style={{ backgroundColor: "#dbc38c"}}>
                 <Card.Title className="py-3">{kat.kat_nev}</Card.Title>
               </Card.Body>
             </Card>
@@ -100,7 +101,7 @@ function Kezdolap() {
       </Row>
       </Container>
 
-      <div style={{ backgroundColor: "#f8f5f0", padding: "50px 0", position: "relative" }}>
+      <div style={{padding: "50px 0", position: "relative" }}>
   <Container style={{ position: "relative" }}>
     <h2 className="mb-4 fw-bold">Neked ajánljuk</h2>
 
@@ -127,14 +128,14 @@ function Kezdolap() {
             onClick={() => navigate(`/termek/${konyv.ISBN}`)}
             style={{ cursor: 'pointer' }}
           >
-            <div style={{ height: '300px', overflow: 'hidden' }}>
+            <div style={{ height: '330px', backgroundColor:"#F5F5DC" }}>
               <Card.Img 
                 variant="top" 
                 src={konyv.kep || `/kepek/${konyv.ISBN}.jpg`} 
                 className='termek_kep2'
               />
             </div>
-            <Card.Body className="p-2 d-flex flex-column">
+            <Card.Body className="p-2 d-flex flex-column" style={{backgroundColor:"#F5F5DC"}}>
               <Card.Title className="fs-6 fw-bold text-truncate mb-1">{konyv.cim}</Card.Title>
               <Card.Subtitle className="small text-muted mb-2">{konyv.szerzok}</Card.Subtitle>
               <div><strong> {konyv.ar} Ft </strong></div>

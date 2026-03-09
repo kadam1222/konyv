@@ -73,7 +73,8 @@ function App() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeFilters, setActiveFilters] = useState({});
   const [hasSearchOrCategory, setHasSearchOrCategory] = useState(false);
-
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(true);
 
 
 
@@ -126,7 +127,7 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
       <SearchStateWatcher onSearch={handleSearch} setActiveCategory={setActiveCategory} setSearchQuery={setSearchQuery} setHasSearchOrCategory={setHasSearchOrCategory} setActiveFilters={setActiveFilters}/>
       <div className="app">
 
-        <Header onSearch={handleSearch}  accessToken={accessToken} setAccessToken={setAccessToken} />
+        <Header onSearch={handleSearch}  accessToken={accessToken} setAccessToken={setAccessToken} showAuthPopup={showAuthPopup} setShowAuthPopup={setShowAuthPopup} showLoginForm={showLoginForm} setShowLoginForm={setShowLoginForm}/>
         <main>
           <Routes>
             <Route path="" element={<Kezdolap/>}/>
@@ -172,9 +173,9 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
             <Route path="/ASZF" element={<Ászf />} />
             <Route path="/rolunk" element={<Rolunk />} />
             <Route path="/elerhetosegek" element={<Elerhetosegek />} />
-            <Route path="/cart" element={<Kosar accesToken={accessToken}/>} />
+            <Route path="/cart" element={<Kosar accessToken={accessToken} setShowAuthPopup={setShowAuthPopup} setShowLoginForm={setShowLoginForm}/>} />
             <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
-            <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken} />} />
+            <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken}/>} />
             <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken} setAccessToken={setAccessToken} />}/>
             <Route path="/adminmodosit" element={<AdminModositasok accessToken={accessToken}/>} />
             <Route path="/adminuser" element={<AdminUser accessToken={accessToken}/>} />

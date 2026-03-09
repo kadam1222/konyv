@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import "./kosar.css"
 
 
-export default function Kosar( {accesToken} ){
+export default function Kosar( {accessToken, setShowAuthPopup, setShowLoginForm} ){
 
     const [mennyiseg,setMennyiseg] = useState()
     const navigate = useNavigate();
@@ -25,6 +25,11 @@ export default function Kosar( {accesToken} ){
         (sum, item) => sum + item.ar * item.mennyiseg,
         0
     );
+
+    const handleLoginClick = () => {
+        setShowLoginForm(true); 
+        setShowAuthPopup(true);  
+    };
 
     return(
         <>
@@ -62,12 +67,43 @@ export default function Kosar( {accesToken} ){
 
             
         </div>
-        <div className='teljesar'> <h4 id='rendelescim'>Rendelésed:</h4> 
+        <div className='teljesar'>
+             <h4 id='rendelescim'>Rendelésed:</h4> 
             <div className='RendelesInfo'> 
                 <span className='rendeles'>{mennyiseg} db termék</span> 
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
-                {kosar.length > 0 && accesToken ? <Button className='rendelesgombok' onClick={() => {navigate("/fizetes")}}>Tovább a fizetéshez!</Button> : <><span style={{color:"red"}}><strong>A vásárlás folytatásához kötelező a regisztráció!</strong></span><Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button></>}
-                <Button style={{marginBottom:"5px"}} className='rendelesgombok' onClick={()=>{navigate("/")}}>Vásárlás folytatása!</Button>
+                {!accessToken ? (
+                <>
+                    <span style={{ color: "red", fontWeight: "bold" }}>
+                        A vásárlás folytatásához bejelentkezés szükséges!<br/>
+                        <a  style={{cursor: 'pointer' , textDecoration:"none", color:"black"}} onClick={handleLoginClick}>Kattints ide a bejelentkezéshez </a>
+                    </span>
+                    
+                    <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>
+                </>
+                ) : kosar.length === 0 ? (
+                <>
+                    <span className="rendeles-hiba">
+                        A vásárlás folytatásához kötelező legalább egy terméket a kosárba tenni!
+                    </span>
+                    <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>
+                </>
+                ) : (
+                <Button 
+                    className='rendelesgombok' 
+                        onClick={() => navigate("/fizetes")}>
+                    Tovább a fizetéshez!
+                </Button>
+                )}
+
+                <Button 
+                    variant="outline-secondary"
+                    className='rendelesgombok' 
+                    onClick={() => navigate("/")}
+                >
+                    Vásárlás folytatása
+                </Button>
+
                 </div> 
             </div>
         </div>
