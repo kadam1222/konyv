@@ -7,7 +7,7 @@ export default function AuthScreen() {
   const { login, register } = useAuth();
 
   // Form állapotok
-  const [nev, setNev] = useState('');
+  const [vevo_nev, setVevo_Nev] = useState('');
   const [email, setEmail] = useState('');
   const [jelszo, setJelszo] = useState('');
 
@@ -50,8 +50,8 @@ export default function AuthScreen() {
             <TextInput
               style={styles.input}
               placeholder="Teljes név"
-              value={nev}
-              onChangeText={setNev}
+              value={vevo_nev}
+              onChangeText={setVevo_Nev}
             />
           )}
           <TextInput

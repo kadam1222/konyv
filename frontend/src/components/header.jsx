@@ -17,13 +17,11 @@ import RegisterForm from "./registerform";
 import { useNavigate } from "react-router-dom";
 import "./header.css"
 
-export default function Header({ onSearch, accessToken, setAccessToken }) {
+export default function Header({ onSearch, accessToken, setAccessToken , showAuthPopup, setShowAuthPopup, showLoginForm, setShowLoginForm }) {
    const navigate = useNavigate();
   const [fokat, setFokat] = useState([]);
   const [keresett, setKeresett] = useState("");
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [showAuthPopup, setShowAuthPopup] = useState(false);
-  const [showLoginForm, setShowLoginForm] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams(); 
   const [isAdmin, setIsAdmin] = useState(false)
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState([])
@@ -212,6 +210,11 @@ const handleLogout = async () => {
             <Navbar.Collapse id="basic-navbar-nav" style={{ display: "flex", alignItems: "center",justifyContent: "space-between",width: "100%"}}>
               <Nav className="me-auto"style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
                 <CategoryDropdown title="Kategóriák" />
+                <NavItem style={{ marginLeft: "14px", marginTop:"7.8px" }}>
+                    <a href="/konyvlista" style={{ textDecoration: "none", color: "inherit", fontSize:"16px" }}>
+                      <span>Összes könyv</span>
+                    </a>
+                </NavItem>
               </Nav>
 
               <NavItem style={{ display: "flex", alignItems: "center", gap: "15px" }}>

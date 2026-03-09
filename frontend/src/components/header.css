@@ -60,7 +60,7 @@
 
 .popup-close-icon {
   position: absolute;
-  top: -5px;      /* állítsd 4px-re ha még feljebb akarod */
+  top: -5px;     
   right: 12px;
   cursor: pointer;
   font-size: 20px;

@@ -64,14 +64,25 @@
     min-height: 150px;
 }
 
-.RendelesInfo{
+.RendelesInfo {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; 
     margin-left: 30px;
     margin-top: 5%;
     margin-bottom: 5%;
-    padding: 0%;
+    max-width: 350px; 
+
 }
+
+.rendeles-hiba {
+    color: red;
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 5px;
+    font-weight: bold;
+    display: block; 
+}
+
 
 #rendelescim{
     margin: 20px 0px  0px  20px
