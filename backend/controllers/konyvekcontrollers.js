@@ -538,3 +538,12 @@ exports.osszesRendelesSearch = async (req,res) =>{
   }
 }
 
+exports.DynamicFilters = async (req, res) =>{
+  try {
+    const { kat, cim } = req.query;
+    const szurok = await Konyvek.getElerhetoSzurok(kat, cim);
+    res.json(szurok);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}

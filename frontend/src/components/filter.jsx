@@ -9,7 +9,6 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
   const [nyelvek, setNyelvek] = useState([]);
   const [boritok, setBoritok] = useState([]);
   const [tipusok, setTipusok] = useState([]);
-  const [error, setError] = useState();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState({
     kiado: '',
@@ -20,22 +19,28 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
     armax: ''
   });
 
-  const fetchData = async (endpoint, setter) => {
-    try {
-      const response = await httpCommon.get(`/konyvek/${endpoint}`);
-      setter(response.data);
-    } catch (err) {
-      console.error(`Error fetching ${endpoint}:`, err);
-      setError(err.message);
+  useEffect(() =>{
+    const fetchDynamicFilters = async () =>{
+      try{
+        const response = await httpCommon.get('/konyvek/elerheto-szurok', {
+          params: { 
+            cim: searchQuery, 
+            kat: activeCategory 
+          }
+        });
+        const { kiadok, nyelvek, boritok, tipusok } = response.data;
+        
+        setKiadok(kiadok);
+        setNyelvek(nyelvek);
+        setBoritok(boritok);
+        setTipusok(tipusok);
+      }
+      catch(err){
+        console.error(err)
+      }
     }
-  };
-
-  useEffect(() => {
-    fetchData('kiadok', setKiadok);
-    fetchData('nyelv', setNyelvek);
-    fetchData('borito', setBoritok);
-    fetchData('tipus', setTipusok);
-  }, []);
+    fetchDynamicFilters();
+  }, [searchQuery, activeCategory])
 
   useEffect(() => {
     const params = Object.fromEntries([...searchParams]);
@@ -109,77 +114,56 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
         )}
       </div>
 
-      <h3>Kiadó:</h3>
+     <h3>Kiadó:</h3>
       <div className="filter_options">
-        {kiadok.map(k => (
+        {kiadok.map((k, index) => (
           <span
-            key={k.id}
-            className={`kat ${filters.kiado === k.kiado_nev ? 'active' : ''}`}
-            onClick={() => handleSelectFilter('kiado', k.kiado_nev)}
+            key={index}
+            className={`kat ${filters.kiado === k ? 'active' : ''}`}
+            onClick={() => handleSelectFilter('kiado', k)}
           >
-            {k.kiado_nev}
+            {k}
           </span>
         ))}
       </div>
 
       <h3>Nyelv:</h3>
-      <div className="filter_options">
-        {nyelvek.map(n => (
-          <span
-            key={n.id}
-            className={`kat ${filters.nyelv === n.nyelv_nev ? 'active' : ''}`}
-            onClick={() => handleSelectFilter('nyelv', n.nyelv_nev)}
-          >
-            {n.nyelv_nev}
-          </span>
-        ))}
-      </div>
+  <div className="filter_options">
+  {nyelvek.map((n, index) => (
+    <span
+      key={index}
+      className={`kat ${filters.nyelv === n ? 'active' : ''}`}
+      onClick={() => handleSelectFilter('nyelv', n)}
+    >
+      {n}
+    </span>
+  ))}
+</div>
 
-      <h3>Borító:</h3>
-      <div className="filter_options">
-        {boritok.map(b => (
-          <span
-            key={b.id}
-            className={`kat ${filters.borito === b.borito_nev ? 'active' : ''}`}
-            onClick={() => handleSelectFilter('borito', b.borito_nev)}
-          >
-            {b.borito_nev}
-          </span>
-        ))}
-      </div>
-
-      <h3>Típus:</h3>
-      <div className="filter_options">
-        {tipusok.map(t => (
-          <span
-            key={t.id}
-            className={`kat ${filters.tipus === t.tipus_nev ? 'active' : ''}`}
-            onClick={() => handleSelectFilter('tipus', t.tipus_nev)}
-          >
-            {t.tipus_nev}
-          </span>
-        ))}
-      </div>
-      {/*
-      <h3>Ár:</h3>
-      <div className="arak_range">
-        <input
-          type="number"
-          placeholder="Min"
-          value={filters.armin}
-          onChange={e => handleSelectFilter('armin', e.target.value)}
-        />
-        <span>Ft - </span>
-        <input
-          type="number"
-          placeholder="Max"
-          value={filters.armax}
-          onChange={e => handleSelectFilter('armax', e.target.value)}
-        />
-        <span>Ft</span>
-      </div>
-    */}
-     
+ <h3>Borító:</h3>
+<div className="filter_options">
+  {boritok.map((b, index) => (
+    <span
+      key={index}
+      className={`kat ${filters.borito === b ? 'active' : ''}`}
+      onClick={() => handleSelectFilter('borito', b)}
+    >
+      {b}
+    </span>
+  ))}
+</div>
+  {/*<h3>Típus:</h3>
+  <div className="filter_options">
+    {tipusok && tipusok.map((t, index) => (
+      <span
+        key={index}
+        className={`kat ${filters.tipus === t ? 'active' : ''}`}
+        onClick={() => handleSelectFilter('tipus', t)}
+      >
+        {t}
+      </span>
+    ))}
+      </div>*/}
     </div>
   );
 }
