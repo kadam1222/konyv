@@ -83,6 +83,20 @@
     display: block; 
 }
 
+.auth-login-link {
+    cursor: pointer;
+    text-decoration: none;
+    color: #2d3748;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.auth-login-link:hover {
+    color: #000;
+    transform: translateY(-1px);
+}
 
 #rendelescim{
     margin: 20px 0px  0px  20px
