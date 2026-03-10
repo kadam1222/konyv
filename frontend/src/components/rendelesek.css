@@ -1,0 +1,45 @@
+.fodivrendeles{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 70px;
+    border: 3px solid #7641345b ;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #ebdaaf;
+    max-width: 900px;
+    min-width: 400px;
+}
+
+.order {
+    background-color: #a18f5f31; 
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid #d9cbb6a1;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
+    margin: auto 20px 20px 20px;
+}
+
+
+.order h4 {
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+
+.order p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.order ul {
+    margin-left: 20px;
+    margin-top: 5px;
+    padding-left: 15px;
+}
+
+.order ul li {
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}

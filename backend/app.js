@@ -5,11 +5,20 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 const konyvekRouter = require('./routes/konyvek')
 const authRoutes = require("./routes/tokens")
+const kepfeltoltesRouter = require("./routes/kepfeltoltes");
+const adminRouter = require("./routes/admin")
+
 
 var app = express();
 
 const cors = require('cors')
-var corsOptions = { origin: "http://localhost:5173", credentials : true}
+const corsOptions = { 
+    origin: true
+    , credentials : true,
+
+}
+
+
 
 app.use(cors(corsOptions))
 app.use(logger('dev'));
@@ -21,5 +30,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use("/auth", authRoutes);
 app.use('/konyvek', konyvekRouter)
+app.use("/upload", kepfeltoltesRouter);
+app.use("/admin",adminRouter)
+
+
 
 module.exports = app;

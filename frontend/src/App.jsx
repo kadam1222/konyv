@@ -5,9 +5,62 @@ import Filters from './components/filter';
 import Fooldal from './components/fooldal';
 import { useState, useEffect } from 'react';
 import Main from './components/main';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Footer from './components/footer';
 import Termek from './components/termek';
+import Ászf from './components/ÁSZF'
+import Rolunk from './components/rolunk';
+import Elerhetosegek from './components/elerhetosegek';
+import Kosar from './components/kosar';
+import Profil from './components/profil';
+import Segitseg from './components/segitseg';
+import Fizetes from './components/fizetes';
+import Koszonjuk from './components/Koszonjuk';
+import Rendelesek from './components/Rendelesek';
+import AdminModositasok from './components/adminmodositas';
+import AdminUser from './components/adminusermodositas';
+import AdminBook from './components/adminosszeskonyv';
+import AdminInsertBook from './components/adminujadat';
+import AdminAdatTorles from './components/admintorles';
+import Kezdolap from './components/Kezdolap';
+
+
+function SearchStateWatcher({ onSearch, setActiveCategory, setSearchQuery, setHasSearchOrCategory, setActiveFilters }) {
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const kat = params.get("kat");
+    const search = params.get("search");
+
+    const filters = {
+      kiado: params.get("kiado") || '',
+      nyelv: params.get("nyelv") || '',
+      borito: params.get("borito") || '',
+      tipus: params.get("tipus") || '',
+      armin: params.get("armin") || '',
+      armax: params.get("armax") || ''
+    };
+
+    if (location.pathname === "/konyvlista") {
+      if (kat || search || Object.values(filters).some(v => v !== '')) {
+        onSearch(search || "", 1, kat || null, filters);
+        if(kat) setActiveCategory(kat);
+        if(search) setSearchQuery(search);
+        setActiveFilters(filters);
+      }
+      else{
+        setActiveCategory(null);
+        setSearchQuery("");
+        setActiveFilters({});
+        setHasSearchOrCategory(false);
+      }
+    }
+  }, [location.search, location.pathname]); 
+
+  return null;
+}
+
 
 function App() {
   const [talalatok, setTalalatok] = useState([]);
@@ -16,69 +69,81 @@ function App() {
   const [hasMoreSearch, setHasMoreSearch] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [rawResults, setRawResults] = useState([]);
   const [accessToken, setAccessToken] = useState("");
-  
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [activeFilters, setActiveFilters] = useState({});
+  const [hasSearchOrCategory, setHasSearchOrCategory] = useState(false);
 
-  useEffect(() => {
-    const refreshToken = async () => {
-      try {
-        const res = await fetch("http://localhost:8080/auth/refresh", {
-          method: "POST",
-          credentials: "include",
-        });
-        if (!res.ok) return;
-          const data = await res.json();
-          setAccessToken(data.accessToken);
-      } 
-      catch(err){
 
-      }
-    };
-    refreshToken();
-  }, []);
-  const handleSearch = async (query, pageNum = 1, category = null) => {
-  try {
-    let url;
-    if (category) {
-      url = `/konyvek/search?kat=${category}&page=${pageNum}&limit=10`;
-    } else {
-      url = `/konyvek/fokereso?page=${pageNum}&limit=10&cim=${query}&szerzo=${query}`;
+
+
+useEffect(() => {
+  const refreshToken = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/auth/refresh", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      console.log("Refresh token response:", data);
+      setAccessToken(data.accessToken);
+    } catch(err){
+      console.error(err);
     }
+  };
+  refreshToken();
+}, []);
 
-    const res = await fetch(url);
-    const data = await res.json();
+const handleSearch = async (query, pageNum = 1, category = null, filters = {}) => {
+  setSearchQuery(query);        
+  setActiveCategory(category);
+  setActiveFilters(filters);
+  setSearchPage(pageNum);
 
-    setTalalatok(prev => pageNum === 1 ? data : [...prev, ...data]);
-    setSearchQuery(query);
-    setSearchPage(pageNum);
-    setHasMoreSearch(data.length === 10);
-    setRawResults(data);
+  const params = new URLSearchParams({ page: pageNum, limit: 10 });
+  if (category) params.set("kat", category);
+  if (query) params.set("cim", query) ; params.set("szerzo", query);
+  Object.entries(filters).forEach(([key, val]) => { if(val) params.set(key, val); });
 
-  } catch (err) {
-    console.error(err);
-  }
+  try {
+      const res = await fetch(`/konyvek/search?${params.toString()}`);
+      if (!res.ok) throw new Error("Hiba a keresés során");
+      const data = await res.json();
+
+      setTalalatok(data);
+      setHasMoreSearch(data.length === 10);
+      setHasSearchOrCategory(true);
+    } catch (err) {
+      console.error("Keresési hiba:", err);
+      setTalalatok([]);
+    }
 };
 
 
   return (
     <Router>
-
+      <SearchStateWatcher onSearch={handleSearch} setActiveCategory={setActiveCategory} setSearchQuery={setSearchQuery} setHasSearchOrCategory={setHasSearchOrCategory} setActiveFilters={setActiveFilters}/>
       <div className="app">
 
         <Header onSearch={handleSearch}  accessToken={accessToken} setAccessToken={setAccessToken} />
+        <main>
+          <Routes>
+            <Route path="" element={<Kezdolap/>}/>
+            <Route path="/konyvlista" element={
+                <>
+                {!searchQuery && !activeCategory && <Main />}
 
-        <Routes>
 
-          <Route path="/" element={
-              <>
-                {talalatok.length === 0 && <Main />}
-
-                <div style={{ display: "flex" }}>
-                  {talalatok.length > 0 && (
+                  <div style={{ display: "flex" }}>
+                  {hasSearchOrCategory && talalatok.length > 0 && (
                     <Filters
-                      onSearch={setTalalatok}
+                      onSearch={handleSearch}
                       talalatok={talalatok}
+                      activeFilters={activeFilters}
+                      setActiveFilters={setActiveFilters}
+                      searchQuery={searchQuery}
+                      activeCategory={activeCategory}
                     />
                   )}
 
@@ -94,19 +159,37 @@ function App() {
                     setPage={setPage}
                     hasMore={hasMore}
                     setHasMore={setHasMore}
+                    activeCategory={activeCategory}
+                    activeFilters={activeFilters}
+                    setActiveFilters={setActiveFilters}
                   />
                 </div>
-              </>
-            }
-          />
+                </>
+              }
+            />
 
-          <Route path="/termek/:isbn" element={<Termek />} />
+            <Route path="/termek/:isbn" element={<Termek />} />
+            <Route path="/ASZF" element={<Ászf />} />
+            <Route path="/rolunk" element={<Rolunk />} />
+            <Route path="/elerhetosegek" element={<Elerhetosegek />} />
+            <Route path="/cart" element={<Kosar accesToken={accessToken}/>} />
+            <Route path="/fizetes" element={<Fizetes accessToken={accessToken}/>} />
+            <Route path="/profil" element={<Profil accessToken={accessToken} setAccessToken={setAccessToken} />} />
+            <Route path="/rendelesek" element={<Rendelesek accessToken={accessToken} setAccessToken={setAccessToken} />}/>
+            <Route path="/adminmodosit" element={<AdminModositasok accessToken={accessToken}/>} />
+            <Route path="/adminuser" element={<AdminUser accessToken={accessToken}/>} />
+            <Route path="/adminbook" element={<AdminBook accessToken={accessToken}/>} />
+            <Route path="/admininsert" element={<AdminInsertBook accessToken={accessToken}/>} />
+            <Route path="/admintorles" element={<AdminAdatTorles accessToken={accessToken}/>} />
+            <Route path="/segitseg" element={<Segitseg/>} />
+            <Route path='/koszonjuk' element={<Koszonjuk/>}/>
 
 
-        </Routes>
-
-        <Footer />
+          </Routes>
+        </main>
+        <Footer /> 
       </div>
+
     </Router>
   );
 }

@@ -74,10 +74,10 @@ return (
         <a href="/" className="termek-vissza">← Vissza</a>
 
         <h1>{adatok.cim}</h1>
-        <h3>{adatok.szerzok}</h3>
+        <h4 className="szerzonevek">{adatok.szerzok}</h4>
 
         <p className="termek-leiras">
-          {adatok.leiras}
+          { adatok.leiras ? adatok.leiras : "Nincs leírás"}
         </p>
 
         <div className="termek-meta">
@@ -86,11 +86,24 @@ return (
           <span><strong>Kiadó:</strong> {adatok.kiado_nev}</span>
           <span><strong>Nyelv:</strong> {adatok.nyelv_nev}</span>
           <span><strong>Kiadás éve:</strong> {adatok.kiadas_eve}</span>
+          {adatok.illusztratorok ? <span><strong>Illusztrátor(ok):</strong> {adatok.illusztratorok}</span> : ""}
+          {adatok.fordítok ? <span><strong>Fordító(k):</strong> {adatok.fordítok}</span> : ""}
         </div>
 
         <div className="termek-footer">
           <div className="termek-ar">{adatok.ar} Ft</div>
-          <button className="termek-kosar">Kosárba</button>
+          <button className="termek-kosar"  onClick={() => {
+                  const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
+                  const letezo = kosar.find(item => item.ISBN === adatok.ISBN);
+                  if (letezo) {
+                    letezo.mennyiseg += 1;
+                  } else {
+                    kosar.push({ ...adatok, mennyiseg: 1 });
+                  }
+
+                  localStorage.setItem("kosar", JSON.stringify(kosar));
+                  window.dispatchEvent(new Event("storage"));
+                }}>Kosárba</button>
         </div>
 
       </div>

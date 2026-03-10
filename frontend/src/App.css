@@ -3,11 +3,11 @@
   box-sizing: border-box;
 }
 
-body {
+
+
+html, body {
+  height: 100%;
   margin: 0;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  background-color: #f5f6f8;
-  color: #222;
 }
 
 .app {
@@ -18,16 +18,84 @@ body {
 
 main {
   flex: 1;
+  display: block;
 }
+
 
 
 button:hover {
   transform: translateY(-1px);
+  --bs-btn-bg: #ac853ba8;
+  --bs-btn-border-color: #ac853b;
+}
+
+#bejelentkezesgomb{
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #dbc38c;
+  color: #3a2f1f;
+  transition: all 0.2s ease;
+}
+
+#bejelentkezesgomb{
+  background-color: #8c6b2f;
+    border-color: #8c6b2f;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
+    transform: translateY(-2px);
+}
+
+.footer-fodiv{
+  width: 450px;
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  display: flex;
 }
 
 header{
-position: fixed; 
-    top: 0;          
-    width: 100%;    
-    z-index: 999;    
+  position: sticky;
+  top: 0;
+  padding: 10px 16px;
+  background: #555;
+  z-index: 99;
+}
+
+.termek-vissza {
+  align-self: flex-start;
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: #9f8d73;
+  text-decoration: none;
+}
+
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #ac853ba8;
+  --bs-btn-border-color: #ac853b;
+}
+
+.popup-content {
+  margin: auto;
+  background: #fff;
+  width: 30%;
+  padding: 5px;
+  border: 1px solid #d7d7d7;
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgba(140, 107, 47, 0.4); 
+}
+
+
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:focus-visible {
+  background-color: #8c6b2f;
+  border-color: #8c6b2f;
+  box-shadow: 0 0 0 0.25rem rgba(140, 107, 47, 0.4);
 }

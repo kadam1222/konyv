@@ -1,0 +1,170 @@
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+import { useNavigate } from 'react-router-dom';
+import './kezdolap.css';
+import { useState,useEffect ,useRef} from 'react';
+import httpCommon from '../http-common';
+
+function Kezdolap() {
+  const navigate = useNavigate();
+  const [alkategoriak, setAlkategoriak] = useState([]);
+  const [ajanlottKonyvek, setAjanlottKonyvek] = useState([]);
+  const scrollRef = useRef(null);
+
+  const scroll = (direction) => {
+  if (scrollRef.current) {
+    const { scrollLeft, clientWidth } = scrollRef.current;
+    const scrollAmount = clientWidth * 0.8; 
+    scrollRef.current.scrollTo({
+      left: direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount,
+      behavior: 'smooth'
+    });
+  }
+};
+
+
+  useEffect(() => {
+    const fetchSubCategories = async () => {
+      try {
+        const response = await httpCommon.get("/konyvek/kategoria");
+        
+
+        const csakAlkat = response.data.filter(k => k.katazon !== null);
+        const randomHaram = csakAlkat
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3);
+        
+        const konyvRes = await httpCommon.get("/konyvek?page=1");
+        setAjanlottKonyvek(konyvRes.data);
+
+        setAlkategoriak(randomHaram);
+
+
+      } catch (error) {
+        console.error("Hiba az alkategóriák lekérésekor:", error);
+      }
+    };
+    fetchSubCategories();
+  }, []);
+
+  return (
+    <div className="kezdolap-container">
+      <div className="hero-section">
+        <Container>
+          <Row className="align-items-center py-5">
+            <Col md={6} className="text-md-start text-center">
+              <h1 className="display-3 fw-bold">Találd meg a következő kalandod!</h1>
+              <p className="lead">
+                Több ezer könyv, a legfrissebb megjelenésektől a klasszikusokig. 
+                Böngéssz kedvedre és rendeld házhoz kedvenceidet.
+              </p>
+              <Button 
+                variant="primary" 
+                size="lg" 
+                className="Kosargomb px-5" 
+                onClick={() => navigate('/konyvlista')}
+              >
+                Böngészés a könyvek között
+              </Button>
+            </Col>
+            <Col md={6} className="d-none d-md-block">
+              <img 
+                src="/kepek/hero_books.png" 
+                alt="Könyvek" 
+                className="img-fluid floating-img"
+              />
+            </Col>
+          </Row>
+        </Container>
+      </div>
+
+      <Container className="my-5">
+        <h2 className="text-center mb-4">Népszerű kategóriák</h2>
+        <Row>
+        {alkategoriak.map((kat) => (
+          <Col key={kat.id} md={4} className="mb-4">
+            <Card 
+              className="category-card border-0 shadow-sm"
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate(`/konyvlista?kat=${(kat.kat_nev)}`)}
+            >
+              <Card.Body className="rounded text-center" style={{ backgroundColor: '#f3e5f5' }}>
+                <Card.Title className="py-3">{kat.kat_nev}</Card.Title>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+      </Container>
+
+      <div style={{ backgroundColor: "#f8f5f0", padding: "50px 0", position: "relative" }}>
+  <Container style={{ position: "relative" }}>
+    <h2 className="mb-4 fw-bold">Neked ajánljuk</h2>
+
+    <button 
+      onClick={() => scroll('left')}
+      style={{position: "absolute", left: "-20px", top: "55%", zIndex: 10, background: "white", border: "1px solid #ddd", borderRadius: "50%", width: "40px", height: "40px", boxShadow: "0 2px 5px rgba(0,0,0,0.1)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"}}
+    >
+      ❮
+    </button>
+    <div 
+      ref={scrollRef}
+      className="d-flex flex-nowrap overflow-auto pb-3 gap-3" 
+      style={{ 
+        scrollbarWidth: 'none', 
+        msOverflowStyle: 'none',
+        scrollSnapType: 'x mandatory', 
+        WebkitOverflowScrolling: 'touch'
+      }}
+    >
+      {ajanlottKonyvek.map((konyv) => (
+        <div key={konyv.ISBN} style={{ minWidth: '220px', maxWidth: '220px', scrollSnapAlign: 'start' }}>
+          <Card 
+            className="h-100 border-0 shadow-sm category-card"
+            onClick={() => navigate(`/termek/${konyv.ISBN}`)}
+            style={{ cursor: 'pointer' }}
+          >
+            <div style={{ height: '300px', overflow: 'hidden' }}>
+              <Card.Img 
+                variant="top" 
+                src={konyv.kep || `/kepek/${konyv.ISBN}.jpg`} 
+                className='termek_kep2'
+              />
+            </div>
+            <Card.Body className="p-2 d-flex flex-column">
+              <Card.Title className="fs-6 fw-bold text-truncate mb-1">{konyv.cim}</Card.Title>
+              <Card.Subtitle className="small text-muted mb-2">{konyv.szerzok}</Card.Subtitle>
+              <div><strong> {konyv.ar} Ft </strong></div>
+            </Card.Body>
+          </Card>
+        </div>
+      ))}
+    </div>
+
+
+    <button 
+      onClick={() => scroll('right')}
+      style={{
+        position: "absolute", right: "-20px", top: "55%", zIndex: 10,
+        background: "white", border: "1px solid #ddd", borderRadius: "50%",
+        width: "40px", height: "40px", boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
+      }}
+    >
+      ❯
+    </button>
+  </Container>
+  <style>{`
+    div::-webkit-scrollbar {
+      display: none;
+    }
+  `}</style>
+</div>
+    </div>
+  );
+}
+
+export default Kezdolap;

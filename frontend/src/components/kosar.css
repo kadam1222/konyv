@@ -1,0 +1,131 @@
+.teljesar{
+    border: 3px solid #7641345b ;
+    width: 310px;
+    margin-left: 100px;
+    max-height: 350px;
+    margin-top: 20px;
+    margin-bottom: 1%;
+    background-color: #ebdaaf;
+}
+
+.kosarfodiv{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 70px;
+    border: 3px solid #7641345b ;
+    min-width: 400px;
+    background-color: #ebdaaf;
+}
+
+.cim{
+    margin-left: 10%;
+    margin-top: 5px;
+}
+
+.termekek{
+    display: flex;
+    border-bottom: 3px solid #7641345b ;
+    justify-content: flex-start; 
+    align-items: center;
+}
+
+.termekek > img{
+    width: 100px;
+    height: 150px;
+    margin: 15px;
+    object-fit: contain;
+}
+
+.termekek > input{
+    width: 60px;
+    height: 35px;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 20px;
+    margin-right: 5px;
+
+}
+
+.termekek:last-child {
+    border-bottom: none;
+}
+
+.Termekinfo{
+    display: flex;
+    flex-direction: column;
+    margin-left: 30px;
+    margin-top: 5%;
+    margin-bottom: 1%;
+    padding: 0%;
+    min-width: 350px;
+    flex-grow: 1;
+    min-height: 150px;
+}
+
+.RendelesInfo{
+    display: flex;
+    flex-direction: column;
+    margin-left: 30px;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    padding: 0%;
+}
+
+#rendelescim{
+    margin: 20px 0px  0px  20px
+}
+
+.rendeles{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #ac853ba8;
+  --bs-btn-border-color: #ac853b;
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #494948a8;
+  --bs-btn-disabled-border-color: #474746;
+}
+
+.rendelesgombok{
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 20px;
+    padding: 12px 28px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #dbc38c;
+    color: #3a2f1f;
+    transition: all 0.2s ease;
+}
+
+#konyvcim{
+    max-width: 450px;
+}
+
+#torlesgomb{
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 5px;
+    margin-right: 30px;
+}
+
+.rendelesgombok:hover {
+  background-color: #8c6b2f;
+  border-color: #8c6b2f;
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(159, 141, 115, 0.4);
+  transform: translateY(-2px);
+}
+
+#hibaüzenet{
+    margin-left: auto;
+    margin-right: auto;
+}

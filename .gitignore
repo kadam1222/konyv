@@ -7,9 +7,11 @@
 /frontend1/node_modules/
 /frontend1/.pnp
 /frontend1/.pnp.js
-
+/konyvesbolt
+/mobilapp
 # testing
 /frontend/coverage
+/Mit kell még csinálni.txt
 
 # production
 /frontend/build
