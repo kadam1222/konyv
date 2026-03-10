@@ -720,6 +720,39 @@ static async osszesRendelesSearchbar(page = 1, limit = 10, email = "", szamlasza
     console.error(err);
     throw err;
   }
+} 
+
+static async getElerhetoSzurok(kat, cim) {
+    try {
+        const params = [];
+        let conditions = ["1=1"];
+
+        if (kat && kat !== 'Összes' && kat !== 'undefined') {
+            conditions.push("kat_nev = ?");
+            params.push(kat);
+        }
+
+        if (cim && typeof cim === 'string' && cim.trim() !== "") {
+            conditions.push("(cim LIKE ? OR szerzok LIKE ?)");
+            params.push(`%${cim}%`, `%${cim}%`);
+        }
+
+        const where = `WHERE ${conditions.join(" AND ")}`;
+
+        const [kiadokRows] = await db.query(`SELECT DISTINCT kiado_nev FROM osszes_konyv ${where} ORDER BY kiado_nev`, params);
+        const [nyelvekRows] = await db.query(`SELECT DISTINCT nyelv_nev FROM osszes_konyv ${where} ORDER BY nyelv_nev`, params);
+        const [boritokRows] = await db.query(`SELECT DISTINCT borito_tipus FROM osszes_konyv ${where} ORDER BY borito_tipus`, params) ;
+        const [tipusokRows] = await db.query(`SELECT DISTINCT tipus_nev FROM osszes_konyv ${where} ORDER BY tipus_nev`, params);
+        return {
+            kiadok: (kiadokRows || []).map(r => r.kiado_nev).filter(Boolean),
+            nyelvek: (nyelvekRows || []).map(r => r.nyelv_nev).filter(Boolean),
+            boritok: (boritokRows || []).map(r => r.borito_tipus).filter(Boolean),
+            tipusok: (tipusokRows || []).map(r => r.tipus_nev).filter(Boolean)
+        };
+    } catch (err) {
+        console.error("CRITICAL SQL ERROR:", err.message);
+        throw err; 
+    }
 }
 
 }
