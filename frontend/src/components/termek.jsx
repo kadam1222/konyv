@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import httpCommon from "../http-common";
+import { Button } from "react-bootstrap";
 import "./termek.css"
 
 export default function Termek() {
@@ -92,6 +93,17 @@ return (
 
         <div className="termek-footer">
           <div className="termek-ar">{adatok.ar} Ft</div>
+          {adatok.raktar == 0 ? <div> 
+            <span style={{color:"red", fontSize:"16px", fontWeight:"bold"}}>A termék nincs raktáron. <br/> Kérjük próbálkozzon újra később.</span> <br/>
+            <Button className="termek-kosar" style={{backgroundColor:"grey", marginLeft:"70px", color:"white"}} disabled>Kosárba</Button>  
+            
+            </div>
+          : <div>
+            {adatok.raktar < 5 && (
+              <span style={{ color: "red", fontSize: "16px", fontWeight: "bold" }}>
+                Utolsó darabok! ({adatok.raktar} db) <br />
+              </span>
+            )}
           <button className="termek-kosar"  onClick={() => {
                   const kosar = JSON.parse(localStorage.getItem("kosar")) || [];
                   const letezo = kosar.find(item => item.ISBN === adatok.ISBN);
@@ -104,6 +116,9 @@ return (
                   localStorage.setItem("kosar", JSON.stringify(kosar));
                   window.dispatchEvent(new Event("storage"));
                 }}>Kosárba</button>
+              </div>
+              }
+          
         </div>
 
       </div>

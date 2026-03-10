@@ -9,6 +9,7 @@ router.get('/search', konyvekcontrollers.filter);
 
 router.get('/kategoria', konyvekcontrollers.kategoria);
 
+router.get('/elerheto-szurok', konyvekcontrollers.DynamicFilters)
 
 
 router.get('/nyelv', konyvekcontrollers.nyelv);

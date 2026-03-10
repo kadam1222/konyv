@@ -44,8 +44,8 @@
 .termek-vissza {
   align-self: flex-start;
   margin-bottom: 16px;
-  font-size: 14px;
-  color: #9f8d73;
+  font-size: 15px;
+  color: #b69e7d;
   text-decoration: none;
 }
 
@@ -87,7 +87,7 @@
 }
 
 .termek-meta strong {
-  color: #3a2f1f;
+  color: #a38458;
 }
 
 
@@ -116,6 +116,15 @@
   background-color: #dbc38c;
   color: #3a2f1f;
   transition: all 0.2s ease;
+}
+
+.termek-kosar-disabled {
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: #3a2f1f;
 }
 
 .termek-kosar:hover {

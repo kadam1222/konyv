@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useAuth } from '@/auth/AuthProvider';
 
 export default function AuthScreen() {
@@ -7,7 +7,7 @@ export default function AuthScreen() {
   const { login, register } = useAuth();
 
   // Form állapotok
-  const [nev, setNev] = useState('');
+  const [vevo_nev, setVevo_Nev] = useState('');
   const [email, setEmail] = useState('');
   const [jelszo, setJelszo] = useState('');
 
@@ -15,8 +15,10 @@ export default function AuthScreen() {
     if (isLogin) {
       await login(email, jelszo);
     } else {
-      const success = await register(nev, email, jelszo);
-      if (success) setIsLogin(true); // Regisztráció után dobjuk át a loginra
+      const success = await register({nev: nev, email: email, jelszo : jelszo});
+      if (success){
+         setIsLogin(true);
+      } 
     }
   };
 
@@ -48,8 +50,8 @@ export default function AuthScreen() {
             <TextInput
               style={styles.input}
               placeholder="Teljes név"
-              value={nev}
-              onChangeText={setNev}
+              value={vevo_nev}
+              onChangeText={setVevo_Nev}
             />
           )}
           <TextInput
