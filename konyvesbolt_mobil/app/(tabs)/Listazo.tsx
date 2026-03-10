@@ -4,6 +4,7 @@ import {View, Text, Image, Button, ActivityIndicator, FlatList, StyleSheet, Aler
 import axios from 'axios';
 import { Dimensions } from 'react-native';
 import { useCart } from './CartContext';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 const CARD_MARGIN = 8;
@@ -31,6 +32,7 @@ const ListazoInfinite = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery , setSearchQuery] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     loadPage(1);
@@ -125,10 +127,8 @@ const ListazoInfinite = () => {
       key={2} 
       columnWrapperStyle={styles.row}
       renderItem={({ item }) => (
-        <View style={styles.item}>
-          <Text style={styles.title}>
-            {item.ISBN}. {item.cim}
-          </Text>
+        <TouchableOpacity style={styles.item} onPress={() => router.push({pathname: "/BookDetails", params: { isbn: item.ISBN }})}>
+          <Text style={styles.title}> {item.cim} </Text>
 
           <Image
             source={{ uri: `${backendUrl}/kepek/${item.ISBN}.jpg` }}
@@ -144,7 +144,7 @@ const ListazoInfinite = () => {
               Alert.alert("Sikeres kosárba rakás", "A terméket sikeresen elhelyezte a kosárba");
             }}
           />
-        </View>
+        </TouchableOpacity>
       )}
       onEndReached={loadMore}
       onEndReachedThreshold={0.5}
