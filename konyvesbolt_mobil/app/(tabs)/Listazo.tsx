@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { useCart } from './CartContext';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 40) / 2; 
@@ -39,6 +40,7 @@ const ListazoInfinite = () => {
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [kategoriak, setKategoriak] = useState<Kategoria[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     fetchCategories();
@@ -198,26 +200,45 @@ const ListazoInfinite = () => {
         ListFooterComponent={loading ? <ActivityIndicator color="yellow" /> : null}
       />
 
-      <Modal
-        visible={isFilterVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsFilterVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.bottomSheet}>
-            <View style={styles.sheetHeader}>
-              <Text style={styles.sheetTitle}>Válassz kategóriát</Text>
-              <TouchableOpacity onPress={() => setIsFilterVisible(false)}>
-                <Text style={{ color: 'red', fontWeight: 'bold' }}>Bezárás</Text>
-              </TouchableOpacity>
-            </View>
-            {renderKategoriaLista()}
-          </View>
-        </View>
-      </Modal>
-    </View>
-  );
+    <FlatList
+      data={data}
+      numColumns={2}
+      key={2} 
+      columnWrapperStyle={styles.row}
+      renderItem={({ item }) => (
+        <TouchableOpacity style={styles.item} onPress={() => router.push({pathname: "/BookDetails", params: { isbn: item.ISBN }})}>
+          <Text style={styles.title}> {item.cim} </Text>
+
+          <Image
+            source={{ uri: `${backendUrl}/kepek/${item.ISBN}.jpg` }}
+            style={styles.image}
+          />
+
+          <Text numberOfLines={2} style={styles.price}>Ár: {item.ar} Ft</Text>
+
+          <Button
+            title="Kosárba"
+            onPress={() => {
+              addToCart(item);
+              Alert.alert("Sikeres kosárba rakás", "A terméket sikeresen elhelyezte a kosárba");
+            }}
+          />
+        </TouchableOpacity>
+      )}
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.5}
+      refreshing={loading && page === 1}
+      onRefresh={refreshList}
+      ListFooterComponent={
+        loading && page > 1 ? (
+          <ActivityIndicator style={{ marginVertical: 20 }} />
+        ) : !hasMore ? (
+          <Text style={styles.endText}>Nincs több termék</Text>
+        ) : null
+      }
+    />
+  </View>
+);
 };
 
 export default ListazoInfinite;
