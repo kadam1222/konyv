@@ -137,7 +137,7 @@ const handleSearch = async (query, pageNum = 1, category = null, filters = {}) =
 
 
                   <div style={{ display: "flex" }}>
-                  {hasSearchOrCategory && talalatok.length > 0 && (
+                  {hasSearchOrCategory && (
                     <Filters
                       onSearch={handleSearch}
                       talalatok={talalatok}
