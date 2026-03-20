@@ -95,9 +95,9 @@ try {
     }
   };
 
-  const register = async (vevo_nev: string, email: string, jelszo: string) => {
+  const register = async ({ nev, email, jelszo } : {nev: string, email: string, jelszo: string}) => {
   try {
-    await api.post("/auth/register", { vevo_nev, email, jelszo });
+    await api.post("/auth/register", { nev, email, jelszo });
     Alert.alert("Sikeres regisztráció!");
     return true;
   } catch (error: any) {
