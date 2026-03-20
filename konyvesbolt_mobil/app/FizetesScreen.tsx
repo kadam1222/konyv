@@ -15,6 +15,7 @@ const FizetesScreen = () => {
   const [shippingMethod, setShippingMethod] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState(1);  
   const [loading, setLoading] = useState(false);
+  const [adoszam, setAdoszam] = useState("")
 
 
   const szallitasiKoltseg = shippingMethod === 1 ? 500 : 0;
@@ -42,7 +43,7 @@ const FizetesScreen = () => {
         nev: user?.vevo_nev,
         email: user?.email,
         lakcim: lakcim,
-        adoszam: "",
+        adoszam: adoszam,
         teljesites_kelte: kuldendoDatum
       });
 
@@ -79,6 +80,13 @@ const FizetesScreen = () => {
         placeholder="Szállítási lakcím (Város, utca...)" 
         value={lakcim} 
         onChangeText={setLakcim} 
+      />
+      <Text style={styles.subHeader}>Adószám (csak cégek esetében)</Text>
+      <TextInput 
+        style={styles.input} 
+        placeholder="Adószám" 
+        value={adoszam} 
+        onChangeText={setAdoszam} 
       />
 
       <Text style={styles.subHeader}>Szállítási mód</Text>
