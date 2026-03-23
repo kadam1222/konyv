@@ -116,9 +116,8 @@ const ListazoInfinite = () => {
         onChangeText={(text) => setSearchQuery(text)} 
         clearButtonMode="while-editing"
       />
-      <TouchableOpacity style={styles.searchButton} onPress={startSearch}>
-        <Text style={styles.searchButtonText}>Keresés</Text>
-      </TouchableOpacity>
+      <Button style={styles.searchButton} title='Keresés' onPress={startSearch}>
+      </Button>
     </View>
 
     <FlatList
@@ -139,6 +138,7 @@ const ListazoInfinite = () => {
 
           <Button
             title="Kosárba"
+            style = {styles.kosarButton} 
             onPress={() => {
               addToCart(item);
               Alert.alert("Sikeres kosárba rakás", "A terméket sikeresen elhelyezte a kosárba");
@@ -167,7 +167,6 @@ export default ListazoInfinite;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#25292e',
   },
   center: {
     flex: 1,
@@ -176,7 +175,6 @@ const styles = StyleSheet.create({
   },
   htext: {
     fontSize: 24,
-    color: 'yellow',
     marginVertical: 10,
     textAlign: 'center',
   },
@@ -217,7 +215,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', 
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#25292e',
     gap: 10, 
   },
   searchInput: {
@@ -230,7 +227,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   searchButton: {
-    backgroundColor: 'yellow',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -241,4 +237,8 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
   },
+  kosarbutton: {
+    top: 0,
+    marginTop: 20,
+  }
 });
