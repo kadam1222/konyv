@@ -194,9 +194,10 @@ exports.regisztracio = async ( req, res, next) =>{
       email,
       hashedjelszo
     )
-    res.status(201).json({message: "Sikeres regisztráció! 🎉"})
+    return res.status(201).json({message: "Sikeres regisztráció! 🎉"})
   }
   catch(err){
+    if (err.code == "ER_DUP_ENTRY") return res.status(409).json({message: "A megadott email cím már használatban van"});
     next(err)
   }
 }
@@ -294,7 +295,7 @@ exports.szamlakeszites = async (req, res) => {
   console.log("Beérkező adatok:", req.body)
   try {
     const { email } = req.user; 
-    const { fizetesi_mod, szallitas_mod, termekek, lakcim, teljesites_kelte } = req.body; 
+    const { fizetesi_mod, szallitas_mod, termekek, lakcim, teljesites_kelte, adoszam } = req.body; 
 
     if (!fizetesi_mod || !szallitas_mod || !termekek || termekek.length === 0 || !lakcim) {
       return res.status(400).json({
@@ -316,7 +317,7 @@ exports.szamlakeszites = async (req, res) => {
     for (const item of termekek) {
       await Konyvek.darabszam_modositas(item.darab, item.ISBN);
     }
-    const { szamla_id } = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg, lakcim, teljesites_kelte); 
+    const { szamla_id } = await Konyvek.szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg, lakcim, teljesites_kelte, adoszam); 
     await Konyvek.rendelesSnapshotFeltoltese(szamla_id, termekek);
 
     res.status(201).json({
