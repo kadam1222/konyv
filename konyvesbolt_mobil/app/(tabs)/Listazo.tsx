@@ -93,7 +93,6 @@ const ListazoInfinite = () => {
     loadPage(1, true);
   };
 
-  // ❌ Hiba képernyő
   if (error && data.length === 0) {
     return (
       <View style={styles.center}>
