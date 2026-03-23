@@ -152,7 +152,7 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
     </span>
   ))}
 </div>
-  {/*<h3>Típus:</h3>
+  <h3>Típus:</h3>
   <div className="filter_options">
     {tipusok && tipusok.map((t, index) => (
       <span
@@ -163,7 +163,7 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
         {t}
       </span>
     ))}
-      </div>*/}
+      </div>
     </div>
   );
 }
