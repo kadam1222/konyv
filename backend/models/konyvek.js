@@ -256,7 +256,7 @@ class Konyvek {
   
 }
 
-static async szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg, lakcim, teljesites_kelte) {
+static async szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg, lakcim, teljesites_kelte, adoszam) {
   try {
     const [vevoRows] = await db.query(
       "SELECT id FROM vevo WHERE email = ?",
@@ -279,7 +279,8 @@ static async szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg, lakci
         vegosszeg,
         szamlaszam,
         lakcim,
-        teljesites_kelte
+        teljesites_kelte,
+        adoszam
       )
       SELECT
         ?,           
@@ -298,9 +299,10 @@ static async szamlakeszites(email, fizetesi_mod, szallitas_mod, vegosszeg, lakci
           )
         ),
         ?,
+        ?,
         ?
       `,
-      [fizetesi_mod, szallitas_mod, vevo_id,vegosszeg, vevo_id, vevo_id,lakcim, teljesites_kelte]
+      [fizetesi_mod, szallitas_mod, vevo_id,vegosszeg, vevo_id, vevo_id,lakcim, teljesites_kelte, adoszam]
     );
 
     return {

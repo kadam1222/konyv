@@ -9,7 +9,8 @@ import { useNavigate } from "react-router-dom";
 export default function Fizetes( {accessToken}){
     const [nev, setNev] = useState("");
     const [email, setEmail] = useState("");
-    const [mennyiseg,setMennyiseg] = useState("")
+    const [mennyiseg,setMennyiseg] = useState("");
+    const [adoszam ,setAdoszam] = useState("")
     const [lakcim,setLakcim] = useState("")
     const [paymentMethod, setPaymentMethod] = useState("");
     const [shippingMethod, setShippingMethod] = useState("");
@@ -77,7 +78,8 @@ useEffect(() => {
                     nev,
                     email,
                     lakcim: lakcim,
-                    teljesites_kelte: kuldendoDatum
+                    teljesites_kelte: kuldendoDatum,
+                    adoszam: adoszam
                 },
                 {
                     headers: {
@@ -128,7 +130,7 @@ useEffect(() => {
 
         <Form.Group className="mb-3" controlId="formBasicadoszam">
             <Form.Label>Adószám</Form.Label>
-            <Form.Control type="number" placeholder="12345678-2-10" />
+            <Form.Control type="number" placeholder="12345678-2-10" value={adoszam || ""}  onChange={(e) => setAdoszam(e.target.value)} />
             <Form.Text className="text-muted">
             CSAK cégek számára!
             </Form.Text>

@@ -39,10 +39,24 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const clearCart = () => setCart([]);
 
+  const updateQuantity = (ISBN: string, change: number) => {
+    setCart((prevCart) =>
+      prevCart
+        .map((item) => {
+          if (item.ISBN === ISBN) {
+            const newQuantity = item.mennyiseg + change;
+            // Ne engedjük 1 alá menni (vagy ha 0, akkor eltávolíthatjuk)
+            return { ...item, mennyiseg: newQuantity > 0 ? newQuantity : 1 };
+          }
+          return item;
+        })
+    );
+  };
+
   const totalPrice = cart.reduce((sum, item) => sum + item.ar * item.mennyiseg, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, totalPrice }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, totalPrice , updateQuantity }}>
       {children}
     </CartContext.Provider>
   );

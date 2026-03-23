@@ -139,9 +139,10 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
     </span>
   ))}
 </div>
-
- <h3>Borító:</h3>
-<div className="filter_options">
+{boritok.length ? 
+  <>
+   <h3>Borító:</h3>
+  <div className="filter_options">
   {boritok.map((b, index) => (
     <span
       key={index}
@@ -152,6 +153,11 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
     </span>
   ))}
 </div>
+</>
+:
+""
+}
+
   <h3>Típus:</h3>
   <div className="filter_options">
     {tipusok && tipusok.map((t, index) => (
