@@ -162,16 +162,22 @@ useEffect(() => {
   </NavDropdown>
 );
 
+const AdminDropdown = () => (
+  <NavDropdown style={{paddingLeft:"23px"}} drop="end" title="Adminisztráció" id="admin-nav-dropdown">
+    <NavDropdown.Item onClick={() => navigate("/adminmodosit")}>Rendelések módosítása</NavDropdown.Item>
+    <NavDropdown.Item onClick={() => navigate("/adminuser")}>Felhasználók módosítása</NavDropdown.Item>
+    <NavDropdown.Item onClick={() => navigate("/adminbook")}>Könyvek módosítása</NavDropdown.Item>
+    <NavDropdown.Item onClick={() => navigate("/admininsert")}>Új adatok felvétele</NavDropdown.Item>
+    <NavDropdown.Item onClick={() => navigate("/admintorles")}>Adatok törlése</NavDropdown.Item>
+  </NavDropdown>
+);
+
   const Profildropdown = () => (
     <NavDropdown title="Profilom" id="asd">
           <NavDropdown.Item onClick={() => navigate("/profil")}>Személyes adatok</NavDropdown.Item>
           <NavDropdown.Item onClick={() => navigate("/rendelesek")} >Rendeléseim</NavDropdown.Item>
           <NavDropdown.Item onClick={() => navigate("/segitseg")}>Segítség</NavDropdown.Item>
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminmodosit")}>Rendelések módosítása</NavDropdown.Item> : ""}
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminuser")}>Felhasználók módosítása</NavDropdown.Item> : ""}
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminbook")}>Könyvek módosítása</NavDropdown.Item> : ""}
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/admininsert")}>Új adatok felvétele</NavDropdown.Item> : ""}
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/admintorles")}>Adatok törlése</NavDropdown.Item> : ""}
+          {isAdmin && <AdminDropdown />}
           <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );

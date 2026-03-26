@@ -1,26 +1,23 @@
+
 import React, { useEffect, useState } from 'react';
-import {
-  View, Text, Image, Button, ActivityIndicator, FlatList, StyleSheet,
-  Alert, TextInput, TouchableOpacity, Modal, ScrollView, Dimensions
-} from 'react-native';
+import {View, Text, Image, Button, ActivityIndicator, FlatList, StyleSheet, Alert, TextInput, TouchableOpacity} from 'react-native';
 import axios from 'axios';
+import { Dimensions } from 'react-native';
 import { useCart } from './CartContext';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 40) / 2; 
+const CARD_MARGIN = 8;
+const NUM_COLUMNS = 2;
+const CARD_WIDTH =
+  (width - CARD_MARGIN * (NUM_COLUMNS * 2)) / NUM_COLUMNS;
 
 
 type Termek = {
   id: number;
-  ISBN: string;
-  cim: string;
+  termek: string;
   ar: number;
-};
-
-type Kategoria = {
-  id: number;
-  kat_nev: string;
-  katazon: number | null;
+  kepnev: string;
 };
 
 const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
@@ -33,213 +30,238 @@ const ListazoInfinite = () => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery , setSearchQuery] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [kategoriak, setKategoriak] = useState<Kategoria[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchCategories();
-    loadPage(1, true);
+    loadPage(1);
   }, []);
 
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get(`${backendUrl}/konyvek/kategoria`);
-      console.log("Kategóriák a backendről:", response.data[0]); // Nézd meg az első elemet!
-      setKategoriak(response.data);
-    } catch (err) {
-      console.error("Hiba a kategóriák betöltésekor:", err);
-    }
-  };
-
-  const loadPage = async (pageNum: number, refresh = false, query = activeSearch, kat = selectedCategory) => {
-    if (loading && !refresh) return;
+  const startSearch = () =>{
+    const cleanQuery = searchQuery.trim();
+    setData([])
+    setActiveSearch(searchQuery)
+    setPage(1)
+    setHasMore(true)
+    loadPage(1, true, cleanQuery)
+  }
+  const loadPage = async (pageNum: number, refresh = false, query = activeSearch) => {
+    if (loading) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      const endpoint = (query || (kat && kat !== "Összes")) ? '/konyvek/search' : '/konyvek';
-      
-      const response = await axios.get<Termek[]>(`${backendUrl}${endpoint}`, {
-        params: {
-          page: pageNum,
-          cim: query,
-          kat: kat === "Összes" ? null : kat,
-        },
-        timeout: 5000,
-      });
+      const endpoint = query ? '/konyvek/search' : '/konyvek';
+      const response = await axios.get<Termek[]>(
+        `${backendUrl}${endpoint}`,
+        {
+          params: {
+            page: pageNum,
+            cim: query
+            //limit: PAGE_SIZE,
+          },
+          timeout: 5000,
+        }
+      );
 
       const newData = response.data;
-      setData(prev => (refresh ? newData : [...prev, ...newData]));
-      setHasMore(newData.length === PAGE_SIZE);
+      setData((prev) =>{
+        if (refresh || pageNum === 1) return newData;
+        return [...prev, ...newData]
+      })
+      if (newData.length < PAGE_SIZE) {
+        setHasMore(false);
+      }
       setPage(pageNum);
     } catch (err) {
+      console.error('Fetch error:', err);
       setError('❌ Nem érhető el a backend szerver');
     } finally {
       setLoading(false);
     }
   };
 
-  const startSearch = () => {
-    setData([]);
-    setActiveSearch(searchQuery);
-    setPage(1);
-    setHasMore(true);
-    loadPage(1, true, searchQuery, selectedCategory);
-  };
-
-  const handleSelectCategory = (kat_nev: string | null) => {
-    setSelectedCategory(kat_nev);
-    setIsFilterVisible(false);
-    setData([]);
-    setPage(1);
-    setHasMore(true);
-    loadPage(1, true, activeSearch, kat_nev);
-  };
-
-  const renderKategoriaLista = () => {
-    const fokategoriak = kategoriak.filter(k => k.katazon === null);
-
-    return (
-      <ScrollView style={{ maxHeight: 400 }}>
-        <TouchableOpacity 
-          style={[styles.categoryItem, selectedCategory === null && styles.selectedCategoryItem]} 
-          onPress={() => handleSelectCategory("Összes")}
-        >
-          <Text style={[styles.categoryText, { fontWeight: 'bold' }]}>Összes termék</Text>
-        </TouchableOpacity>
-
-        {fokategoriak.map((foker) => (
-          <View key={foker.id}>
-            <View style={styles.fokategHeader}>
-              <Text style={styles.fokategText}>{foker.kat_nev}</Text>
-            </View>
-            
-            {kategoriak
-              .filter(alkat => alkat.katazon === foker.id)
-              .map(alkat => (
-                <TouchableOpacity 
-                  key={alkat.id} 
-                  style={[
-                    styles.categoryItem, 
-                    { paddingLeft: 30 },
-                    selectedCategory === alkat.kat_nev && styles.selectedCategoryItem
-                  ]}
-                  onPress={() => handleSelectCategory(alkat.kat_nev)}
-                >
-                  <Text style={styles.categoryText}>• {alkat.kat_nev}</Text>
-                </TouchableOpacity>
-              ))}
-          </View>
-        ))}
-      </ScrollView>
-    );
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.htext}>Terméklista</Text>
-
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Keresés..."
-          placeholderTextColor="#888"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          clearButtonMode="while-editing"
-        />
-        <TouchableOpacity style={styles.searchButton} onPress={startSearch}>
-          <Text style={styles.searchButtonText}>Keresés</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.searchButton, { backgroundColor: selectedCategory && selectedCategory !== "Összes" ? '#28a745' : '#444' }]} 
-          onPress={() => setIsFilterVisible(true)}
-        >
-          <Text style={{ color: 'white' }}>Szűrő</Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={data}
-        numColumns={2}
-        keyExtractor={(item, index) => {
-    if (item && item.id) {
-      return item.id.toString();
+  const loadMore = () => {
+    if (hasMore && !loading) {
+      loadPage(page + 1);
     }
-    return index.toString();
-  }}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.title} numberOfLines={1}>{item.cim}</Text>
-            <Image
-              source={{ uri: `${backendUrl}/kepek/${item.ISBN}.jpg` }}
-              style={styles.image}
-            />
-            <Text style={styles.price}>{item.ar} Ft</Text>
-            <Button
-              title="Kosárba"
-              onPress={() => {
-                addToCart(item);
-                Alert.alert("Siker", "Kosárba került!");
-              }}
-            />
-          </View>
-        )}
-        onEndReached={() => hasMore && loadPage(page + 1)}
-        onEndReachedThreshold={0.5}
-        refreshing={loading && page === 1}
-        onRefresh={() => loadPage(1, true)}
-        ListFooterComponent={loading ? <ActivityIndicator color="yellow" /> : null}
-      />
+  };
 
-      <Modal
-        visible={isFilterVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsFilterVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.bottomSheet}>
-            <View style={styles.sheetHeader}>
-              <Text style={styles.sheetTitle}>Válassz kategóriát</Text>
-              <TouchableOpacity onPress={() => setIsFilterVisible(false)}>
-                <Text style={{ color: 'red', fontWeight: 'bold' }}>Bezárás</Text>
-              </TouchableOpacity>
-            </View>
-            {renderKategoriaLista()}
-          </View>
-        </View>
-      </Modal>
+  const refreshList = () => {
+    setHasMore(true);
+    loadPage(1, true);
+  };
+
+  if (error && data.length === 0) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorText}>{error}</Text>
+        <Button title="Újrapróbálás" onPress={refreshList} />
+      </View>
+    );
+  }
+
+ return (
+  <View style={styles.container}>
+    <Text style={styles.htext}>Terméklista</Text>
+
+    <View style={styles.searchContainer}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Keresés..."
+        placeholderTextColor="#888"
+        value={searchQuery}
+        onChangeText={(text) => setSearchQuery(text)} 
+        clearButtonMode="while-editing"
+      />
+      <Button
+        title='Keresés' onPress={startSearch}
+      />
     </View>
-  );
+
+    <FlatList
+      data={data}
+      numColumns={2}
+      key={2} 
+      columnWrapperStyle={styles.row}
+      renderItem={({ item }) => (
+        <TouchableOpacity style={styles.item} onPress={() => router.push({pathname: "/BookDetails", params: { isbn: item.ISBN }})}>
+          <View style={styles.cardTopContent}>
+            <Text style={styles.title} numberOfLines={2}> {item.cim} </Text>
+
+          <Image
+            source={{ uri: `${backendUrl}/kepek/${item.ISBN}.jpg` }}
+            style={styles.image}
+          />
+
+          <Text numberOfLines={2} style={styles.price}>Ár: {item.ar} Ft</Text>
+
+          <View style={styles.buttonContainer}>
+          <Button
+            title="Kosárba"
+            onPress={() => {
+              addToCart(item);
+              Alert.alert("Sikeres kosárba rakás", "A terméket sikeresen elhelyezte a kosárba");
+            }}
+          />
+          </View>
+          </View>
+        </TouchableOpacity>
+      )}
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.5}
+      refreshing={loading && page === 1}
+      onRefresh={refreshList}
+      ListFooterComponent={
+        loading && page > 1 ? (
+          <ActivityIndicator style={{ marginVertical: 20 }} />
+        ) : !hasMore ? (
+          <Text style={styles.endText}>Nincs több termék</Text>
+        ) : null
+      }
+    />
+  </View>
+);
 };
 
 export default ListazoInfinite;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#25292e' },
-  searchContainer: { flexDirection: 'row', padding: 10, gap: 10 },
-  searchInput: { flex: 1, backgroundColor: 'white', padding: 10, borderRadius: 8 },
-  searchButton: { backgroundColor: 'yellow', padding: 10, borderRadius: 8, justifyContent: 'center' },
-  searchButtonText: { fontWeight: 'bold' },
-  htext: { fontSize: 24, color: 'yellow', textAlign: 'center', marginVertical: 10 },
-  item: { flex: 1, margin: 8, padding: 10, backgroundColor: 'white', borderRadius: 8, width: CARD_WIDTH, alignItems: 'center' },
-  image: { height: 120, width: '100%', resizeMode: 'contain' },
-  title: { fontWeight: 'bold', marginBottom: 5 },
-  price: { marginVertical: 5, color: '#444' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  bottomSheet: { backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 },
-  sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
-  sheetTitle: { fontSize: 18, fontWeight: 'bold' },
-  fokategHeader: { backgroundColor: '#f0f0f0', padding: 8, marginTop: 10, borderRadius: 4 },
-  fokategText: { fontSize: 12, fontWeight: 'bold', color: '#666' },
-  categoryItem: { paddingVertical: 15, borderBottomWidth: 0.5, borderBottomColor: '#eee' },
-  categoryText: { fontSize: 16 },
-  selectedCategoryItem: { backgroundColor: '#fff9c4' },
+  container: {
+    flex: 1,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  htext: {
+    fontSize: 24,
+    marginVertical: 10,
+    textAlign: 'center',
+  },
+  item: {
+    flex : 1,
+    margin: 8,
+    padding: 12,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    alignItems: 'center',
+    minHeight: 320,
+    justifyContent: "space-between",
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  cardTopContent: {
+    alignItems: 'center', 
+    width: '100%',
+  },
+  title: {
+    fontSize: 16,
+    color: 'black',
+    textAlign: "center",
+    fontWeight: 'bold',
+    marginBottom: 5,
+    height: 40,
+  },
+  price: {
+    fontSize: 16,
+    marginVertical: 5,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
+  image: {
+    height: 120,
+    resizeMode: 'contain',
+    marginVertical: 10,
+    width: '100%'
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  endText: {
+    textAlign: 'center',
+    color: 'gray',
+    marginVertical: 20,
+  },
+  searchContainer: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    padding: 10,
+    gap: 10, 
+  },
+  buttonContainer: {
+    width: '100%',
+    marginTop: 'auto',  
+  },
+  searchInput: {
+    flex: 1, 
+    backgroundColor: 'white',
+    color: 'black',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  searchButton: {
+    backgroundColor: 'yellow',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchButtonText: {
+    color: 'black',
+    fontWeight: 'bold',
+  },
 });

@@ -25,11 +25,27 @@ export default function Kosar( {accessToken, setShowAuthPopup, setShowLoginForm}
         (sum, item) => sum + item.ar * item.mennyiseg,
         0
     );
+    const vanTulcsordulas = kosar.some(item => Number(item.mennyiseg) > Number(item.raktar));
 
     const handleLoginClick = () => {
         setShowLoginForm(true); 
         setShowAuthPopup(true);  
     };
+    
+    const handleCheckout = async () => {
+    const hibasTermekek = kosar.filter(item => Number(item.mennyiseg) > Number(item.raktar));
+
+    if (hibasTermekek.length > 0) {
+        const hibaUzenet = hibasTermekek
+            .map(t => `${t.cim}: Csak ${t.raktar} db van raktáron (a kosaradban: ${t.mennyiseg} db)`)
+            .join("\n");
+        
+        alert("Sajnos nem tudsz továbblépni a fizetéshez:\n\n" + hibaUzenet);
+    } else {
+
+        navigate("/fizetes");
+    }
+};
 
     return(
         <>
@@ -55,6 +71,11 @@ export default function Kosar( {accessToken, setShowAuthPopup, setShowLoginForm}
                 window.dispatchEvent(new Event("storage"));
             }} />
             <span style={{margin:"auto",marginLeft:"0px",marginRight:"15px"}}>db</span>
+            {item.mennyiseg > item.raktaron && (
+                <span style={{color: "red", fontSize: "12px"}}>
+                    Csak {item.raktaron} db van raktáron!
+                </span>
+            )}
             <FaTrashCan id='torlesgomb' onClick={() => { const ujKosar = kosar.filter((_, i) => i !== index); setKosar(ujKosar); localStorage.setItem("kosar", JSON.stringify(ujKosar)); window.dispatchEvent(new Event("storage")); }}/>
 
             
@@ -73,29 +94,36 @@ export default function Kosar( {accessToken, setShowAuthPopup, setShowLoginForm}
                 <span className='rendeles'>{mennyiseg} db termék</span> 
                 <span className='rendeles'>Teljes ár: {teljesAr} Ft</span> 
                 {!accessToken ? (
-                <>
-                    <span  style={{ color: "red", fontWeight: "bold" }}>
-                        A vásárlás folytatásához bejelentkezés szükséges!<br/>
-                        <a className="auth-login-link" onClick={handleLoginClick}>Kattints ide a bejelentkezéshez </a>
-                    </span>
-                    
-                    <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>
-                </>
+                    <>
+                        <span style={{ color: "red", fontWeight: "bold" }}>
+                            A vásárlás folytatásához bejelentkezés szükséges!<br/>
+                            <a className="auth-login-link" onClick={handleLoginClick} style={{cursor:'pointer'}}>Kattints ide a bejelentkezéshez </a>
+                        </span>
+                        <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>
+                    </>
                 ) : kosar.length === 0 ? (
-                <>
-                    <span className="rendeles-hiba">
-                        A vásárlás folytatásához kötelező legalább egy terméket a kosárba tenni!
-                    </span>
-                    <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>
-                </>
+                    <>
+                        <span className="rendeles-hiba">A kosár üres!</span>
+                        <Button disabled className='rendelesgombok'>Tovább a fizetéshez!</Button>
+                    </>
                 ) : (
-                <Button 
-                    className='rendelesgombok' 
-                        onClick={() => navigate("/fizetes")}>
-                    Tovább a fizetéshez!
-                </Button>
+                    <>
+                        {vanTulcsordulas && (
+                            <span style={{ color: "red", fontWeight: "bold", display: "block", marginBottom: "10px" }}>
+                                Figyelem: Néhány termékből nincs ennyi raktáron!
+                            </span>
+                        )}
+                        <Button 
+                            className='rendelesgombok' 
+                            variant={vanTulcsordulas ? "danger" : "primary"} 
+                            onClick={handleCheckout}>
+                            Tovább a fizetéshez!
+                        </Button>
+                    </>
                 )}
-
+                {
+                    
+                }
                 <Button 
                     variant="outline-secondary"
                     className='rendelesgombok' 

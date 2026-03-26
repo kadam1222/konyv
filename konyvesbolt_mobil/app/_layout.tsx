@@ -41,6 +41,16 @@ function RootLayoutNav() {
       <Stack.Screen name="LoginLogout" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="FizetesScreen" options={{ headerShown: true, title: 'Pénztár', headerBackTitle: 'Vissza' }} />
+      <Stack.Screen 
+        name="termek/[isbn]" 
+        options={{ 
+          headerShown: true, 
+          title: 'Termék részletei', 
+          headerBackTitle: 'Vissza',
+          headerTintColor: '#FFD814', // Amazon-sárga szöveg a fejlécben
+          headerStyle: { backgroundColor: '#121212' }, // Sötét fejléc
+        }} 
+      />
     </Stack>
   );
 }
