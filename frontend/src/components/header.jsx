@@ -163,7 +163,7 @@ useEffect(() => {
 );
 
 const AdminDropdown = () => (
-  <NavDropdown style={{paddingLeft:"23px"}} drop="end" title="Adminisztráció" id="admin-nav-dropdown">
+  <NavDropdown  drop="end" title="Adminisztráció" id="admin-nav-dropdown">
     <NavDropdown.Item onClick={() => navigate("/adminmodosit")}>Rendelések módosítása</NavDropdown.Item>
     <NavDropdown.Item onClick={() => navigate("/adminuser")}>Felhasználók módosítása</NavDropdown.Item>
     <NavDropdown.Item onClick={() => navigate("/adminbook")}>Könyvek módosítása</NavDropdown.Item>
