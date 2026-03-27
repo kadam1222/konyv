@@ -83,12 +83,14 @@ return (
 
         <div className="termek-meta">
           <span><strong>ISBN:</strong> {adatok.ISBN}</span>
-          <span><strong>Borító:</strong> {adatok.borito_tipus}</span>
+          {adatok.borito_tipus ? <span><strong>Borító:</strong> {adatok.borito_tipus}</span> : ""}
           <span><strong>Kiadó:</strong> {adatok.kiado_nev}</span>
           <span><strong>Nyelv:</strong> {adatok.nyelv_nev}</span>
           <span><strong>Kiadás éve:</strong> {adatok.kiadas_eve}</span>
+          <span><strong>Kategória:</strong> {adatok.kat_nev}</span>
           {adatok.illusztratorok ? <span><strong>Illusztrátor(ok):</strong> {adatok.illusztratorok}</span> : ""}
           {adatok.fordítok ? <span><strong>Fordító(k):</strong> {adatok.fordítok}</span> : ""}
+          
         </div>
 
         <div className="termek-footer">
