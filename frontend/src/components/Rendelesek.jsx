@@ -64,7 +64,7 @@ export default function Rendelesek({accessToken, setAccessToken}){
                     <li key={idx}>{book.cim} - {book.darab} db</li>
                     ))}
                 </ul>
-                <strong><h4>Végösszeg: {order.vegosszeg}</h4></strong>
+                <strong><h4>Végösszeg: {order.vegosszeg} Ft</h4></strong>
                 </div>
             ))}
         </div>

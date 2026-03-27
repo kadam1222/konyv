@@ -29,7 +29,7 @@
 
 # backend
 /backend/node_modules/
-/backend/.env
+
 /backend1/node_modules/
 /backend1/.env
 

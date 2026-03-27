@@ -92,10 +92,10 @@ const jogosultsagupdate = async (email,jogosultsag) =>{
             Email: {U.email} <br/> 
             Adószám: {U.adoszam ? U.adoszam : "Nincs felvett adat"} <br/> 
             Jogosultság:  {U.jogosultsag === 1 ? "Felhasználó" : U.jogosultsag === 2 ? "Admin" : "TÖRÖLT"} <br/>
-            <div style={{marginTop:"10px"}}>
+            <div style={{marginTop:"10px", display:"flex", width:"150px"}}>
             <Button className="clear-filters-btn" style={{marginRight:"15px"}} onClick={() => usertorles(U.email)}>Felhasználó törlése</Button>
-            <Button className="apply-filters-btn" onClick={() => jogosultsagupdate(U.email,2)}>Admin jogosultság</Button>
-            <Button className="apply-filters-btn" onClick={() => jogosultsagupdate(U.email,1)}>User jogosultsag</Button>
+            <Button className="apply-filters-btn" style={{marginRight:"15px"}} onClick={() => jogosultsagupdate(U.email,2)}>Admin jogosultság</Button>
+            <Button className="apply-filters-btn" style={{marginRight:"15px"}} onClick={() => jogosultsagupdate(U.email,1)}>User jogosultsag</Button>
             </div>
             </span>
 
