@@ -157,15 +157,18 @@ export default function AdminModositasok({ accessToken }) {
                         <h4>Rendelés száma: {order.szamlaszam}</h4>
                         
                         {modositas === order.szamlaszam ? (
-                            <div style={{ marginBottom: "15px" }}>
+                            <div style={{ marginBottom: "15px"}}>
                                 <select value={ujstatusz} onChange={(e) => setUjstatusz(Number(e.target.value))}>
                                     <option value="">Válassz státuszt...</option>
                                     {statuszok.map((s) => (
                                         <option key={s.id} value={s.id}>{s.statusz}</option>
                                     ))}
                                 </select>
-                                <Button style={{ marginLeft: "15px" }} className="apply-filters-btn" onClick={() => statusz_modositas(order.szamlaszam)}>Mentés</Button>
-                                <Button className="clear-filters-btn" onClick={() => setModositas(null)}>Mégse</Button>
+                                <div style={{display:"flex", width:"120px"}}>
+                                    <Button style={{marginRight:"15px" }} className="apply-filters-btn" onClick={() => statusz_modositas(order.szamlaszam)}>Mentés</Button>
+                                    <Button className="clear-filters-btn" onClick={() => setModositas(null)}>Mégse</Button>
+                                </div>
+                                
                             </div>
                         ) : (
                             <div style={{ marginBottom: "15px" }}>
