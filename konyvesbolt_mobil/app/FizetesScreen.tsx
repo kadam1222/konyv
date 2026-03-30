@@ -10,7 +10,7 @@ const FizetesScreen = () => {
   const { user } = useAuth();
   const { cart, totalPrice, clearCart } = useCart();
   
-  // Felhasználói és szállítási állapotok
+  
   const [lakcim, setLakcim] = useState('');
   const [shippingMethod, setShippingMethod] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState(1);  

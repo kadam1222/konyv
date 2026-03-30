@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { api } from '@/api/api';
 
-// Interfész a "lapos" adatokhoz, amik a szerverről jönnek
+
 interface RawOrderRow {
   szamla_id: number;
   szamlaszam: string;
@@ -25,8 +25,8 @@ interface RawOrderRow {
   email: string;
   lakcim: string;
   adoszam?: string;
-  cim: string; // A könyv címe
-  darab: number; // A könyv darabszáma
+  cim: string; 
+  darab: number; 
 }
 
 const RendelesekScreen = () => {
@@ -49,14 +49,14 @@ const RendelesekScreen = () => {
     }
   };
 
-  // --- CSOPORTOSÍTÁSI LOGIKA (Ugyanaz, mint a webes Map-ed) ---
+
   const groupedOrdersMap = new Map();
 
   rawRows.forEach(row => {
     if (!groupedOrdersMap.has(row.szamlaszam)) {
       groupedOrdersMap.set(row.szamlaszam, {
         ...row,
-        books: [] // Itt gyűjtjük a címeket
+        books: [] 
       });
     }
     groupedOrdersMap.get(row.szamlaszam).books.push({ 
@@ -67,10 +67,9 @@ const RendelesekScreen = () => {
 
   const groupedOrders = Array.from(groupedOrdersMap.values());
 
-  // Kiválasztott rendelés adatai
   const selectedOrder = groupedOrders.find(o => o.szamlaszam === selectedOrderNo);
 
-  // --- SZÁMLA NÉZET ---
+  
   if (selectedOrder) {
     return (
       <ScrollView style={styles.invoiceContainer}>
@@ -92,7 +91,7 @@ const RendelesekScreen = () => {
 
           <View style={styles.divider} />
 
-          {/* TERMÉKEK LISTÁJA A CSOPORTOSÍTOTT "BOOKS" TÖMBBŐL */}
+          
           <Text style={[styles.label, { marginBottom: 10 }]}>Megrendelt termékek:</Text>
           {selectedOrder.books.map((book: any, idx: number) => (
             <View key={idx} style={styles.itemRow}>
@@ -117,7 +116,7 @@ const RendelesekScreen = () => {
     );
   }
 
-  // --- LISTA NÉZET ---
+  
   if (loading) return <ActivityIndicator size="large" style={styles.center} />;
 
   return (
@@ -150,7 +149,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: 'bold', marginBottom: 15, color: '#333' },
   divider: { height: 1, backgroundColor: '#eee', marginVertical: 15 },
 
-  // Kártyák a listában
+  
   card: {
     backgroundColor: 'white', borderRadius: 10, padding: 15, marginBottom: 15,
     elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
@@ -163,7 +162,7 @@ const styles = StyleSheet.create({
   detailsHint: { fontSize: 12, color: '#007bff', marginTop: 10, textAlign: 'right' },
   empty: { textAlign: 'center', marginTop: 50, color: 'gray', fontSize: 16 },
 
-  // Számla stílusok
+  
   invoiceContainer: { flex: 1, backgroundColor: '#fff' },
   backButton: { padding: 10, alignItems: 'flex-start' },
   invoiceBox: { padding: 20, margin: 10, borderWidth: 1, borderColor: '#eee', borderRadius: 8 },
@@ -175,7 +174,7 @@ const styles = StyleSheet.create({
   value: { fontSize: 15, color: '#333', marginBottom: 2 },
   dateRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, backgroundColor: '#f9f9f9', padding: 10, borderRadius: 5 },
   
-  // Termékek táblázat-szerű megjelenítése
+  
   itemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   itemCim: { fontSize: 14, fontWeight: '600', color: '#333' },
   itemArInfo: { fontSize: 12, color: '#777' },

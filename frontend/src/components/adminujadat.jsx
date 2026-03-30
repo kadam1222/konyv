@@ -250,7 +250,7 @@ const handleFileChange = (e) => {
             </div>
 
             <div style={{ marginBottom: "15px" }}>
-                <label>Új Illusztrátor felvétele: </label>
+                <label>Új illusztrátor felvétele: </label>
                 <input placeholder="pl. Alice Oseman" value={illusztrator} onChange={(e) => setIllusztrator(e.target.value)} 
                 />
                 <Button className="hozzaadgombok" variant="success" onClick={() => mentés("illusztrator", illusztrator, setIllusztrator)}>Hozzáad</Button>

@@ -15,7 +15,6 @@ const BookDetails = ({ route }: any) => {
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
-        // Mivel a backend 'req.body.ISBN'-t vár, POST kérést küldünk
         const response = await axios.post(`${backendUrl}/konyvek/isbn`, {
           ISBN: isbn
         });
