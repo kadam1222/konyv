@@ -652,9 +652,9 @@ static async deleteAdat(adatok) {
     };
 
     const kapcsololtMezok = {
-      szerzo: { tabla: 'szerző', kapcsolotabla: 'termek_szerzo', fk: 'szerzo_id' },
-      fordito: { tabla: 'fordito', kapcsolotabla: 'termek_forditok', fk: 'fordito_id' },
-      illusztrator: { tabla: 'illusztrator', kapcsolotabla: 'termek_illusztratorok', fk: 'illusztrator_id' }
+      szerzo: { tabla: 'szerző', kapcsolotabla: 'kapcsolo_szerzo', fk: 'szerzo_id' },
+      fordito: { tabla: 'fordito', kapcsolotabla: 'kapcsolo_forditok', fk: 'fordito_id' },
+      illusztrator: { tabla: 'illusztrator', kapcsolotabla: 'kapcsolo_illusztratorok', fk: 'illusztrator_id' }
     };
 
     for (const [kulcs, config] of Object.entries(alapMezok)) {
