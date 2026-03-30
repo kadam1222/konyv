@@ -26,11 +26,11 @@ function RootLayoutNav() {
 
     const inTabsGroup = segments[0] === '(tabs)';
 
-    // Ha nincs user (nincs token), és a védett részre tévedne
+   
     if (!user && inTabsGroup) {
       router.replace('/LoginLogout');
     } 
-    // Ha bejelentkezett, ne lássa többé a logint, vigyük a főoldalra
+    
     else if (user && segments[0] === 'LoginLogout') {
       router.replace('/(tabs)');
     }
@@ -41,6 +41,16 @@ function RootLayoutNav() {
       <Stack.Screen name="LoginLogout" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="FizetesScreen" options={{ headerShown: true, title: 'Pénztár', headerBackTitle: 'Vissza' }} />
+      <Stack.Screen 
+        name="termek/[isbn]" 
+        options={{ 
+          headerShown: true, 
+          title: 'Termék részletei', 
+          headerBackTitle: 'Vissza',
+          headerTintColor: '#FFD814', 
+          headerStyle: { backgroundColor: '#121212' }, 
+        }} 
+      />
     </Stack>
   );
 }

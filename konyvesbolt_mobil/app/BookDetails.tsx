@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Image,Button ,StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
 import { useCart } from './(tabs)/CartContext';
@@ -15,7 +15,6 @@ const BookDetails = ({ route }: any) => {
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
-        // Mivel a backend 'req.body.ISBN'-t vár, POST kérést küldünk
         const response = await axios.post(`${backendUrl}/konyvek/isbn`, {
           ISBN: isbn
         });
@@ -33,7 +32,7 @@ const BookDetails = ({ route }: any) => {
   if (loading) return <ActivityIndicator size="large" color="yellow" style={styles.center} />;
   
   if (!book) return <View style={styles.center}><Text style={{color: 'white'}}>Nem található a könyv.</Text></View>;
-
+ 
   return (
     <ScrollView style={styles.container}>
       <Image 
@@ -42,14 +41,14 @@ const BookDetails = ({ route }: any) => {
       />
       <View style={styles.infoContainer}>
         <Text style={styles.title}>{book.cim}</Text>
-        <Text style={styles.price}>{book.ar} Ft</Text>
-        <Text style={styles.author}>Író: {book.szerzok}</Text>
-        <Text style={styles.author}>Kiadó: {book.kiado_nev}</Text>
-        <Text style={styles.author}>Nyelv: {book.nyelv_nev}</Text>
-        <Text style={styles.author}>Kiadás éve: {book.kiadas_eve}</Text>
-        <Text style={styles.author}>ISBN: {book.ISBN}</Text>
-        {book.illusztratorok ? <Text style={styles.author}>Illusztrátor(ok): {book.illusztratorok}</Text> : ""}
-        {book.fordítok ? <Text style={styles.author}>Fordító(k): {book.forditok}</Text> : ""}
+        <Text style={styles.author}>{book.szerzok}</Text>
+        <Text style={styles.price}>{book.ar} Ft</Text>  
+        <Text style={styles.ossz}><b>Kiadó:</b> {book.kiado_nev}</Text>
+        <Text style={styles.ossz}><b>Nyelv:</b> {book.nyelv_nev}</Text>
+        <Text style={styles.ossz}><b>Kiadás éve:</b> {book.kiadas_eve}</Text>
+        <Text style={styles.ossz}><b>ISBN:</b> {book.ISBN}</Text>
+        {book.illusztratorok ? <Text style={styles.author}><b>Illusztrátor(ok):</b> {book.illusztratorok}</Text> : ""}
+        {book.fordítok ? <Text style={styles.author}><b>Fordító(k):</b> {book.forditok}</Text> : ""}
         <Text style={styles.description}>
             {book.leiras}
         </Text>
@@ -72,16 +71,13 @@ const BookDetails = ({ route }: any) => {
                   Utolsó darabok! ({book.raktar} db)
                 </Text>
               )}
-              <TouchableOpacity 
-                style={styles.button} 
+              <Button title='Kosárba' 
                 onPress={() => {
-                  // 3. Itt hívjuk meg a kontextus addToCart függvényét
                   addToCart(book);
                   Alert.alert("Sikeres", `${book.cim} bekerült a kosárba!`);
                 }}
-              >
-                <Text style={styles.buttonText}>Kosárba</Text>
-              </TouchableOpacity>
+                />
+
             </View>
           )}
         </View>
@@ -93,16 +89,15 @@ const BookDetails = ({ route }: any) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#25292e' },
+  container: { flex: 1 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#25292e' },
   image: { width: '100%', height: 400, resizeMode: 'contain', marginTop: 20 },
   infoContainer: { padding: 20 },
-  title: { fontSize: 28, fontWeight: 'bold', color: 'yellow', marginBottom: 10 },
-  author: { fontSize: 18, color: '#ccc', marginBottom: 10 },
-  price: { fontSize: 24, color: 'white', fontWeight: 'bold', marginBottom: 20 },
-  description: { fontSize: 16, color: 'white', lineHeight: 24 },
+  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 10},
+  author: { fontSize: 18, color: 'black', marginBottom: 10,  fontStyle: 'italic'  },
+  price: { fontSize: 24, color: 'green', fontWeight: 'bold', marginBottom: 20 },
+  description: { fontSize: 16, color: 'black', lineHeight: 24 },
   termekFooter: { marginTop: 20 },
-  termekAr: { color: 'yellow', fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
   nincsRaktaron: { color: "red", fontSize: 16, fontWeight: "bold", marginBottom: 10 },
   utolsoDarabok: { color: "red", fontSize: 16, fontWeight: "bold", marginBottom: 10 },
   cartSection: { marginVertical: 10 },
@@ -117,7 +112,8 @@ const styles = StyleSheet.create({
   warningText: { color: "#ffbb33", fontSize: 16, fontWeight: "bold", marginBottom: 10 },
   disabledButton: { backgroundColor: '#555' },
   buttonText: { color: 'black', fontWeight: 'bold', fontSize: 16 },
-  error: { color: 'white', textAlign: 'center', marginTop: 50 }
+  error: { color: 'white', textAlign: 'center', marginTop: 50 },
+  ossz: {fontSize: 18, color: 'black', marginBottom: 10 }
 });
 
 export default BookDetails;

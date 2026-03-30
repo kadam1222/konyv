@@ -106,6 +106,13 @@ export default function Profil({ accessToken , setAccessToken}) {
               </div>
             )}
           </div>
+
+          {(!modositNev || !modositEmail) && (
+            <div className="profil-warning">
+              Figyelem! Az adatok módosítása után a biztonság érdekében a rendszer kijelentkezteti, és újra be kell jelentkeznie.
+            </div>
+          )}
+
         </div>
       </div>
     </div>
