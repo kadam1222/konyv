@@ -133,20 +133,20 @@ export default function AdminModositasok({ accessToken }) {
 
     return (
         <>
-            <div style={{ position: "sticky", top: 70, backgroundColor: "#fff", padding: "15px", zIndex: 100, borderBottom: "2px solid #ddd", marginBottom: "20px", display: "flex", gap: "10px" }}>
+            <div style={{ position: "sticky", top: 70, backgroundColor: "#ceb795", padding: "15px", zIndex: 100, borderBottom: "2px solid #ddd", marginBottom: "20px", display: "flex", gap: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)" , borderRadius: "0 0 8px 8px" }}>
                 <input 
                     type="text" 
                     placeholder="Keresés email alapján..." 
                     value={searchEmail} 
                     onChange={(e) => setSearchEmail(e.target.value)}
-                    style={{ flex: 1, padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+                    style={{ flex: 1, padding: "8px 12px", borderRadius: "5px", border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "#ffffffec", fontSize:"14px" }}
                 />
                 <input 
                     type="text" 
                     placeholder="Számlaszám..." 
                     value={searchSzamlaszam} 
                     onChange={(e) => setSearchSzamlaszam(e.target.value)}
-                    style={{ flex: 1, padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+                    style={{ flex: 1, padding: "8px", borderRadius: "5px", border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "#ffffffec", fontSize:"14px"}}
                 />
             </div>
 
