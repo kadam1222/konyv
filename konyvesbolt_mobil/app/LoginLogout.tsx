@@ -15,7 +15,7 @@ export default function AuthScreen() {
     if (isLogin) {
       await login(email, jelszo);
     } else {
-      const success = await register({nev: nev, email: email, jelszo : jelszo});
+      const success = await register({nev: vevo_nev, email: email, jelszo : jelszo});
       if (success){
          setIsLogin(true);
       } 
