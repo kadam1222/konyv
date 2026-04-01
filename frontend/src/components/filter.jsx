@@ -100,7 +100,7 @@ export default function Filters({ onSearch, talalatok, activeFilters, setActiveF
                 Szűrők törlése
             </Button>
       </div>
-      <div className="selected_filters">
+      <div className="selected_filters" style={{display:'flex', flexDirection:"column"}}>
         {Object.entries(filters).map(([key, value]) =>
           value ? (
             <span
