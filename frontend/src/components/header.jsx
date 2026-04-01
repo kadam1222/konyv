@@ -162,16 +162,22 @@ useEffect(() => {
   </NavDropdown>
 );
 
+const AdminDropdown = () => (
+  <NavDropdown  drop="end" title="Adminisztráció" id="admin-nav-dropdown">
+    <NavDropdown.Item onClick={() => navigate("/adminmodosit")}>Rendelések módosítása</NavDropdown.Item>
+    <NavDropdown.Item onClick={() => navigate("/adminuser")}>Felhasználók módosítása</NavDropdown.Item>
+    <NavDropdown.Item onClick={() => navigate("/adminbook")}>Könyvek módosítása</NavDropdown.Item>
+    <NavDropdown.Item onClick={() => navigate("/admininsert")}>Új adatok felvétele</NavDropdown.Item>
+    <NavDropdown.Item onClick={() => navigate("/admintorles")}>Adatok törlése</NavDropdown.Item>
+  </NavDropdown>
+);
+
   const Profildropdown = () => (
     <NavDropdown title="Profilom" id="asd">
           <NavDropdown.Item onClick={() => navigate("/profil")}>Személyes adatok</NavDropdown.Item>
           <NavDropdown.Item onClick={() => navigate("/rendelesek")} >Rendeléseim</NavDropdown.Item>
           <NavDropdown.Item onClick={() => navigate("/segitseg")}>Segítség</NavDropdown.Item>
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminmodosit")}>Rendelések módosítása</NavDropdown.Item> : ""}
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminuser")}>Felhasználók módosítása</NavDropdown.Item> : ""}
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/adminbook")}>Könyvek módosítása</NavDropdown.Item> : ""}
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/admininsert")}>Új adatok felvétele</NavDropdown.Item> : ""}
-          {isAdmin ? <NavDropdown.Item onClick={() => navigate("/admintorles")}>Adatok törlése</NavDropdown.Item> : ""}
+          {isAdmin && <AdminDropdown />}
           <NavDropdown.Item onClick={handleLogout} >Kijelentkezés</NavDropdown.Item>    
     </NavDropdown>
   );
@@ -194,7 +200,7 @@ const handleLogout = async () => {
 };
 
   return (
-    <header style={{backgroundColor:"#ceb795ff",zIndex: 1000}}>
+    <header style={{backgroundColor:"#ceb795ff",zIndex: 1000, boxShadow: "0 2px 10px rgba(0,0,0,0.2)"}}>
       <Navbar>
         <NavItem style={{ marginLeft: "14px" }}>
           <a href="/" style={{ textDecoration: "none", color: "inherit" }}>
@@ -208,24 +214,24 @@ const handleLogout = async () => {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
             <Navbar.Collapse id="basic-navbar-nav" style={{ display: "flex", alignItems: "center",justifyContent: "space-between",width: "100%"}}>
-              <Nav className="me-auto"style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
-                <CategoryDropdown title="Kategóriák" />
+              <Nav className="me-auto"style={{ display: "flex", flexDirection: "row", gap: "20px" }}>                
                 <NavItem style={{ marginLeft: "14px", marginTop:"7.8px" }}>
                     <a href="/konyvlista" style={{ textDecoration: "none", color: "inherit", fontSize:"16px" }}>
                       <span>Összes könyv</span>
                     </a>
                 </NavItem>
+                <CategoryDropdown title="Kategóriák" />
               </Nav>
 
               <NavItem style={{ display: "flex", alignItems: "center", gap: "15px" }}>
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <input placeholder="Keresés..." style={{ width: "300px", height: "30px", border: "1px solid rgba(0,0,0,0.25)", borderRadius: "4px",padding: "4px 8px",color: "#3a3a3a",fontSize: "14px",outlineColor: "#9f8d73",transition: "outline-color 0.2s ease", backgroundColor: "#ffffffec"}} value={keresett} onChange={(e) => setKeresett(e.target.value)} type="search"
+                  <input placeholder="Keresés..." style={{ width: "300px", height: "30px", border: "1px solid rgba(0,0,0,0.25)",borderRight:"none", borderRadius: "4px 0 0 4px",padding: "4px 8px",color: "#3a3a3a",fontSize: "14px",outline: "none",transition: "outline-color 0.2s ease", backgroundColor: "#ffffffec"}} value={keresett} onChange={(e) => setKeresett(e.target.value)} type="search"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleSearch();
                     }}
                   />
 
-                  <button style={{width: "40px",height: "30px", border: "1px solid rgba(0,0,0,0.25)",borderRadius: "0 4px 4px 0" ,display: "flex", alignItems: "center",  justifyContent: "center", padding: 0, backgroundColor: "#ffffffec", cursor: "pointer",color: "#9f8d73", transition: "color 0.2s ease"}}
+                  <button style={{width: "40px",height: "30px", border: "1px solid rgba(0,0,0,0.25)",borderLeft: "none",borderRadius: "0 4px 4px 0" ,display: "flex", alignItems: "center",  justifyContent: "center", padding: 0, backgroundColor: "#ffffffec", cursor: "pointer",color: "#9f8d73", transition: "color 0.2s ease"}}
                     onClick={handleSearch}
                   >
                     <FaMagnifyingGlass />

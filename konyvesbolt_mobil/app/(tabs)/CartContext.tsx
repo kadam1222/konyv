@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-// Típus definiálása a kosár tartalmához
+
 export type CartItem = {
   ISBN: string;
   cim: string;
@@ -45,7 +45,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         .map((item) => {
           if (item.ISBN === ISBN) {
             const newQuantity = item.mennyiseg + change;
-            // Ne engedjük 1 alá menni (vagy ha 0, akkor eltávolíthatjuk)
+
             return { ...item, mennyiseg: newQuantity > 0 ? newQuantity : 1 };
           }
           return item;

@@ -3,10 +3,10 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import { useAuth } from '@/auth/AuthProvider';
 
 export default function AuthScreen() {
-  const [isLogin, setIsLogin] = useState(true); // Ez váltja a tabokat
+  const [isLogin, setIsLogin] = useState(true); 
   const { login, register } = useAuth();
 
-  // Form állapotok
+  
   const [vevo_nev, setVevo_Nev] = useState('');
   const [email, setEmail] = useState('');
   const [jelszo, setJelszo] = useState('');
@@ -28,7 +28,7 @@ export default function AuthScreen() {
       style={styles.container}
     >
       <View style={styles.card}>
-        {/* Tab váltó fejléce */}
+        
         <View style={styles.tabContainer}>
           <TouchableOpacity 
             style={[styles.tab, isLogin && styles.activeTab]} 
@@ -44,7 +44,7 @@ export default function AuthScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Űrlap mezők */}
+        
         <View style={styles.form}>
           {!isLogin && (
             <TextInput

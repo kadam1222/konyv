@@ -215,59 +215,74 @@ const handleFileChange = (e) => {
 
     return (
         <div id="fohozzadasdiv">
-        <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
-            <h2>Gyors adatfelvétel</h2>
+        <div className="admin-card quick-add" style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
+            <h2 className="admin-title">Gyors adatfelvétel</h2>
+            <div className="quick-list">
 
-            <div style={{ marginBottom: "15px" }}>
-                <label>Új borító felvétele: </label>
-                <input placeholder="pl. keménytáblás" value={borito}onChange={(e) => setBorito(e.target.value)} />
-                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("borito", borito, setBorito)}>Hozzáad</Button>
+            <div className="quick-input-group" style={{ marginBottom: "15px" }}>
+                <label className="quick-label">Új borító felvétele: </label>
+                <div className="custom-input-group">
+                    <input className="quick-input" placeholder="pl. keménytáblás" value={borito}onChange={(e) => setBorito(e.target.value)} />
+                    <Button className="quick-add-btn" variant="success" onClick={() => mentés("borito", borito, setBorito)}>Hozzáad</Button>
+                </div>
+                
             </div>
 
-            <div style={{ marginBottom: "15px" }}>
-                <label>Új kiadó felvétele: </label>
-                <input placeholder="pl. Európa Kiadó" value={kiado} onChange={(e) => setKiado(e.target.value)} />
-                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("kiado", kiado, setKiado)}>Hozzáad</Button>
+            <div className="quick-input-group" style={{ marginBottom: "15px" }}>
+                <label className="quick-label">Új kiadó felvétele: </label>
+                <div className="custom-input-group">
+                    <input className="quick-input" placeholder="pl. Európa Kiadó" value={kiado} onChange={(e) => setKiado(e.target.value)} />
+                    <Button className="quick-add-btn" variant="success" onClick={() => mentés("kiado", kiado, setKiado)}>Hozzáad</Button>
+                </div>
             </div>
 
-            <div style={{ marginBottom: "15px" }}>
-                <label>Új szerző felvétele: </label>
-                <input  placeholder="pl. J.K. Rowling"  value={szerzo} onChange={(e) => setSzerzo(e.target.value)} />
-                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("szerzo", szerzo, setSzerzo)}>Hozzáad</Button>
+            <div className="quick-input-group" style={{ marginBottom: "15px" }}>
+                <label className="quick-label">Új szerző felvétele: </label>
+                <div className="custom-input-group">
+                    <input className="quick-input" placeholder="pl. J.K. Rowling"  value={szerzo} onChange={(e) => setSzerzo(e.target.value)} />
+                    <Button className="quick-add-btn" variant="success" onClick={() => mentés("szerzo", szerzo, setSzerzo)}>Hozzáad</Button>
+                </div>
             </div>
 
-            <div style={{ marginBottom: "15px" }}>
-                <label>Új fordító felvétele: </label>
-                <input placeholder="pl. Acsai Roland" value={fordito} onChange={(e) => setFordito(e.target.value)} />
-                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("fordito", fordito, setFordito)}>Hozzáad</Button>
+            <div className="quick-input-group" style={{ marginBottom: "15px" }}>
+                <label className="quick-label">Új fordító felvétele: </label>
+                <div className="custom-input-group">
+                    <input className="quick-input" placeholder="pl. Acsai Roland" value={fordito} onChange={(e) => setFordito(e.target.value)} />
+                    <Button className="quick-add-btn" variant="success" onClick={() => mentés("fordito", fordito, setFordito)}>Hozzáad</Button>
+                </div>
             </div>
 
-            <div style={{ marginBottom: "15px" }}>
-                <label>Új illusztráció felvétele: </label>
-                <input placeholder="pl. Színes Képekkel, Fotókkal" value={illusztracio} onChange={(e) => setIllusztracio(e.target.value)} 
-                />
-                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("illusztracio", illusztracio, setIllusztracio)}>Hozzáad</Button>
+            <div className="quick-input-group" style={{ marginBottom: "15px" }}>
+                <label className="quick-label">Új illusztráció felvétele: </label>
+                <div className="custom-input-group">
+                    <input className="quick-input" placeholder="pl. Színes Képekkel, Fotókkal" value={illusztracio} onChange={(e) => setIllusztracio(e.target.value)} />
+                    <Button className="quick-add-btn" variant="success" onClick={() => mentés("illusztracio", illusztracio, setIllusztracio)}>Hozzáad</Button>
+                </div>
             </div>
 
-            <div style={{ marginBottom: "15px" }}>
-                <label>Új Illusztrátor felvétele: </label>
-                <input placeholder="pl. Alice Oseman" value={illusztrator} onChange={(e) => setIllusztrator(e.target.value)} 
-                />
-                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("illusztrator", illusztrator, setIllusztrator)}>Hozzáad</Button>
+            <div className="quick-input-group" style={{ marginBottom: "15px" }}>
+                <label className="quick-label">Új illusztrátor felvétele: </label>
+                <div className="custom-input-group">
+                    <input className="quick-input" placeholder="pl. Alice Oseman" value={illusztrator} onChange={(e) => setIllusztrator(e.target.value)} />
+                    <Button className="quick-add-btn" variant="success" onClick={() => mentés("illusztrator", illusztrator, setIllusztrator)}>Hozzáad</Button>
+                </div>
             </div>
 
-            <div style={{ marginBottom: "15px" }}>
-                <label>Új nyelv felvétele: </label>
-                <input placeholder="pl. Magyar" value={nyelv} onChange={(e) => setNyelv(e.target.value)} />
-                <Button className="hozzaadgombok" variant="success" onClick={() => mentés("nyelv", nyelv, setNyelv)}>Hozzáad</Button>
+            <div className="quick-input-group" style={{ marginBottom: "15px" }}>
+                <label className="quick-label">Új nyelv felvétele: </label>
+                <div className="custom-input-group">
+                    <input className="quick-input" placeholder="pl. Magyar" value={nyelv} onChange={(e) => setNyelv(e.target.value)} />
+                    <Button className="quick-add-btn" variant="success" onClick={() => mentés("nyelv", nyelv, setNyelv)}>Hozzáad</Button>
+                </div>
             </div>
 
-            <div className="kategoriafelvetel">
+            <div className="category-divider">
                 <h4>Új kategória felvétele</h4>
                 
                 <div style={{ marginBottom: "10px" }}>
                     <label>Kategória neve: </label>
                     <input 
+                        className="quick-input w-100 mb-2"
                         placeholder="pl. Sci-fi" 
                         value={kategoria} 
                         onChange={(e) => setKategoria(e.target.value)} 
@@ -276,7 +291,7 @@ const handleFileChange = (e) => {
 
                 <div style={{ marginBottom: "10px" }}>
                     <label>Főkategória (ha alkategóriát hozol létre): </label>
-                    <select style={{width:"240px"}} value={fokat} onChange={(e) => setFokat(e.target.value)}>
+                    <select className="quick-input w-100 mb-2" style={{width:"240px"}} value={fokat} onChange={(e) => setFokat(e.target.value)}>
                         <option value="">Nincs (Ez egy főkategória lesz)</option>
                         {kategoriaLista.map(kat => (
                             <option key={kat.id} value={kat.id}>
@@ -286,61 +301,85 @@ const handleFileChange = (e) => {
                     </select>
                 </div>
 
-                <Button variant="success" onClick={kategoriaMentes}>Kategória mentése</Button>
+                <Button className="category-save-btn" variant="success" onClick={kategoriaMentes}>Kategória mentése</Button>
+                </div>
             </div>
         </div>
 
-        <div id="ujkönyvdiv">
-            <h2>Új könyv hozzáadása</h2>
+        <div className="admin-card book-add">
+            <h2 className="admin-title">Új könyv hozzáadása</h2>
+            
+            <div className="book-form-grid">
+            
+                <div className="form-group span-2">
+                    <label>Könyv címe</label>
+                    <input className="book-input title-input" placeholder="Cím" value={ujKonyv.termekek.cim} onChange={e => handleFieldChange("cim", e.target.value)} />
+                </div>
 
-            <input className="bemenőadat" placeholder="ISBN" value={ujKonyv.termekek.ISBN} onChange={e => handleFieldChange("ISBN", e.target.value)} />
-            <input className="bemenőadat" placeholder="Cím" value={ujKonyv.termekek.cim} onChange={e => handleFieldChange("cim", e.target.value)} />
-            <input className="bemenőadat" type="number" placeholder="Ár" value={ujKonyv.termekek.ar} onChange={e => handleFieldChange("ar", e.target.value)} />
-            <input className="bemenőadat" type="number" placeholder="Oldalak száma" value={ujKonyv.termekek.oldalak_szama} onChange={e => handleFieldChange("oldalak_szama", e.target.value)} />
+                <div className="form-group">
+                    <label>ISBN azonosító</label>
+                    <input className="book-input" placeholder="ISBN" value={ujKonyv.termekek.ISBN} onChange={e => handleFieldChange("ISBN", e.target.value)} />
+                </div>
+                
+                <div className="form-group">
+                    <label>Ár (Ft)</label>
+                    <input className="book-input" type="number" placeholder="Ár" value={ujKonyv.termekek.ar} onChange={e => handleFieldChange("ar", e.target.value)} />
+                </div>
+            
+                <div className="form-group">
+                    <label>Oldalak száma</label>
+                    <input className="bemenőadat" type="number" placeholder="Oldalak száma" value={ujKonyv.termekek.oldalak_szama} onChange={e => handleFieldChange("oldalak_szama", e.target.value)} />
+                </div>
 
-            <div className="sor" >
+                <div className="form-group">
+                    <label>Kiadás éve</label>
+                    <input  className="book-input"  type="number"  value={ujKonyv.termekek.kiadas_eve} onChange={e => handleFieldChange("kiadas_eve", e.target.value)}  />
+                </div>        
+            
+
+            <div className="form-group" >
                 <label>Nyelv: </label>
-                <select value={ujKonyv.termekek.nyelv_id} onChange={e => handleFieldChange("nyelv_id", e.target.value)}>
+                <select className="book-input" value={ujKonyv.termekek.nyelv_id} onChange={e => handleFieldChange("nyelv_id", e.target.value)}>
                     <option value="">Válassz...</option>
                     {options.nyelvek.map(ny => <option key={ny.id} value={ny.id}>{ny.nyelv_nev}</option>)}
                 </select>
             </div>
 
-            <div className="sor" >
+            <div className="form-group" >
                 <label>Kiadó: </label>
-                <select value={ujKonyv.termekek.kiado_id} onChange={e => handleFieldChange("kiado_id", e.target.value)}>
+                <select className="book-input" value={ujKonyv.termekek.kiado_id} onChange={e => handleFieldChange("kiado_id", e.target.value)}>
                     <option value="">Válassz...</option>
                     {options.kiadok.map(k => <option key={k.id} value={k.id}>{k.kiado_nev}</option>)}
                 </select>
             </div>
 
-            <div className="sor" >
+            <div className="form-group" >
                 <label>Kategória: </label>
-                <select value={ujKonyv.termekek.kategoria_id} onChange={e => handleFieldChange("kategoria_id", e.target.value)}>
+                <select className="book-input" value={ujKonyv.termekek.kategoria_id} onChange={e => handleFieldChange("kategoria_id", e.target.value)}>
                     <option value="">Válassz...</option>
                     {options.kategoriak.map(k => <option key={k.id} value={k.id}>{k.kat_nev}</option>)}
                 </select>
             </div>
 
-            <div className="sor" >
+            <div className="form-group" >
                 <label>Borító: </label>
-                <select value={ujKonyv.termekek.borito_id} onChange={e => handleFieldChange("borito_id", e.target.value)}>
+                <select className="book-input" value={ujKonyv.termekek.borito_id} onChange={e => handleFieldChange("borito_id", e.target.value)}>
                     <option value="">Válassz...</option>
                     {options.boritok.map(b => <option key={b.id} value={b.id}>{b.borito_nev}</option>)}
                 </select>
             </div>
 
-            <div className="sor" >
+            <div className="form-group" >
                 <label>Típus: </label>
-                <select value={ujKonyv.termekek.tipus_id} onChange={e => handleFieldChange("tipus_id", e.target.value)}>
+                <select className="book-input" value={ujKonyv.termekek.tipus_id} onChange={e => handleFieldChange("tipus_id", e.target.value)}>
                     <option value="">Válassz...</option>
                     {options.tipusok.map(t => <option key={t.id} value={t.id}>{t.tipus_nev}</option>)}
                 </select>
             </div>
             
-            <div className="sor" >
+            <div className="form-group" >
                 <label>Illusztráció típusa: </label>
-                <select value={ujKonyv.termekek.illusztracio || ""} onChange={e => handleFieldChange("illusztracio", e.target.value)}>
+                <select className="book-input" value={ujKonyv.termekek.illusztracio || ""} onChange={e => handleFieldChange("illusztracio", e.target.value)}>
                     <option value="">Nincs / Nem ismert</option>
                     {options.illusztraciok.map(i => (
                         <option key={i.id} value={i.id}>
@@ -349,31 +388,36 @@ const handleFileChange = (e) => {
                     ))}
                 </select>
             </div>
+            </div>
 
-            <MultiSelectDropdown label="Szerzők:" options={options.szerzok} selectedIds={ujKonyv.szerzoIds} nameKey="szerzo_nev" onToggle={id => handleMultiToggle("szerzoIds", id)} />
-            <MultiSelectDropdown label="Fordítók:" options={options.forditok} selectedIds={ujKonyv.fordito_ids} nameKey="fordito_nev" onToggle={id => handleMultiToggle("fordito_ids", id)} />
-            <MultiSelectDropdown label="Illusztrátorok:" options={options.illusztratorok} selectedIds={ujKonyv.illusztrator_ids} nameKey="illusztrator" onToggle={id => handleMultiToggle("illusztrator_ids", id)} />
+            <div className="multi-select-container">
+                <MultiSelectDropdown label="Szerzők:" options={options.szerzok} selectedIds={ujKonyv.szerzoIds} nameKey="szerzo_nev" onToggle={id => handleMultiToggle("szerzoIds", id)} />
+                <MultiSelectDropdown label="Fordítók:" options={options.forditok} selectedIds={ujKonyv.fordito_ids} nameKey="fordito_nev" onToggle={id => handleMultiToggle("fordito_ids", id)} />
+                <MultiSelectDropdown label="Illusztrátorok:" options={options.illusztratorok} selectedIds={ujKonyv.illusztrator_ids} nameKey="illusztrator" onToggle={id => handleMultiToggle("illusztrator_ids", id)} />
+            </div>
+            
+            <div className="form-group mt-3">
+                <label>Rövid leírás / Fülszöveg</label>
+                <textarea className="book-input textarea-input" style={{ width: "100%", height: "80px" }} placeholder="Leírás..." value={ujKonyv.termekek.leiras} onChange={e => handleFieldChange("leiras", e.target.value)} />
+            </div>
 
-            <textarea style={{ width: "100%", height: "80px" }} placeholder="Leírás..." value={ujKonyv.termekek.leiras} onChange={e => handleFieldChange("leiras", e.target.value)} />
-                <div className="mt-3 p-3 border rounded bg-light">
-      <Form.Group>
-        <Form.Label><b>Borítókép feltöltése (csak .jpg)</b></Form.Label>
-        <InputGroup>
-          <Form.Control
-            type="file"
-            accept=".jpg,.jpeg"
-            onChange={handleFileChange}
-            disabled={loading}/>
-        </InputGroup>
-        {message && (
-          <Form.Text className={message.includes("Hiba") ? "text-danger" : "text-success"}>
-            {message}
-          </Form.Text>
-        )}
-      </Form.Group>
-    </div>
-            <Button variant="success" onClick={handleSubmit}>Könyv rögzítése</Button>
+            
+                <div className="upload-section">
+                    <label className="upload-label">Borítókép feltöltése (csak .jpg)</label>
+
+                    <div className="upload-controls">
+                        <input 
+                            type="file" 
+                            accept=".jpg,.jpeg" 
+                            onChange={handleFileChange} 
+                            className="file-input-custom"
+                        />
+                        {message && <span className={`upload-msg ${message.includes("Hiba") ? "err" : "succ"}`}>{message}</span>}
+                    </div>
+                </div>
+
+                    <button className="main-submit-btn" variant="success" onClick={handleSubmit}>Könyv rögzítése</button>
+                </div>
         </div>
-    </div>
     );
 }

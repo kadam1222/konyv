@@ -19,7 +19,6 @@ export default function AdminBook({ accessToken }) {
     const [forditok, setForditok] = useState([]);
     const [kategoria, setKategoria] = useState([]);
     const [tipus, setTipus] = useState([]);
-    const [raktar, setRaktar] = useState(1);
 
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -28,52 +27,58 @@ export default function AdminBook({ accessToken }) {
 
     const observerRef = useRef();
 
+    const lastItemRef = useCallback(node => {
+    if (loading) return;
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasMore) {
+            setPage(prevPage => prevPage + 1);
+        }
+    });
+
+    if (node) observerRef.current.observe(node);
+    }, [loading, hasMore]);
+
     useEffect(() => {
-        const fetchBooks = async () => {
-            if (!accessToken || !hasMore) return;
+        const fetchEverything = async () => {
+            if (!accessToken) return;
+            setLoading(true);
+            let allFetchedBooks = [];
+            let currentPage = 1;
+            let keepFetching = true;
 
             try {
-                setLoading(true);
-                const response = await httpCommon.get(`/admin/adminosszeskonyv?page=${page}&limit=10`, {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                });
-
-                const ujAdatok = response.data;
-
-                if (ujAdatok.length === 0) {
-                    setHasMore(false);
-                } else {
-                    setOsszesKonyv(prev => {
-                        const tenylegesUj = ujAdatok.filter(
-                            n => !prev.some(p => p.ISBN === n.ISBN)
-                        );
-                        return [...prev, ...tenylegesUj];
+                while (keepFetching) {
+                    const response = await httpCommon.get(`/admin/adminosszeskonyv?page=${currentPage}&limit=10`, {
+                        headers: { Authorization: `Bearer ${accessToken}` },
                     });
-                    if (ujAdatok.length < 10) setHasMore(false);
+
+                    const data = response.data;
+
+                    if (data && data.length > 0) {
+                        allFetchedBooks = [...allFetchedBooks, ...data];
+                        if (data.length < 10) {
+                            keepFetching = false;
+                        } else {
+                            currentPage++;
+                        }
+                    } else {
+                        keepFetching = false;
+                    }
                 }
+                const uniqueBooks = Array.from(new Map(allFetchedBooks.map(item => [item.ISBN, item])).values());
+                setOsszesKonyv(uniqueBooks);
+
             } catch (err) {
-                console.error("Hiba a könyvek betöltésekor:", err);
+                console.error("Hiba a teljes lista letöltésekor:", err);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchBooks();
-    }, [page, accessToken]);
-
-
-    const lastItemRef = useCallback(node => {
-        if (loading) return;
-        if (observerRef.current) observerRef.current.disconnect();
-
-        observerRef.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) {
-                setPage(prev => prev + 1);
-            }
-        });
-
-        if (node) observerRef.current.observe(node);
-    }, [loading, hasMore]);
+        fetchEverything();
+    }, [accessToken]);
 
 
     useEffect(() => {
@@ -194,10 +199,10 @@ export default function AdminBook({ accessToken }) {
 
     return (
         <>
-            <div style={{ position: "sticky", top: 70, backgroundColor: "#f4f4f4", padding: "15px", zIndex: 100, borderBottom: "2px solid #ddd", marginBottom: "20px" }}>
+            <div style={{ position: "sticky", top: 70, backgroundColor: "#ceb795", padding: "15px", zIndex: 100, borderBottom: "1px solid rgba(0,0,0,0.1)", marginBottom: "20px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)", }}>
                 <input type="text" placeholder="Keresés cím, ISBN vagy szerző alapján..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ width: "100%", padding: "10px", fontSize: "16px", borderRadius: "5px", border: "1px solid #ccc" }} />
-                <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#666" }}>
+                    style={{ width: "100%", padding: "10px 15px", fontSize: "16px", borderRadius: "5px", border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "#ffffffec", outline: "none" }} />
+                <p style={{ margin: "8px 0 0 5px", fontSize: "14px", color: "#4b3d2a", fontWeight: "500" }}>
                     Találatok (betöltött): {filteredKonyvek.length} db
                 </p>
             </div>
@@ -218,8 +223,8 @@ export default function AdminBook({ accessToken }) {
                             Leírás: {K.leiras ? K.leiras.substring(0, 100) + '...' : 'Nincs leírás'} <br />
                             Szerzők: {K.szerzok} <br />
                             Típus: {K.tipus_nev} <br />
-                            Raktáron: {K.raktar}
-                            {K.fordítok && `Fordítók: ${K.fordítok}`} <br />
+                            Raktáron: {K.raktar} <br />
+                            {K.fordítok && `Fordítók: ${K.fordítok}` } 
                             {K.illusztratorok && `Illusztrátorok: ${K.illusztratorok}`}
 
                         </span>

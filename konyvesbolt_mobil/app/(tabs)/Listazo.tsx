@@ -5,10 +5,10 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { useCart } from './CartContext';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 40) / 2; 
-
+const CARD_WIDTH = (width - 40) / 2;
 
 type Termek = {
   id: number;
@@ -28,6 +28,8 @@ const PAGE_SIZE = 10;
 
 const ListazoInfinite = () => {
   const { addToCart } = useCart();
+  const router = useRouter();
+  
   const [data, setData] = useState<Termek[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -48,7 +50,6 @@ const ListazoInfinite = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(`${backendUrl}/konyvek/kategoria`);
-      console.log("Kategóriák a backendről:", response.data[0]); // Nézd meg az első elemet!
       setKategoriak(response.data);
     } catch (err) {
       console.error("Hiba a kategóriák betöltésekor:", err);
@@ -93,12 +94,13 @@ const ListazoInfinite = () => {
   };
 
   const handleSelectCategory = (kat_nev: string | null) => {
-    setSelectedCategory(kat_nev);
+    const categoryToSet = kat_nev === "Összes" ? null : kat_nev;
+    setSelectedCategory(categoryToSet);
     setIsFilterVisible(false);
     setData([]);
     setPage(1);
     setHasMore(true);
-    loadPage(1, true, activeSearch, kat_nev);
+    loadPage(1, true, activeSearch, categoryToSet);
   };
 
   const renderKategoriaLista = () => {
@@ -153,12 +155,12 @@ const ListazoInfinite = () => {
           onChangeText={setSearchQuery}
           clearButtonMode="while-editing"
         />
-        <TouchableOpacity style={styles.searchButton} onPress={startSearch}>
-          <Text style={styles.searchButtonText}>Keresés</Text>
-        </TouchableOpacity>
+        <Button title='Keresés' onPress={startSearch}>
+
+        </Button>
         
         <TouchableOpacity 
-          style={[styles.searchButton, { backgroundColor: selectedCategory && selectedCategory !== "Összes" ? '#28a745' : '#444' }]} 
+          style={[styles.searchButton, { backgroundColor: selectedCategory ? '#28a745' : '#444' }]} 
           onPress={() => setIsFilterVisible(true)}
         >
           <Text style={{ color: 'white' }}>Szűrő</Text>
@@ -168,34 +170,34 @@ const ListazoInfinite = () => {
       <FlatList
         data={data}
         numColumns={2}
-        keyExtractor={(item, index) => {
-    if (item && item.id) {
-      return item.id.toString();
-    }
-    return index.toString();
-  }}
+        keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.item}>
+          <TouchableOpacity 
+            style={styles.item} 
+            onPress={() => router.push({pathname: "/BookDetails", params: { isbn: item.ISBN }})}
+          >
             <Text style={styles.title} numberOfLines={1}>{item.cim}</Text>
             <Image
               source={{ uri: `${backendUrl}/kepek/${item.ISBN}.jpg` }}
               style={styles.image}
             />
             <Text style={styles.price}>{item.ar} Ft</Text>
-            <Button
-              title="Kosárba"
-              onPress={() => {
-                addToCart(item);
-                Alert.alert("Siker", "Kosárba került!");
-              }}
-            />
-          </View>
+            <View style={styles.buttonWrapper}>
+                <Button
+                title="Kosárba"
+                onPress={() => {
+                    addToCart(item);
+                    Alert.alert("Siker", "Kosárba került!");
+                }}
+                />
+            </View>
+          </TouchableOpacity>
         )}
         onEndReached={() => hasMore && loadPage(page + 1)}
         onEndReachedThreshold={0.5}
         refreshing={loading && page === 1}
         onRefresh={() => loadPage(1, true)}
-        ListFooterComponent={loading ? <ActivityIndicator color="yellow" /> : null}
+        ListFooterComponent={loading ? <ActivityIndicator color="yellow" style={{margin: 20}} /> : null}
       />
 
       <Modal
@@ -223,23 +225,37 @@ const ListazoInfinite = () => {
 export default ListazoInfinite;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#25292e' },
+  container: { flex: 1 },
   searchContainer: { flexDirection: 'row', padding: 10, gap: 10 },
-  searchInput: { flex: 1, backgroundColor: 'white', padding: 10, borderRadius: 8 },
+  searchInput: { flex: 1, backgroundColor: 'white', padding: 10, borderRadius: 8, color: 'black' },
   searchButton: { backgroundColor: 'yellow', padding: 10, borderRadius: 8, justifyContent: 'center' },
-  searchButtonText: { fontWeight: 'bold' },
-  htext: { fontSize: 24, color: 'yellow', textAlign: 'center', marginVertical: 10 },
-  item: { flex: 1, margin: 8, padding: 10, backgroundColor: 'white', borderRadius: 8, width: CARD_WIDTH, alignItems: 'center' },
-  image: { height: 120, width: '100%', resizeMode: 'contain' },
-  title: { fontWeight: 'bold', marginBottom: 5 },
-  price: { marginVertical: 5, color: '#444' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  bottomSheet: { backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 },
-  sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
-  sheetTitle: { fontSize: 18, fontWeight: 'bold' },
+  searchButtonText: { fontWeight: 'bold', color: 'black' },
+  htext: { fontSize: 24, textAlign: 'center', marginVertical: 10, fontWeight: 'bold' },
+  item: { 
+    flex: 1, 
+    margin: 8, 
+    padding: 10, 
+    backgroundColor: 'white', 
+    borderRadius: 8, 
+    width: CARD_WIDTH, 
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  image: { height: 120, width: '100%', resizeMode: 'contain', marginVertical: 10 },
+  title: { fontWeight: 'bold', marginBottom: 5, textAlign: 'center', color: '#333' },
+  price: { marginVertical: 5, color: '#2ecc71', fontWeight: 'bold', fontSize: 16 },
+  buttonWrapper: { width: '100%', marginTop: 5 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+  bottomSheet: { backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, minHeight: 300 },
+  sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, borderBottomWidth: 1, borderBottomColor: '#eee', paddingBottom: 10 },
+  sheetTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
   fokategHeader: { backgroundColor: '#f0f0f0', padding: 8, marginTop: 10, borderRadius: 4 },
-  fokategText: { fontSize: 12, fontWeight: 'bold', color: '#666' },
+  fokategText: { fontSize: 12, fontWeight: 'bold', color: '#666', textTransform: 'uppercase' },
   categoryItem: { paddingVertical: 15, borderBottomWidth: 0.5, borderBottomColor: '#eee' },
-  categoryText: { fontSize: 16 },
+  categoryText: { fontSize: 16, color: '#333' },
   selectedCategoryItem: { backgroundColor: '#fff9c4' },
 });
