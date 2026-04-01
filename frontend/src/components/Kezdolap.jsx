@@ -13,6 +13,7 @@ function Kezdolap() {
   const [alkategoriak, setAlkategoriak] = useState([]);
   const [ajanlottKonyvek, setAjanlottKonyvek] = useState([]);
   const scrollRef = useRef(null);
+  const [scrollPosition, setScrollPosition] = useState({ isAtStart: true, isAtEnd: false });
 
   const scroll = (direction) => {
   if (scrollRef.current) {
@@ -23,8 +24,26 @@ function Kezdolap() {
       behavior: 'smooth'
     });
   }
-};
+  };
 
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setScrollPosition({
+        isAtStart: scrollLeft <= 0,
+        isAtEnd: scrollLeft + clientWidth >= scrollWidth - 1
+      });
+    }
+  };
+
+  useEffect(() => {
+    const currentRef = scrollRef.current;
+    if (currentRef) {
+      currentRef.addEventListener('scroll', handleScroll);
+      handleScroll();
+    }
+    return () => currentRef?.removeEventListener('scroll', handleScroll);
+  }, [ajanlottKonyvek]);
 
   useEffect(() => {
     const fetchSubCategories = async () => {
@@ -88,12 +107,12 @@ function Kezdolap() {
         {alkategoriak.map((kat) => (
           <Col key={kat.id} md={4} className="mb-4">
             <Card 
-              className="category-card border-0 shadow-sm"
-              style={{ cursor: 'pointer' }}
+              className="category-card border-0 shadow-sm h-100"
+              style={{ cursor: 'pointer', borderRadius: "15px", overflow: 'hidden', transition: "transform 0.3s ease, box-shadow 0.3s ease" }}
               onClick={() => navigate(`/konyvlista?kat=${(kat.kat_nev)}`)}
             >
-              <Card.Body className="rounded text-center" style={{ backgroundColor: "#dbc38c"}}>
-                <Card.Title className="py-3">{kat.kat_nev}</Card.Title>
+              <Card.Body className="d-flex align-items-center justify-content-center" style={{ backgroundColor: "#dbc38c", minHeight: "120px" }}>
+                <Card.Title className="fw-bold m-0">{kat.kat_nev}</Card.Title>
               </Card.Body>
             </Card>
           </Col>
@@ -105,12 +124,19 @@ function Kezdolap() {
   <Container style={{ position: "relative" }}>
     <h2 className="mb-4 fw-bold">Neked ajánljuk</h2>
 
-    <button 
-      onClick={() => scroll('left')}
-      style={{position: "absolute", left: "-20px", top: "55%", zIndex: 10, background: "white", border: "1px solid #ddd", borderRadius: "50%", width: "40px", height: "40px", boxShadow: "0 2px 5px rgba(0,0,0,0.1)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"}}
-    >
-      ❮
-    </button>
+    {!scrollPosition.isAtStart && (
+      <button 
+        onClick={() => scroll('left')}
+        style={{
+          position: "absolute", left: "-20px", top: "55%", zIndex: 10,
+          background: "white", border: "1px solid #ddd", borderRadius: "50%",
+          width: "40px", height: "40px", boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
+        }}
+      >
+        ❮
+      </button>
+    )}
     <div 
       ref={scrollRef}
       className="d-flex flex-nowrap overflow-auto pb-3 gap-3" 
@@ -126,7 +152,7 @@ function Kezdolap() {
           <Card 
             className="h-100 border-0 shadow-sm category-card"
             onClick={() => navigate(`/termek/${konyv.ISBN}`)}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', borderRadius: "10px", overflow:"hidden" }}
           >
             <div style={{ height: '330px', backgroundColor:"#F5F5DC" }}>
               <Card.Img 
@@ -146,17 +172,19 @@ function Kezdolap() {
     </div>
 
 
-    <button 
-      onClick={() => scroll('right')}
-      style={{
-        position: "absolute", right: "-20px", top: "55%", zIndex: 10,
-        background: "white", border: "1px solid #ddd", borderRadius: "50%",
-        width: "40px", height: "40px", boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
-      }}
-    >
-      ❯
-    </button>
+    {!scrollPosition.isAtEnd && (
+      <button 
+        onClick={() => scroll('right')}
+        style={{
+          position: "absolute", right: "-20px", top: "55%", zIndex: 10,
+          background: "white", border: "1px solid #ddd", borderRadius: "50%",
+          width: "40px", height: "40px", boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
+        }}
+      >
+        ❯
+      </button>
+    )}
   </Container>
   <style>{`
     div::-webkit-scrollbar {

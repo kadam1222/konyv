@@ -133,20 +133,20 @@ export default function AdminModositasok({ accessToken }) {
 
     return (
         <>
-            <div style={{ position: "sticky", top: 70, backgroundColor: "#fff", padding: "15px", zIndex: 100, borderBottom: "2px solid #ddd", marginBottom: "20px", display: "flex", gap: "10px" }}>
+            <div style={{ position: "sticky", top: 70, backgroundColor: "#ceb795", padding: "15px", zIndex: 100, borderBottom: "2px solid #ddd", marginBottom: "20px", display: "flex", gap: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)" , borderRadius: "0 0 8px 8px" }}>
                 <input 
                     type="text" 
                     placeholder="Keresés email alapján..." 
                     value={searchEmail} 
                     onChange={(e) => setSearchEmail(e.target.value)}
-                    style={{ flex: 1, padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+                    style={{ flex: 1, padding: "8px 12px", borderRadius: "5px", border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "#ffffffec", fontSize:"14px" }}
                 />
                 <input 
                     type="text" 
                     placeholder="Számlaszám..." 
                     value={searchSzamlaszam} 
                     onChange={(e) => setSearchSzamlaszam(e.target.value)}
-                    style={{ flex: 1, padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+                    style={{ flex: 1, padding: "8px", borderRadius: "5px", border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "#ffffffec", fontSize:"14px"}}
                 />
             </div>
 
@@ -157,15 +157,18 @@ export default function AdminModositasok({ accessToken }) {
                         <h4>Rendelés száma: {order.szamlaszam}</h4>
                         
                         {modositas === order.szamlaszam ? (
-                            <div style={{ marginBottom: "15px" }}>
+                            <div style={{ marginBottom: "15px"}}>
                                 <select value={ujstatusz} onChange={(e) => setUjstatusz(Number(e.target.value))}>
                                     <option value="">Válassz státuszt...</option>
                                     {statuszok.map((s) => (
                                         <option key={s.id} value={s.id}>{s.statusz}</option>
                                     ))}
                                 </select>
-                                <Button style={{ marginLeft: "15px" }} className="apply-filters-btn" onClick={() => statusz_modositas(order.szamlaszam)}>Mentés</Button>
-                                <Button className="clear-filters-btn" onClick={() => setModositas(null)}>Mégse</Button>
+                                <div style={{display:"flex", width:"120px"}}>
+                                    <Button style={{marginRight:"15px" }} className="apply-filters-btn" onClick={() => statusz_modositas(order.szamlaszam)}>Mentés</Button>
+                                    <Button className="clear-filters-btn" onClick={() => setModositas(null)}>Mégse</Button>
+                                </div>
+                                
                             </div>
                         ) : (
                             <div style={{ marginBottom: "15px" }}>

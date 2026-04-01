@@ -1,36 +1,221 @@
-.hozzaadgombok{
-    margin-left: 15px;
-}
 
-.bemenőadat{
-    display: block;
-    width: 100%; 
-    margin-bottom: 10px; 
-    padding: 8px 
-}
-
-.sor{
-    margin-bottom: 10px; 
-    display: flex; 
-    justify-content: space-between
-}
-
-.kategoriafelvetel{
-    margin-top: 30px; 
-    width: 550px;
-}
-
-#ujkönyvdiv{
-    padding: 20px; 
-    max-width: 600px; 
-    margin: auto; 
-    border: 1px solid #ccc
-}
-
-#fohozzadasdiv{
+#fohozzadasdiv {
+    background-color: #f2e5bb;
+    padding: 30px;
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;   
-    gap: 20px;                 
-    padding: 20px;
+    gap: 20px;
+    min-height: 100vh;
+}
+
+.admin-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    width: 420px; 
+}
+
+.admin-title {
+    color: #4b3d2a;
+    font-weight: 700;
+    margin-bottom: 5px;
+    border-bottom: 2px solid #ceb795;
+    display: inline-block;
+}
+
+.admin-subtitle {
+    color: #8a7b66;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+}
+
+.quick-input-group {
+    margin-bottom: 12px;
+}
+
+.quick-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #5d4d37;
+    margin-bottom: 4px;
+}
+
+.custom-input-group {
+    display: flex;
+    width: 100%;
+}
+
+.quick-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #d1d1d1;
+    border-radius: 6px 0 0 6px; 
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.quick-input:focus {
+    border-color: #4b3d2a;
+}
+
+
+.quick-add-btn {
+    background-color: #4b3d2a;
+    color: white;
+    border: none;
+    padding: 0 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 0 6px 6px 0; 
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.quick-add-btn:hover {
+    background-color: #362c1e;
+}
+
+
+.category-divider {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px dashed #ceb795;
+}
+
+.category-divider h4 {
+    font-size: 1.1rem;
+    color: #4b3d2a;
+    margin-bottom: 15px;
+}
+
+.category-save-btn {
+    width: 100%;
+    background-color: #ceb795;
+    color: #4b3d2a;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.category-save-btn:hover {
+    background-color: #b8a07e;
+}
+
+.mb-2 { margin-bottom: 10px; }
+.w-100 { width: 100%; border-radius: 6px !important; }
+
+
+.book-add {
+    flex: 2; 
+    min-width: 600px;
+}
+
+.book-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.span-2 {
+    grid-column: span 2;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4b3d2a;
+}
+
+.book-input {
+    padding: 10px;
+    border: 1px solid #d1d1d1;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.book-input:focus {
+    border-color: #ceb795;
+    box-shadow: 0 0 0 3px rgba(206, 183, 149, 0.2);
+    outline: none;
+}
+
+.title-input {
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-left: 4px solid #ceb795;
+}
+
+.textarea-input {
+    min-height: 100px;
+    resize: vertical;
+}
+
+
+.multi-select-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+
+.upload-section {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: #fdfaf5;
+    border: 2px dashed #ceb795;
+    border-radius: 8px;
+}
+
+.upload-label {
+    display: block;
+    font-weight: 700;
+    color: #4b3d2a;
+    margin-bottom: 10px;
+}
+
+.upload-msg {
+    font-size: 0.8rem;
+    margin-left: 10px;
+}
+
+.upload-msg.err { color: #d9534f; }
+.upload-msg.succ { color: #5cb85c; }
+
+
+.main-submit-btn {
+    width: 100%;
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #4b3d2a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.main-submit-btn:hover {
+    background-color: #ceb795;
+    color: #4b3d2a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }

@@ -199,10 +199,10 @@ export default function AdminBook({ accessToken }) {
 
     return (
         <>
-            <div style={{ position: "sticky", top: 70, backgroundColor: "#f4f4f4", padding: "15px", zIndex: 100, borderBottom: "2px solid #ddd", marginBottom: "20px" }}>
+            <div style={{ position: "sticky", top: 70, backgroundColor: "#ceb795", padding: "15px", zIndex: 100, borderBottom: "1px solid rgba(0,0,0,0.1)", marginBottom: "20px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)", }}>
                 <input type="text" placeholder="Keresés cím, ISBN vagy szerző alapján..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ width: "100%", padding: "10px", fontSize: "16px", borderRadius: "5px", border: "1px solid #ccc" }} />
-                <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#666" }}>
+                    style={{ width: "100%", padding: "10px 15px", fontSize: "16px", borderRadius: "5px", border: "1px solid rgba(0,0,0,0.1)", backgroundColor: "#ffffffec", outline: "none" }} />
+                <p style={{ margin: "8px 0 0 5px", fontSize: "14px", color: "#4b3d2a", fontWeight: "500" }}>
                     Találatok (betöltött): {filteredKonyvek.length} db
                 </p>
             </div>
@@ -223,8 +223,8 @@ export default function AdminBook({ accessToken }) {
                             Leírás: {K.leiras ? K.leiras.substring(0, 100) + '...' : 'Nincs leírás'} <br />
                             Szerzők: {K.szerzok} <br />
                             Típus: {K.tipus_nev} <br />
-                            Raktáron: {K.raktar}
-                            {K.fordítok && `Fordítók: ${K.fordítok}`} <br />
+                            Raktáron: {K.raktar} <br />
+                            {K.fordítok && `Fordítók: ${K.fordítok}` } 
                             {K.illusztratorok && `Illusztrátorok: ${K.illusztratorok}`}
 
                         </span>
