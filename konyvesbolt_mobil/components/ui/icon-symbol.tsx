@@ -21,7 +21,8 @@ const MAPPING = {
   'book.fill': 'auto-stories',
   "arrow.right.square" : "login",
   "person.fill" : "person",
-  "cart.fill" : "shopping-cart"
+  "cart.fill" : "shopping-cart",
+  'bag.fill': 'shopping-bag'
 } as IconMapping;
 
 /**

@@ -26,11 +26,11 @@ function RootLayoutNav() {
 
     const inTabsGroup = segments[0] === '(tabs)';
 
-    // Ha nincs user (nincs token), és a védett részre tévedne
+   
     if (!user && inTabsGroup) {
       router.replace('/LoginLogout');
     } 
-    // Ha bejelentkezett, ne lássa többé a logint, vigyük a főoldalra
+    
     else if (user && segments[0] === 'LoginLogout') {
       router.replace('/(tabs)');
     }
@@ -47,8 +47,8 @@ function RootLayoutNav() {
           headerShown: true, 
           title: 'Termék részletei', 
           headerBackTitle: 'Vissza',
-          headerTintColor: '#FFD814', // Amazon-sárga szöveg a fejlécben
-          headerStyle: { backgroundColor: '#121212' }, // Sötét fejléc
+          headerTintColor: '#FFD814', 
+          headerStyle: { backgroundColor: '#121212' }, 
         }} 
       />
     </Stack>

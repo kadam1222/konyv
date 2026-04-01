@@ -15,7 +15,6 @@ const BookDetails = ({ route }: any) => {
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
-        // Mivel a backend 'req.body.ISBN'-t vár, POST kérést küldünk
         const response = await axios.post(`${backendUrl}/konyvek/isbn`, {
           ISBN: isbn
         });
@@ -44,12 +43,12 @@ const BookDetails = ({ route }: any) => {
         <Text style={styles.title}>{book.cim}</Text>
         <Text style={styles.author}>{book.szerzok}</Text>
         <Text style={styles.price}>{book.ar} Ft</Text>  
-        <Text style={styles.ossz}><b>Kiadó:</b> {book.kiado_nev}</Text>
-        <Text style={styles.ossz}><b>Nyelv:</b> {book.nyelv_nev}</Text>
-        <Text style={styles.ossz}><b>Kiadás éve:</b> {book.kiadas_eve}</Text>
-        <Text style={styles.ossz}><b>ISBN:</b> {book.ISBN}</Text>
-        {book.illusztratorok ? <Text style={styles.author}><b>Illusztrátor(ok):</b> {book.illusztratorok}</Text> : ""}
-        {book.fordítok ? <Text style={styles.author}><b>Fordító(k):</b> {book.forditok}</Text> : ""}
+        <Text style={styles.ossz}><Text style={{fontWeight:"bold"}}>Kiadó:</Text> {book.kiado_nev}</Text>
+        <Text style={styles.ossz}><Text style={{fontWeight:"bold"}}>Nyelv:</Text> {book.nyelv_nev}</Text>
+        <Text style={styles.ossz}><Text style={{fontWeight:"bold"}}>Kiadás éve:</Text> {book.kiadas_eve}</Text>
+        <Text style={styles.ossz}><Text style={{fontWeight:"bold"}}>ISBN:</Text> {book.ISBN}</Text>
+        {book.illusztratorok ? <Text style={styles.author}><Text style={{fontWeight:"bold"}}>Illusztrátor(ok):</Text> {book.illusztratorok}</Text> : ""}
+        {book.fordítok ? <Text style={styles.author}><Text style={{fontWeight:"bold"}}>Fordító(k):</Text> {book.forditok}</Text> : ""}
         <Text style={styles.description}>
             {book.leiras}
         </Text>
