@@ -86,11 +86,13 @@ const ListazoInfinite = () => {
   };
 
   const startSearch = () => {
+    const trimmedQuery = searchQuery.trim(); 
+    
     setData([]);
-    setActiveSearch(searchQuery);
+    setActiveSearch(trimmedQuery);
     setPage(1);
     setHasMore(true);
-    loadPage(1, true, searchQuery, selectedCategory);
+    loadPage(1, true, trimmedQuery, selectedCategory);
   };
 
   const handleSelectCategory = (kat_nev: string | null) => {
